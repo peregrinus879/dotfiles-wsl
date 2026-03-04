@@ -1,0 +1,101 @@
+{
+    "$help": "https://aka.ms/terminal-documentation",
+    "$schema": "https://aka.ms/terminal-profiles-schema",
+    "actions": [],
+    "copyFormatting": "none",
+    "copyOnSelect": false,
+    "defaultProfile": "{3abbed5e-1bde-5ac5-99e9-5553dd0e3af1}",
+    "keybindings":
+    [
+        {
+            "id": "Terminal.CopyToClipboard",
+            "keys": "ctrl+c"
+        },
+        {
+            "id": "Terminal.FindText",
+            "keys": "ctrl+shift+f"
+        },
+        {
+            "id": "Terminal.PasteFromClipboard",
+            "keys": "ctrl+v"
+        },
+        {
+            "id": "Terminal.DuplicatePaneAuto",
+            "keys": "alt+shift+d"
+        }
+    ],
+    "newTabMenu":
+    [
+        {
+            "type": "remainingProfiles"
+        }
+    ],
+    "profiles":
+    {
+        "defaults":
+        {
+            "colorScheme": "Miasma",
+            "cursorShape": "filledBox",
+            "font":
+            {
+                "face": "JetBrainsMono Nerd Font",
+                "size": 10
+            },
+            "padding": "14"
+        },
+        "list":
+        [
+            {
+                "commandline": "%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+                "hidden": false,
+                "name": "Windows PowerShell"
+            },
+            {
+                "commandline": "%SystemRoot%\\System32\\cmd.exe",
+                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+                "hidden": false,
+                "name": "Command Prompt"
+            },
+            {
+                "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
+                "hidden": false,
+                "name": "Azure Cloud Shell",
+                "source": "Windows.Terminal.Azure"
+            },
+            {
+                "guid": "{3abbed5e-1bde-5ac5-99e9-5553dd0e3af1}",
+                "hidden": false,
+                "name": "Arch Linux",
+                "source": "Microsoft.WSL"
+            }
+        ]
+    },
+    "schemes":
+    [
+        {
+            "name": "Miasma",
+            "background": "#222222",
+            "foreground": "#c2c2b0",
+            "cursorColor": "#c7c7c7",
+            "selectionBackground": "#78824b",
+            "black": "#000000",
+            "brightBlack": "#666666",
+            "red": "#685742",
+            "brightRed": "#685742",
+            "green": "#5f875f",
+            "brightGreen": "#5f875f",
+            "yellow": "#b36d43",
+            "brightYellow": "#b36d43",
+            "blue": "#78824b",
+            "brightBlue": "#78824b",
+            "purple": "#bb7744",
+            "brightPurple": "#bb7744",
+            "cyan": "#c9a554",
+            "brightCyan": "#c9a554",
+            "white": "#d7c483",
+            "brightWhite": "#d7c483"
+        }
+    ],
+    "themes": []
+}
