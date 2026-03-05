@@ -1,8 +1,8 @@
 # Create a Tmux Dev Layout with editor, ai, and terminal
 # Layout: nvim 60% | AI 40% (top 90%) + terminal 10% (bottom)
-# Usage: tdl <command> [<second_command>]
+# Usage: tdl <c|cx|other_ai> [<second_ai>]
 tdl() {
-  [[ -z $1 ]] && { echo "Usage: tdl <command> [<second_command>]"; return 1; }
+  [[ -z $1 ]] && { echo "Usage: tdl <c|cx|other_ai> [<second_ai>]"; return 1; }
   [[ -z $TMUX ]] && { echo "You must start tmux to use tdl."; return 1; }
 
   local current_dir="${PWD}"
@@ -32,24 +32,24 @@ tdl() {
 }
 
 # Shortcut: nvim + OpenCode
-tdl-oc() {
-  tdl oc
+tdl-c() {
+  tdl c
 }
 
 # Shortcut: nvim + Claude Code
-tdl-cc() {
-  tdl cc
+tdl-cx() {
+  tdl cx
 }
 
 # Shortcut: nvim + Claude Code + OpenCode
 tdl-both() {
-  tdl cc oc
+  tdl cx c
 }
 
 # Create multiple tdl windows with one per subdirectory in the current directory
-# Usage: tdlm <command> [<second_command>]
+# Usage: tdlm <c|cx|other_ai> [<second_ai>]
 tdlm() {
-  [[ -z $1 ]] && { echo "Usage: tdlm <command> [<second_command>]"; return 1; }
+  [[ -z $1 ]] && { echo "Usage: tdlm <c|cx|other_ai> [<second_ai>]"; return 1; }
   [[ -z $TMUX ]] && { echo "You must start tmux to use tdlm."; return 1; }
 
   local ai="$1"
