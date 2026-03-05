@@ -31,21 +31,6 @@ tdl() {
   tmux select-pane -t "$editor_pane"
 }
 
-# Shortcut: nvim + OpenCode
-tdl-c() {
-  tdl c
-}
-
-# Shortcut: nvim + Claude Code
-tdl-cx() {
-  tdl cx
-}
-
-# Shortcut: nvim + Claude Code + OpenCode
-tdl-both() {
-  tdl cx c
-}
-
 # Create multiple tdl windows with one per subdirectory in the current directory
 # Usage: tdlm <c|cx|other_ai> [<second_ai>]
 tdlm() {
