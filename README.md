@@ -76,9 +76,8 @@ sudo locale-gen
 ### 3. Packages
 
 ```bash
-sudo pacman -S --needed bash-completion bat btop eza fastfetch fd fzf git \
-  gum jq lazygit less neovim ripgrep starship stow tmux \
-  ttf-jetbrains-mono-nerd yazi zoxide
+sudo pacman -S --needed bash-completion bat btop eza fastfetch fd fzf git gum jq \
+  lazygit less neovim ripgrep starship stow tmux ttf-jetbrains-mono-nerd yazi zoxide
 ```
 
 ### 4. Tools
@@ -105,7 +104,7 @@ curl -fsSL https://claude.ai/install.sh | bash
 ### 5. Clone
 
 ```bash
-git clone git@github.com:peregrinus879/dotfiles-wsl.git ~/dotfiles-wsl
+git clone git@github.com:peregrinus879/dotfiles-wsl.git ~/path/to/dotfiles-wsl
 ```
 
 ### 6. Prepare
@@ -114,15 +113,15 @@ Remove existing files that would conflict with stow:
 
 ```bash
 rm -f ~/.bashrc ~/.inputrc
-rm -f ~/.config/nvim/lua/plugins/example.lua
-rm -f ~/.config/nvim/lua/config/options.lua
 rm -f ~/.config/nvim/lazyvim.json
+rm -f ~/.config/nvim/lua/config/options.lua
+rm -f ~/.config/nvim/lua/plugins/example.lua
 ```
 
 ### 7. Stow
 
 ```bash
-cd ~/dotfiles-wsl
+cd ~/path/to/dotfiles-wsl
 
 for pkg in bash btop editorconfig fastfetch git nvim starship tmux yazi; do
   stow -v -t ~ "$pkg"
