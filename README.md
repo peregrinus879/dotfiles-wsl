@@ -51,9 +51,10 @@ On first launch, Arch runs as root. Update the system and create your user:
 
 ```bash
 pacman -Syu
+pacman -S --needed git neovim sudo
 useradd -m -G wheel -s /bin/bash <username>
 passwd <username>
-EDITOR=vim visudo  # uncomment: %wheel ALL=(ALL:ALL) ALL
+EDITOR=nvim visudo  # uncomment: %wheel ALL=(ALL:ALL) ALL
 ```
 
 Set the default user in `/etc/wsl.conf`:
@@ -74,14 +75,29 @@ sudo sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 sudo locale-gen
 ```
 
-### 3. Packages
+### 3. SSH Key
 
 ```bash
-sudo pacman -S --needed bash-completion bat btop eza fastfetch fd fzf git gum jq \
-  lazygit less neovim ripgrep starship stow tmux ttf-jetbrains-mono-nerd yazi zoxide
+ssh-keygen -t ed25519 -C "your_email@example.com"
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+cat ~/.ssh/id_ed25519.pub
 ```
 
-### 4. Tools
+Copy the output and add it at [github.com/settings/ssh/new](https://github.com/settings/ssh/new).
+
+```bash
+ssh -T git@github.com
+```
+
+### 4. Packages
+
+```bash
+sudo pacman -S --needed bash-completion bat btop eza fastfetch fd fzf gum jq \
+  lazygit less ripgrep starship stow tmux ttf-jetbrains-mono-nerd yazi zoxide
+```
+
+### 5. Tools
 
 LazyVim:
 
@@ -102,13 +118,13 @@ Claude Code:
 curl -fsSL https://claude.ai/install.sh | bash
 ```
 
-### 5. Clone
+### 6. Clone
 
 ```bash
 git clone git@github.com:peregrinus879/dotfiles-wsl.git ~/path/to/dotfiles-wsl
 ```
 
-### 6. Prepare
+### 7. Prepare
 
 Remove existing files that would conflict with stow:
 
@@ -119,7 +135,7 @@ rm -f ~/.config/nvim/lua/config/options.lua
 rm -f ~/.config/nvim/lua/plugins/example.lua
 ```
 
-### 7. Stow
+### 8. Stow
 
 ```bash
 cd ~/path/to/dotfiles-wsl
@@ -129,7 +145,7 @@ for pkg in bash btop editorconfig fastfetch git nvim starship tmux yazi; do
 done
 ```
 
-### 8. Windows Terminal
+### 9. Windows Terminal
 
 Open Windows Terminal settings JSON with `Ctrl+Shift+,` and replace the contents with `windows-terminal/settings.json`.
 
@@ -139,7 +155,7 @@ Alternatively, edit the file directly at:
 %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
 ```
 
-### 9. Neovim Plugins
+### 10. Neovim Plugins
 
 Open neovim to trigger plugin installation:
 
