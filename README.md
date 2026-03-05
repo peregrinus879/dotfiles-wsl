@@ -13,6 +13,7 @@ Personal dotfiles for WSL (Arch Linux), inspired by [Omarchy](https://github.com
 - **File Manager**: Yazi
 - **System Monitor**: btop
 - **System Info**: fastfetch
+- **AI**: Claude Code (`cx`), OpenCode (`c`)
 
 ## Stow Packages
 
@@ -33,7 +34,37 @@ yazi/              File manager config + Miasma theme overrides
 
 ## Setup
 
-### 1. Locale
+### 0. Prerequisites (Windows)
+
+Install the Nerd Font and WSL with Arch Linux from PowerShell:
+
+```powershell
+winget install DEVCOM.JetBrainsMonoNerdFont
+wsl --install
+wsl --install archlinux
+```
+
+### 1. Arch Linux Initial Setup
+
+On first launch, Arch runs as root. Update the system and create your user:
+
+```bash
+pacman -Syu
+useradd -m -G wheel -s /bin/bash <username>
+passwd <username>
+EDITOR=vim visudo  # uncomment: %wheel ALL=(ALL:ALL) ALL
+```
+
+Set the default user in `/etc/wsl.conf`:
+
+```ini
+[user]
+default = <username>
+```
+
+Restart WSL from PowerShell: `wsl --shutdown`, then reopen.
+
+### 2. Locale
 
 Generate the `en_US.UTF-8` locale to avoid perl/stow warnings:
 
@@ -42,30 +73,53 @@ sudo sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 sudo locale-gen
 ```
 
-### 2. Packages
+### 3. Packages
 
 ```bash
 sudo pacman -S --needed bash-completion bat btop eza fastfetch fd fzf git \
-  jq lazygit less neovim ripgrep starship stow tmux \
+  gum jq lazygit less neovim ripgrep starship stow tmux \
   ttf-jetbrains-mono-nerd yazi zoxide
 ```
 
-### 3. Clone
+### 4. Tools
+
+LazyVim:
+
+```bash
+git clone https://github.com/LazyVim/starter ~/.config/nvim
+rm -rf ~/.config/nvim/.git
+```
+
+OpenCode:
+
+```bash
+curl -fsSL https://opencode.ai/install | bash
+```
+
+Claude Code:
+
+```bash
+curl -fsSL https://claude.ai/install.sh | bash
+```
+
+### 5. Clone
 
 ```bash
 git clone git@github.com:peregrinus879/dotfiles-wsl.git ~/dotfiles-wsl
 ```
 
-### 4. Prepare
+### 6. Prepare
 
 Remove existing files that would conflict with stow:
 
 ```bash
 rm -f ~/.bashrc ~/.inputrc
 rm -f ~/.config/nvim/lua/plugins/example.lua
+rm -f ~/.config/nvim/lua/config/options.lua
+rm -f ~/.config/nvim/lazyvim.json
 ```
 
-### 5. Stow
+### 7. Stow
 
 ```bash
 cd ~/dotfiles-wsl
@@ -75,7 +129,7 @@ for pkg in bash btop editorconfig fastfetch git nvim starship tmux yazi; do
 done
 ```
 
-### 6. Windows Terminal
+### 8. Windows Terminal
 
 Copy the contents of `windows-terminal/settings.json` into Windows Terminal's settings file:
 
@@ -83,7 +137,7 @@ Copy the contents of `windows-terminal/settings.json` into Windows Terminal's se
 %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
 ```
 
-### 7. Neovim Plugins
+### 9. Neovim Plugins
 
 Open neovim to trigger plugin installation:
 

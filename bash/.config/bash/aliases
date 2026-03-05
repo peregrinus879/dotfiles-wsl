@@ -28,8 +28,8 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 
 # Tools
-alias oc='opencode'
-alias cc='claude'
+alias c='opencode'
+alias cx='printf "\033[2J\033[3J\033[H" && claude'
 alias t='tmux attach || tmux new -s Work'
 n() { if [ "$#" -eq 0 ]; then command nvim . ; else command nvim "$@"; fi; }
 
