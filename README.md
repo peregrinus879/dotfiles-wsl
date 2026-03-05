@@ -77,6 +77,8 @@ sudo locale-gen
 
 ### 3. SSH Key
 
+Generate an SSH key and add it to GitHub:
+
 ```bash
 ssh-keygen -t ed25519 -C "your_email@example.com"
 eval "$(ssh-agent -s)"
@@ -86,11 +88,15 @@ cat ~/.ssh/id_ed25519.pub
 
 Copy the output and add it at [github.com/settings/ssh/new](https://github.com/settings/ssh/new).
 
+Test the connection:
+
 ```bash
 ssh -T git@github.com
 ```
 
 ### 4. Packages
+
+Install required packages:
 
 ```bash
 sudo pacman -S --needed bash-completion bat btop eza fastfetch fd fzf gum jq \
@@ -120,6 +126,8 @@ curl -fsSL https://claude.ai/install.sh | bash
 
 ### 6. Clone
 
+Clone the dotfiles repo:
+
 ```bash
 git clone git@github.com:peregrinus879/dotfiles-wsl.git ~/path/to/dotfiles-wsl
 ```
@@ -136,6 +144,8 @@ rm -f ~/.config/nvim/lua/plugins/example.lua
 ```
 
 ### 8. Stow
+
+Create symlinks for all packages:
 
 ```bash
 cd ~/path/to/dotfiles-wsl
