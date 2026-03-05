@@ -179,7 +179,7 @@ All configs use the [Miasma](https://github.com/xero/miasma.nvim) color palette.
 
 ## Credits
 
-Inspired by [Omarchy](https://github.com/basecamp/omarchy) by DHH.
+Inspired by [Omarchy](https://github.com/basecamp/omarchy) by DHH. See [APPROACH.md](APPROACH.md) for adaptation methodology and deviations.
 
 ## License
 
