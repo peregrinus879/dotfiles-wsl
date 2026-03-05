@@ -4,16 +4,17 @@ Personal dotfiles for WSL (Arch Linux), inspired by [Omarchy](https://github.com
 
 ## Stack
 
-- **Shell**: Bash (modular config)
-- **Terminal**: Windows Terminal + Miasma theme
+- **Shell**: Bash
+- **Terminal**: Windows Terminal
 - **Prompt**: Starship
-- **Multiplexer**: Tmux (Ctrl+Space prefix)
-- **Editor**: Neovim (LazyVim + Miasma)
-- **Version Control**: Git + Lazygit
+- **Multiplexer**: Tmux
+- **Editor**: Neovim (LazyVim)
+- **Version Control**: Git + LazyGit
 - **File Manager**: Yazi
 - **System Monitor**: btop
 - **System Info**: fastfetch
-- **AI**: Claude Code (`cx`), OpenCode (`c`)
+- **AI**: Claude Code, OpenCode
+- **Theme**: Miasma
 
 ## Stow Packages
 
@@ -21,15 +22,15 @@ Each directory is a GNU Stow package that symlinks into `$HOME`:
 
 ```
 bash/              Shell config (.bashrc, .inputrc, .config/bash/)
-btop/              System monitor config + Miasma theme
+btop/              System monitor config (btop.conf, themes/miasma.theme)
 editorconfig/      Editor formatting rules (.editorconfig)
-fastfetch/         System info display config
-git/               Git config (aliases, defaults)
-nvim/              Neovim colorscheme (Miasma via LazyVim)
-starship/          Prompt config
-tmux/              Tmux config (keybindings, Miasma status bar)
-windows-terminal/  Windows Terminal settings.json (applied manually, not stowed)
-yazi/              File manager config + Miasma theme overrides
+fastfetch/         System info config (config.jsonc)
+git/               Git config (config)
+nvim/              Neovim config (lazyvim.json, lua/config/, lua/plugins/, plugin/after/)
+starship/          Prompt config (starship.toml)
+tmux/              Tmux config (tmux.conf)
+windows-terminal/  Windows Terminal config (settings.json, not stowed)
+yazi/              File manager config (yazi.toml, theme.toml)
 ```
 
 ## Setup
@@ -130,7 +131,9 @@ done
 
 ### 8. Windows Terminal
 
-Copy the contents of `windows-terminal/settings.json` into Windows Terminal's settings file:
+Open Windows Terminal settings JSON with `Ctrl+Shift+,` and replace the contents with `windows-terminal/settings.json`.
+
+Alternatively, edit the file directly at:
 
 ```
 %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
