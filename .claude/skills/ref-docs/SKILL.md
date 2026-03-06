@@ -80,9 +80,3 @@ When working on dotfiles configs, fetch the relevant official documentation befo
 
 - [xero/miasma.nvim](https://github.com/xero/miasma.nvim) - Neovim colorscheme, palette
 - [Miasma colors.toml](https://github.com/basecamp/omarchy/blob/main/themes/miasma/colors.toml) - Omarchy color definitions
-
-## Local References
-
-- `~/projects/dotfiles/omarchy/` - Omarchy main repo
-- `~/projects/dotfiles/omarchy-pkgs/` - Omarchy package builds
-- `~/projects/dotfiles/dotfiles-wsl/APPROACH.md` - Methodology and deviations from Omarchy
