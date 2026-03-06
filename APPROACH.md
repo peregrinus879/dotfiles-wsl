@@ -39,7 +39,9 @@ Omarchy is an opinionated Arch Linux distribution targeting a full desktop envir
 - Config location: `~/.config/bash/` (XDG pattern) instead of Omarchy's `~/.local/share/omarchy/default/bash/`.
 - Modular functions in `~/.config/bash/functions/` sourced via loop in `.bashrc`. Omarchy sources individual files from `~/.local/share/omarchy/default/bash/fns/`.
 - Dropped aliases: `open` (xdg-open, GUI-only), `d='docker'`, `r='rails'`.
+- `cx` alias omits `--allow-dangerously-skip-permissions` flag present in Omarchy.
 - Added `y()` function for Yazi cd-on-exit (Yazi is not part of Omarchy).
+- Removed `mise` (runtime version manager) references. Not needed on WSL.
 
 ### Tmux dev layout
 
@@ -73,4 +75,5 @@ Omarchy is an opinionated Arch Linux distribution targeting a full desktop envir
 
 - All GUI/desktop components: Hyprland, Waybar, SDDM, Plymouth, SwayOSD, Mako, Walker, Fcitx5, hardware drivers, systemd desktop units, Elephant widgets.
 - `omarchy-fish`, `omarchy-zsh`, `omarchy-walker` packages.
-- Docker and Rails aliases.
+- `drives` functions (iso2sd, format-drive) - hardware-focused, not applicable to WSL.
+- `transcoding` functions (video/image conversion) - GUI/hardware-focused, not applicable to WSL.
