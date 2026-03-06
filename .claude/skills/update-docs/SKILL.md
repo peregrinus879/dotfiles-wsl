@@ -1,11 +1,11 @@
 ---
-name: sync-docs
-description: Cross-check docs against the dotfiles stack. Always update README.md and APPROACH.md after modifying configs, tools, or deviations.
+name: update-docs
+description: Update README.md and APPROACH.md to reflect dotfiles changes. Always run after modifying configs, tools, or deviations.
 ---
 
-# Sync Documentation
+# Update Documentation
 
-After modifying any dotfiles, configs, or stack components, cross-check and update the following files to reflect the changes:
+After modifying any dotfiles, configs, or stack components, update the following files to reflect the changes:
 
 ## Files to check
 
