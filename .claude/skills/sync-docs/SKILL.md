@@ -1,6 +1,6 @@
 ---
 name: sync-docs
-description: Cross-check and update README.md and APPROACH.md after any dotfile changes. Always run after modifying configs, adding tools, or changing deviations from Omarchy.
+description: Cross-check docs against the dotfiles stack. Always update README.md and APPROACH.md after modifying configs, tools, or deviations.
 ---
 
 # Sync Documentation
