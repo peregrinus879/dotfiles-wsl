@@ -132,6 +132,13 @@ Clone the dotfiles repo:
 git clone git@github.com:peregrinus879/dotfiles-wsl.git ~/path/to/dotfiles-wsl
 ```
 
+Optionally, clone the Omarchy repos as sibling directories for reference:
+
+```bash
+git clone https://github.com/basecamp/omarchy.git ~/path/to/omarchy
+git clone https://github.com/omacom-io/omarchy-pkgs.git ~/path/to/omarchy-pkgs
+```
+
 ### 7. Prepare
 
 Remove existing files that would conflict with stow:
