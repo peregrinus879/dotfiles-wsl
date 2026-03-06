@@ -1,6 +1,6 @@
 ---
 name: ref-docs
-description: Reference docs for the dotfiles stack. Always verify config syntax, defaults, and options against official sources.
+description: Reference docs for the dotfiles stack. Always verify config syntax, defaults, and options against official sources before making changes.
 ---
 
 # Documentation Reference
