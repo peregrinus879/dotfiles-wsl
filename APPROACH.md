@@ -45,13 +45,14 @@ Omarchy is an opinionated Arch Linux distribution targeting a full desktop envir
 
 ### Tmux dev layout
 
-- Changed `tdl` split percentages from Omarchy's 85% editor / 30% AI / 15% terminal to 60% editor / 40% AI (top 90%) + terminal 10% (bottom).
+- Changed `tdl` split percentages from Omarchy's 85% editor / 30% AI / 15% terminal to 50% editor / 50% AI (top 85%) + terminal 15% (bottom). The bottom terminal pane matches Omarchy's 15%.
 
 ### Neovim
 
 - WSL clipboard provider added in `options.lua`. Uses `clip.exe` for copy and `powershell.exe Get-Clipboard` for paste. Omarchy runs native Linux and does not need this.
 - Skipped `all-themes.lua` and `omarchy-theme-hotreload.lua` (theme switching not needed).
-- Kept verbatim from omarchy-nvim: `transparency.lua`, `disable-news-alert.lua`, `snacks-animated-scrolling-off.lua`, `lazyvim.json` (neo-tree), `vim.opt.relativenumber = false`.
+- Added `lazyvim.plugins.extras.lang.markdown` extra. Not in Omarchy's omarchy-nvim.
+- Kept verbatim from omarchy-nvim: `transparency.lua`, `disable-news-alert.lua`, `snacks-animated-scrolling-off.lua`, `vim.opt.relativenumber = false`.
 
 ### Fastfetch
 
