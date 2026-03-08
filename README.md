@@ -62,6 +62,9 @@ Set the default user in `/etc/wsl.conf`:
 ```ini
 [user]
 default = <username>
+
+[interop]
+enabled = true
 ```
 
 Restart WSL from PowerShell: `wsl --shutdown`, then reopen.
