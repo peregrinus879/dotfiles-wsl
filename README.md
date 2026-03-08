@@ -57,7 +57,7 @@ passwd <username>
 EDITOR=nvim visudo  # uncomment: %wheel ALL=(ALL:ALL) ALL
 ```
 
-Set the default user in `/etc/wsl.conf`:
+Set the default user and enable Windows interop in `/etc/wsl.conf`:
 
 ```ini
 [user]
