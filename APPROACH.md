@@ -1,6 +1,6 @@
 # Approach
 
-This document describes the methodology behind adapting [Omarchy](https://github.com/basecamp/omarchy) for WSL (Arch Linux) with Windows Terminal, and catalogues all deviations from the original.
+This document describes the methodology behind this adaptation of [Omarchy](https://github.com/basecamp/omarchy) for WSL (Arch Linux) with Windows Terminal, and catalogues all deviations from the original.
 
 ## Methodology
 
@@ -46,7 +46,7 @@ Omarchy is an opinionated Arch Linux distribution targeting a full desktop envir
 
 ### Tmux dev layout
 
-- Changed `tdl` split percentages from Omarchy's 85% editor / 30% AI / 15% terminal to 50% editor / 50% AI (top 85%) + terminal 15% (bottom). The bottom terminal pane matches Omarchy's 15%.
+- Changed `tdl` split percentages from Omarchy's 85% editor / 30% AI / 15% terminal to 50% editor / 50% AI (top 85%) + terminal 15% (bottom).
 
 ### Neovim
 

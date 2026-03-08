@@ -1,20 +1,20 @@
 # dotfiles-wsl
 
-Personal dotfiles for WSL (Arch Linux), inspired by [Omarchy](https://github.com/basecamp/omarchy). Managed with [GNU Stow](https://www.gnu.org/software/stow/).
+Personal dotfiles for WSL (Arch Linux), adapted from [Omarchy](https://github.com/basecamp/omarchy). Managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
 ## Stack
 
-- **Shell**: Bash
-- **Terminal**: Windows Terminal
-- **Prompt**: Starship
-- **Multiplexer**: Tmux
-- **Editor**: Neovim (LazyVim)
-- **Version Control**: Git + LazyGit
-- **File Manager**: Yazi
-- **System Monitor**: btop
-- **System Info**: fastfetch
-- **AI**: Claude Code, OpenCode
-- **Theme**: Miasma
+- **Shell**: [Bash](https://www.gnu.org/software/bash/)
+- **Terminal**: [Windows Terminal](https://github.com/microsoft/terminal)
+- **Prompt**: [Starship](https://starship.rs/)
+- **Multiplexer**: [Tmux](https://github.com/tmux/tmux)
+- **Editor**: [Neovim](https://neovim.io/) ([LazyVim](https://www.lazyvim.org/))
+- **Version Control**: [Git](https://git-scm.com/) + [LazyGit](https://github.com/jesseduffield/lazygit)
+- **File Manager**: [Yazi](https://yazi-rs.github.io/)
+- **System Monitor**: [btop](https://github.com/aristocratos/btop)
+- **System Info**: [fastfetch](https://github.com/fastfetch-cli/fastfetch)
+- **AI**: [Claude Code](https://github.com/anthropics/claude-code), [OpenCode](https://github.com/opencode-ai/opencode)
+- **Theme**: [Miasma](https://github.com/xero/miasma.nvim)
 
 ## Stow Packages
 
@@ -184,13 +184,9 @@ Open neovim to trigger plugin installation:
 nvim
 ```
 
-## Theme
-
-All configs use the [Miasma](https://github.com/xero/miasma.nvim) color palette.
-
 ## Credits
 
-Inspired by [Omarchy](https://github.com/basecamp/omarchy) by DHH. See [APPROACH.md](APPROACH.md) for adaptation methodology and deviations.
+Adapted from [Omarchy](https://github.com/basecamp/omarchy). See [APPROACH.md](APPROACH.md) for methodology and deviations.
 
 ## License
 
