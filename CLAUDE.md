@@ -13,11 +13,11 @@ Each top-level directory (except `windows-terminal/`) is a GNU Stow package that
 
 ## Reference Repos
 
-Cloned as sibling directories:
+Cloned in the sibling `../upstream/` directory:
 
-- `../omarchy/` - Main repo (bash, tmux, starship, git, fastfetch, btop configs)
-- `../omarchy-pkgs/` - Package builds (omarchy-nvim at `pkgbuilds/stable/omarchy-nvim/`)
-- `../miasma.nvim/` - Miasma color scheme source (palette, terminal exports in `extras/`)
+- `../upstream/omarchy/` - Main repo (bash, tmux, starship, git, fastfetch, btop configs)
+- `../upstream/omarchy-pkgs/` - Package builds (omarchy-nvim at `pkgbuilds/stable/omarchy-nvim/`)
+- `../upstream/miasma.nvim/` - Miasma color scheme source (palette, terminal exports in `extras/`)
 
 ## Skills
 

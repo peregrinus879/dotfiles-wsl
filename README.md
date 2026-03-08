@@ -135,12 +135,13 @@ Clone the dotfiles repo:
 git clone git@github.com:peregrinus879/dotfiles-wsl.git ~/path/to/dotfiles-wsl
 ```
 
-Optionally, clone reference repos as sibling directories:
+Optionally, clone reference repos in a sibling `upstream/` directory:
 
 ```bash
-git clone https://github.com/basecamp/omarchy.git ~/path/to/omarchy
-git clone https://github.com/omacom-io/omarchy-pkgs.git ~/path/to/omarchy-pkgs
-git clone https://github.com/xero/miasma.nvim.git ~/path/to/miasma.nvim
+mkdir -p ~/path/to/upstream
+git clone https://github.com/basecamp/omarchy.git ~/path/to/upstream/omarchy
+git clone https://github.com/omacom-io/omarchy-pkgs.git ~/path/to/upstream/omarchy-pkgs
+git clone https://github.com/xero/miasma.nvim.git ~/path/to/upstream/miasma.nvim
 ```
 
 ### 7. Prepare
