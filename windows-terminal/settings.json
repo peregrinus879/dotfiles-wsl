@@ -1,11 +1,7 @@
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions": [],
-    "copyFormatting": "none",
-    "copyOnSelect": false,
-    "defaultProfile": "{3abbed5e-1bde-5ac5-99e9-5553dd0e3af1}",
-    "keybindings":
+    "actions":
     [
         {
             "id": "Terminal.CopyToClipboard",
@@ -24,6 +20,9 @@
             "keys": "alt+shift+d"
         }
     ],
+    "copyFormatting": "none",
+    "copyOnSelect": false,
+    "defaultProfile": "{3abbed5e-1bde-5ac5-99e9-5553dd0e3af1}",
     "launchMode": "maximized",
     "newTabMenu":
     [
@@ -35,7 +34,7 @@
     {
         "defaults":
         {
-            "bellStyle": "none",
+            "bellStyle": "visual",
             "colorScheme": "Miasma",
             "cursorShape": "filledBox",
             "font":
