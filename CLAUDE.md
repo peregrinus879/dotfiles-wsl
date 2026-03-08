@@ -11,12 +11,13 @@ WSL (Arch Linux) dotfiles adapted from [Omarchy](https://github.com/basecamp/oma
 
 Each top-level directory (except `windows-terminal/`) is a GNU Stow package that symlinks into `$HOME`. Run `stow -v -t ~ <pkg>` from the repo root.
 
-## Omarchy Reference
+## Reference Repos
 
-Omarchy repos are cloned as sibling directories:
+Cloned as sibling directories:
 
 - `../omarchy/` - Main repo (bash, tmux, starship, git, fastfetch, btop configs)
 - `../omarchy-pkgs/` - Package builds (omarchy-nvim at `pkgbuilds/stable/omarchy-nvim/`)
+- `../miasma.nvim/` - Miasma color scheme source (palette, terminal exports in `extras/`)
 
 ## Skills
 

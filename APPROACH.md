@@ -18,6 +18,7 @@ Omarchy is an opinionated Arch Linux distribution targeting a full desktop envir
 
 - [basecamp/omarchy](https://github.com/basecamp/omarchy) - Main Omarchy repo (bash, tmux, starship, git, fastfetch, btop, editorconfig configs)
 - [omacom-io/omarchy-pkgs](https://github.com/omacom-io/omarchy-pkgs) - Omarchy package builds (omarchy-nvim: LazyVim config, plugins, transparency, options)
+- [xero/miasma.nvim](https://github.com/xero/miasma.nvim) - Miasma color scheme source (palette, terminal exports)
 
 ## Deviations
 
