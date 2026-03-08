@@ -6,14 +6,14 @@ Personal dotfiles for WSL (Arch Linux), adapted from [Omarchy](https://github.co
 
 - **Shell**: [Bash](https://www.gnu.org/software/bash/)
 - **Terminal**: [Windows Terminal](https://github.com/microsoft/terminal)
-- **Prompt**: [Starship](https://starship.rs/)
+- **Prompt**: [Starship](https://github.com/starship/starship)
 - **Multiplexer**: [Tmux](https://github.com/tmux/tmux)
-- **Editor**: [Neovim](https://neovim.io/) ([LazyVim](https://www.lazyvim.org/))
+- **Editor**: [Neovim](https://github.com/neovim/neovim) ([LazyVim](https://github.com/LazyVim/LazyVim))
 - **Version Control**: [Git](https://git-scm.com/) + [LazyGit](https://github.com/jesseduffield/lazygit)
-- **File Manager**: [Yazi](https://yazi-rs.github.io/)
+- **File Manager**: [Yazi](https://github.com/sxyazi/yazi)
 - **System Monitor**: [btop](https://github.com/aristocratos/btop)
 - **System Info**: [fastfetch](https://github.com/fastfetch-cli/fastfetch)
-- **AI**: [Claude Code](https://github.com/anthropics/claude-code), [OpenCode](https://github.com/opencode-ai/opencode)
+- **AI**: [Claude Code](https://github.com/anthropics/claude-code), [OpenCode](https://github.com/anomalyco/opencode)
 - **Theme**: [Miasma](https://github.com/xero/miasma.nvim)
 
 ## Stow Packages
