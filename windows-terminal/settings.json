@@ -1,25 +1,6 @@
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions":
-    [
-        {
-            "id": "Terminal.CopyToClipboard",
-            "keys": "ctrl+c"
-        },
-        {
-            "id": "Terminal.FindText",
-            "keys": "ctrl+shift+f"
-        },
-        {
-            "id": "Terminal.PasteFromClipboard",
-            "keys": "ctrl+v"
-        },
-        {
-            "id": "Terminal.DuplicatePaneAuto",
-            "keys": "alt+shift+d"
-        }
-    ],
     "copyFormatting": "none",
     "copyOnSelect": false,
     "defaultProfile": "{3abbed5e-1bde-5ac5-99e9-5553dd0e3af1}",
@@ -30,11 +11,12 @@
             "type": "remainingProfiles"
         }
     ],
+    "searchWebDefaultQueryUrl": "https://search.brave.com/search?q=%22%s%22",
     "profiles":
     {
         "defaults":
         {
-            "bellStyle": "visual",
+            "bellStyle": "taskbar",
             "colorScheme": "Miasma",
             "cursorShape": "filledBox",
             "font":
@@ -76,10 +58,13 @@
     [
         {
             "name": "Miasma",
+
             "cursorColor": "#C7C7C7",
             "selectionBackground": "#78824B",
+
             "background": "#222222",
             "foreground": "#C2C2B0",
+
             "black": "#000000",
             "blue": "#78824B",
             "cyan": "#C9A554",
@@ -98,6 +83,24 @@
             "brightYellow": "#B36D43"
         }
     ],
-    "searchWebDefaultQueryUrl": "https://search.brave.com/search?q=%22%s%22",
+    "keybindings":
+    [
+        {
+            "id": "Terminal.CopyToClipboard",
+            "keys": "ctrl+c"
+        },
+        {
+            "id": "Terminal.FindText",
+            "keys": "ctrl+shift+f"
+        },
+        {
+            "id": "Terminal.PasteFromClipboard",
+            "keys": "ctrl+v"
+        },
+        {
+            "id": "Terminal.DuplicatePaneAuto",
+            "keys": "alt+shift+d"
+        }
+    ],
     "themes": []
 }
