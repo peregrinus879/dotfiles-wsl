@@ -135,7 +135,7 @@ Clone the dotfiles repo:
 git clone git@github.com:peregrinus879/dotfiles-wsl.git ~/path/to/dotfiles-wsl
 ```
 
-Optionally, clone reference repos in a sibling `upstream/` directory:
+Optionally, clone upstream reference repos in a sibling `upstream/` directory for customizing configs:
 
 ```bash
 mkdir -p ~/path/to/upstream
