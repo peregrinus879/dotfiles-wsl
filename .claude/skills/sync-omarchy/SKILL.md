@@ -9,10 +9,10 @@ Source configs from the Omarchy repos, compare against dotfiles-wsl, and apply c
 
 ## Omarchy Repos
 
-These repos are cloned as sibling directories:
+These repos are cloned in the sibling `../upstream/` directory:
 
-- `../omarchy/` - Main repo (bash, tmux, starship, git, fastfetch, btop configs)
-- `../omarchy-pkgs/` - Package builds (omarchy-nvim at `pkgbuilds/stable/omarchy-nvim/`)
+- `../upstream/omarchy/` - Main repo (bash, tmux, starship, git, fastfetch, btop configs)
+- `../upstream/omarchy-pkgs/` - Package builds (omarchy-nvim at `pkgbuilds/stable/omarchy-nvim/`)
 
 ## Workflow
 
