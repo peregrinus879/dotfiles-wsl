@@ -132,6 +132,12 @@ curl -fsSL https://claude.ai/install.sh | bash
 Clone the dotfiles repo:
 
 ```bash
+git clone https://github.com/peregrinus879/dotfiles-wsl.git ~/path/to/dotfiles-wsl
+```
+
+Or, if you set up SSH in step 3:
+
+```bash
 git clone git@github.com:peregrinus879/dotfiles-wsl.git ~/path/to/dotfiles-wsl
 ```
 
