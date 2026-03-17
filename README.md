@@ -173,6 +173,26 @@ for pkg in bash btop editorconfig fastfetch git nvim starship tmux yazi; do
 done
 ```
 
+### Unstow
+
+```bash
+cd ~/path/to/dotfiles-wsl
+for pkg in bash btop editorconfig fastfetch git nvim starship tmux yazi; do
+  stow -D -v -t ~ "$pkg"
+done
+```
+
+### Dry Run
+
+Preview what stow would do without making changes:
+
+```bash
+cd ~/path/to/dotfiles-wsl
+for pkg in bash btop editorconfig fastfetch git nvim starship tmux yazi; do
+  stow -v -n -t ~ "$pkg"
+done
+```
+
 ### 9. Windows Terminal
 
 Open Windows Terminal settings JSON with `Ctrl+Shift+,` and replace the contents with `windows-terminal/settings.json`.
