@@ -22,7 +22,6 @@ Cloned in the sibling `../upstream/` directory:
 ## Skills
 
 - `/ref-docs` - Official documentation links for all tools in the stack
-- `/update-docs` - Update README.md and APPROACH.md after config changes
 - `/sync-omarchy` - Source, compare, and update configs against Omarchy
 
 ## Workflow
