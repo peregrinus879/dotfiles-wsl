@@ -97,13 +97,19 @@ Test the connection:
 ssh -T git@github.com
 ```
 
+Authenticate the GitHub CLI using your existing SSH setup:
+
+```bash
+gh auth login -h github.com -p ssh
+```
+
 ### 4. Packages
 
 Install required packages:
 
 ```bash
-sudo pacman -S --needed bash-completion bat btop eza fastfetch fd fzf gum jq \
-  lazygit less ripgrep starship stow tmux ttf-jetbrains-mono-nerd yazi zoxide
+sudo pacman -S --needed bash-completion bat btop eza fastfetch fd fzf gum github-cli \
+  jq lazygit less ripgrep starship stow tmux ttf-jetbrains-mono-nerd yazi zoxide
 ```
 
 ### 5. Tools
