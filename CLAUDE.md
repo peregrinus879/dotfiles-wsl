@@ -66,14 +66,14 @@ Cloned in the sibling `../upstream/` directory:
 
 ## Skills
 
-- `/ref-docs` - Official documentation links for all tools in the stack
-- `/sync-omarchy` - Source, compare, and update configs against Omarchy
-- `/update-docs` - After code changes, verify and update project docs
+- `/reference` - Official documentation links for all tools in the stack
+- `/synchronize` - Source, compare, and update configs against Omarchy
+- `/update` - After code changes, verify and update project docs
 - `/commit` - Commit conventions (conventional commits, atomic, co-author)
 
 ## Workflow
 
-1. Before changing configs, check official docs (`/ref-docs`)
-2. When syncing with Omarchy updates, use `/sync-omarchy`
-3. After any changes, update documentation (`/update-docs`)
+1. Before changing configs, check official docs (`/reference`)
+2. When syncing with Omarchy updates, use `/synchronize`
+3. After any changes, update documentation (`/update`)
 4. When committing, follow conventions (`/commit`)
