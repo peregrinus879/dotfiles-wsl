@@ -51,7 +51,7 @@ On first launch, Arch runs as root. Update the system and create your user:
 
 ```bash
 pacman -Syu
-pacman -S --needed git neovim sudo
+pacman -S --needed git neovim openssh sudo
 useradd -m -G wheel -s /bin/bash <username>
 passwd <username>
 EDITOR=nvim visudo  # uncomment: %wheel ALL=(ALL:ALL) ALL
@@ -108,7 +108,7 @@ gh auth login -h github.com -p ssh
 Install required packages:
 
 ```bash
-sudo pacman -S --needed bash-completion bat btop eza fastfetch fd fzf gum github-cli \
+sudo pacman -S --needed bash-completion bat btop eza fastfetch fd fzf gcc gum github-cli \
   jq lazygit less ripgrep starship stow tmux ttf-jetbrains-mono-nerd yazi zoxide
 ```
 
