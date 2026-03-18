@@ -42,6 +42,11 @@ Install the Nerd Font and WSL with Arch Linux from PowerShell:
 ```powershell
 winget install DEVCOM.JetBrainsMonoNerdFont
 wsl --install
+```
+
+Restart Windows if prompted, then:
+
+```powershell
 wsl --install archlinux
 ```
 
@@ -67,7 +72,7 @@ default = <username>
 enabled = true
 ```
 
-Restart WSL from PowerShell: `wsl --shutdown`, then reopen.
+Restart WSL from PowerShell: `wsl --shutdown`, then reopen. WSL now launches as your user instead of root.
 
 ### 2. Locale
 
@@ -178,6 +183,8 @@ for pkg in bash btop editorconfig fastfetch git nvim starship tmux yazi; do
   stow -v -t ~ "$pkg"
 done
 ```
+
+Start a new terminal session (or run `source ~/.bashrc`) for the shell config to take effect.
 
 ### Unstow
 
