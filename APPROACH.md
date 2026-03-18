@@ -30,10 +30,9 @@ Omarchy is an opinionated Arch Linux distribution targeting a full desktop envir
 
 - Only Miasma installed. Omarchy's `all-themes.lua` (15 lazy-loaded theme plugins) and `omarchy-theme-hotreload.lua` (hot-reload on LazyReload event) are skipped.
 
-### Readability fixes
+### Yazi theme
 
-- **Tmux status bar**: `fg=#222222` instead of Omarchy's `fg=black`. Black text on olive green (`#78824b`) was unreadable on Windows Terminal.
-- **Yazi theme**: Custom `theme.toml` with `fg=#222222` overrides for mode, status, and tab elements. Same readability issue.
+- Custom `theme.toml` uses Miasma palette throughout. One off-palette color: `#333333` for alternate/inactive backgrounds, providing subtle visual separation from the terminal background (`#222222`).
 
 ### Bash
 
