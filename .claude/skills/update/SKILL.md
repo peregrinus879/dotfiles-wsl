@@ -1,5 +1,5 @@
 ---
-name: update-docs
+name: update
 description: After code changes, verify and update dotfiles-wsl documentation (README.md, APPROACH.md) to stay in sync with configs and setup steps.
 ---
 

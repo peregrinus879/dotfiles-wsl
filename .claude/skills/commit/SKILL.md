@@ -38,4 +38,6 @@ Co-Authored-By: Claude <current model> <noreply@anthropic.com>
 - Subject: imperative mood, concise (50 chars), lowercase
 - Body: when the change needs context (explain why, not what)
 - Co-Author: always append with current model name
-- Push: user handles manually (SSH passphrase required). Do not push.
+- Push: user handles manually (SSH passphrase required). Do not push. After committing, show the push command:
+  - First push (no upstream): `git push -u origin <branch>`
+  - Subsequent pushes: `git push`

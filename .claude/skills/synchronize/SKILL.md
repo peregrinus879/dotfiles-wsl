@@ -1,5 +1,5 @@
 ---
-name: sync-omarchy
+name: synchronize
 description: Keep WSL configs aligned with Omarchy. Always source, compare, and update dotfiles when syncing with Omarchy changes.
 ---
 

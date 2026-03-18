@@ -1,5 +1,5 @@
 ---
-name: ref-docs
+name: reference
 description: Reference docs for the dotfiles stack. Always verify config syntax, defaults, and options against official sources before making changes.
 ---
 
