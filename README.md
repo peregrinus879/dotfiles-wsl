@@ -114,7 +114,7 @@ Install required packages:
 
 ```bash
 sudo pacman -S --needed bash-completion bat btop eza fastfetch fd fzf gcc gum github-cli \
-  jq lazygit less ripgrep starship stow tmux ttf-jetbrains-mono-nerd yazi zoxide
+  jq lazygit less ripgrep shellcheck starship stow tmux ttf-jetbrains-mono-nerd yazi zoxide
 ```
 
 ### 5. Tools
