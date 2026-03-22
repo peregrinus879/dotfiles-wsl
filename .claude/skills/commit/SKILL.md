@@ -1,6 +1,7 @@
 ---
 name: commit
 description: Commit conventions for this project. Conventional commits, atomic changes, staging, imperative mood, co-author line.
+disable-model-invocation: true
 ---
 
 # Commit Conventions
