@@ -1,56 +1,43 @@
 # dotfiles-wsl
 
-Personal dotfiles for WSL (Arch Linux), adapted from [Omarchy](https://github.com/basecamp/omarchy). Managed with [GNU Stow](https://www.gnu.org/software/stow/).
+WSL overlay dotfiles for making an Arch Linux WSL environment look and feel like Omarchy, managed with [GNU Stow](https://www.gnu.org/software/stow/).
+
+This repo is applied on top of `dotfiles-arch`. It owns only the WSL and Windows-specific pieces needed to complete the Omarchy-like setup on Arch Linux running inside WSL.
 
 ## Stack
 
-- **Shell**: [Bash](https://www.gnu.org/software/bash/)
+- **Base Layer**: `dotfiles-arch`
 - **Terminal**: [Windows Terminal](https://github.com/microsoft/terminal)
-- **Prompt**: [Starship](https://github.com/starship/starship)
-- **Multiplexer**: [Tmux](https://github.com/tmux/tmux)
-- **Editor**: [Neovim](https://github.com/neovim/neovim) ([LazyVim](https://github.com/LazyVim/LazyVim))
-- **Version Control**: [Git](https://git-scm.com/) + [LazyGit](https://github.com/jesseduffield/lazygit)
-- **File Manager**: [Yazi](https://github.com/sxyazi/yazi)
-- **System Monitor**: [btop](https://github.com/aristocratos/btop)
-- **System Info**: [fastfetch](https://github.com/fastfetch-cli/fastfetch)
-- **AI**: [Claude Code](https://github.com/anthropics/claude-code), [OpenCode](https://github.com/anomalyco/opencode)
+- **Editor Overlay**: [Neovim](https://github.com/neovim/neovim) WSL clipboard integration
 - **Theme**: [Miasma](https://github.com/xero/miasma.nvim)
 
 ## Stow Packages
 
-Each directory is a GNU Stow package that symlinks into `$HOME`:
+Each directory is a GNU Stow package or a manually applied config:
 
-```
-bash/              Shell config (.bashrc, .inputrc, .config/bash/)
-btop/              System monitor config (btop.conf, themes/miasma.theme)
-editorconfig/      Editor formatting rules (.editorconfig)
-fastfetch/         System info config (config.jsonc)
-git/               Git config (config)
-nvim/              Neovim config (lazyvim.json, lua/config/, lua/plugins/, plugin/after/)
-starship/          Prompt config (starship.toml)
-tmux/              Tmux config (tmux.conf)
-windows-terminal/  Windows Terminal config (settings.json, not stowed)
-yazi/              File manager config (yazi.toml, theme.toml)
+```text
+nvim-wsl/          WSL-specific Neovim options.lua overlay
+windows-terminal/  Windows Terminal settings.json, applied manually, not stowed
 ```
 
 ## Setup
 
-### 0. Prerequisites (Windows)
+### 1. Windows and WSL
 
-Install the Nerd Font and WSL with Arch Linux from PowerShell:
+Install the Nerd Font and WSL from PowerShell:
 
 ```powershell
 winget install DEVCOM.JetBrainsMonoNerdFont
 wsl --install
 ```
 
-Restart Windows if prompted, then:
+Restart Windows if prompted, then install Arch Linux:
 
 ```powershell
 wsl --install archlinux
 ```
 
-### 1. Arch Linux Initial Setup
+### 2. WSL Initial Setup
 
 On first launch, Arch runs as root. Update the system and create your user:
 
@@ -59,10 +46,16 @@ pacman -Syu
 pacman -S --needed git neovim openssh sudo
 useradd -m -G wheel -s /bin/bash <username>
 passwd <username>
-EDITOR=nvim visudo  # uncomment: %wheel ALL=(ALL:ALL) ALL
+EDITOR=nvim visudo
 ```
 
-Set the default user and enable Windows interop in `/etc/wsl.conf`:
+Uncomment this line in `visudo`:
+
+```text
+%wheel ALL=(ALL:ALL) ALL
+```
+
+Set the default user and keep Windows interop enabled in `/etc/wsl.conf`:
 
 ```ini
 [user]
@@ -72,127 +65,86 @@ default = <username>
 enabled = true
 ```
 
-Restart WSL from PowerShell: `wsl --shutdown`, then reopen. WSL now launches as your user instead of root.
+Restart WSL from PowerShell:
 
-### 2. Locale
+```powershell
+wsl --shutdown
+```
 
-Generate the `en_US.UTF-8` locale to avoid perl/stow warnings:
+### 3. Locale
+
+Generate the `en_US.UTF-8` locale to avoid perl and stow warnings:
 
 ```bash
 sudo sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 sudo locale-gen
 ```
 
-### 3. SSH Key
+### 4. Apply dotfiles-arch First
 
-Generate an SSH key and add it to GitHub:
+Before using this repo, complete the full `dotfiles-arch` setup first:
 
-```bash
-ssh-keygen -t ed25519 -C "your_email@example.com"
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_ed25519
-cat ~/.ssh/id_ed25519.pub
-```
+- install the baseline packages
+- clone the LazyVim starter into `~/.config/nvim`
+- create `~/.config/git/config.local`
+- clone `dotfiles-arch`
+- run the Arch baseline stow command without `nvim-arch`
 
-Copy the output and add it at [github.com/settings/ssh/new](https://github.com/settings/ssh/new).
-
-Test the connection:
+On WSL, apply the shared baseline packages from `dotfiles-arch` without `nvim-arch`:
 
 ```bash
-ssh -T git@github.com
+cd ~/path/to/dotfiles-arch
+stow -v -t ~ bash btop editorconfig fastfetch git nvim starship tmux yazi
 ```
 
-Authenticate the GitHub CLI using your existing SSH setup:
+This repo assumes the shared shell, tmux, git, fastfetch, btop, Yazi, and shared Neovim config already come from `dotfiles-arch`.
 
-```bash
-gh auth login -h github.com -p ssh
-```
-
-### 4. Packages
-
-Install required packages:
-
-```bash
-sudo pacman -S --needed bash-completion bat btop eza fastfetch fd fzf gcc gum github-cli \
-  jq lazygit less ripgrep shellcheck starship stow tmux ttf-jetbrains-mono-nerd yazi zoxide
-```
-
-### 5. Tools
-
-LazyVim:
-
-```bash
-git clone https://github.com/LazyVim/starter ~/.config/nvim
-rm -rf ~/.config/nvim/.git
-```
-
-OpenCode:
-
-```bash
-curl -fsSL https://opencode.ai/install | bash
-```
-
-Claude Code:
-
-```bash
-curl -fsSL https://claude.ai/install.sh | bash
-```
-
-### 6. Clone
-
-Clone the dotfiles repo:
+### 5. Clone
 
 ```bash
 git clone https://github.com/peregrinus879/dotfiles-wsl.git ~/path/to/dotfiles-wsl
 ```
 
-Or, if you set up SSH in step 3:
+Or with SSH:
 
 ```bash
 git clone git@github.com:peregrinus879/dotfiles-wsl.git ~/path/to/dotfiles-wsl
 ```
 
-Optionally, clone upstream reference repos in a sibling `upstream/` directory for customizing configs:
+### 6. Stow
+
+Checklist before stowing the overlay:
+
+- `dotfiles-arch` prerequisites and shared baseline stow are already complete
+- `~/.config/nvim` exists as a real LazyVim starter directory
+- `nvim-arch` is not currently stowed on this WSL machine
+- Any existing conflicting WSL overlay file was removed
+
+If `nvim-arch` was ever stowed on this WSL machine, unstow it first from the `dotfiles-arch` repo:
 
 ```bash
-mkdir -p ~/path/to/upstream
-git clone https://github.com/basecamp/omarchy.git ~/path/to/upstream/omarchy
-git clone https://github.com/omacom-io/omarchy-pkgs.git ~/path/to/upstream/omarchy-pkgs
-git clone https://github.com/xero/miasma.nvim.git ~/path/to/upstream/miasma.nvim
+cd ~/path/to/dotfiles-arch
+stow -D -v -t ~ nvim-arch
 ```
 
-### 7. Prepare
-
-Remove existing files that would conflict with stow:
+Remove any existing conflicting WSL overlay file:
 
 ```bash
-rm -f ~/.bashrc ~/.inputrc
-rm -f ~/.config/nvim/lazyvim.json
 rm -f ~/.config/nvim/lua/config/options.lua
-rm -f ~/.config/nvim/lua/plugins/example.lua
 ```
 
-### 8. Stow
-
-Create symlinks for all packages:
+Then stow the WSL overlay:
 
 ```bash
 cd ~/path/to/dotfiles-wsl
-
-for pkg in bash btop editorconfig fastfetch git nvim starship tmux yazi; do
-  stow -v -t ~ "$pkg"
-done
+stow -v -t ~ nvim-wsl
 ```
-
-Start a new terminal session (or run `source ~/.bashrc`) for the shell config to take effect.
 
 ### Unstow
 
 ```bash
 cd ~/path/to/dotfiles-wsl
-for pkg in bash btop editorconfig fastfetch git nvim starship tmux yazi; do
-  stow -D -v -t ~ "$pkg"
-done
+stow -D -v -t ~ nvim-wsl
 ```
 
 ### Dry Run
@@ -201,32 +153,52 @@ Preview what stow would do without making changes:
 
 ```bash
 cd ~/path/to/dotfiles-wsl
-for pkg in bash btop editorconfig fastfetch git nvim starship tmux yazi; do
-  stow -v -n -t ~ "$pkg"
-done
+stow -v -n -t ~ nvim-wsl
 ```
 
-### 9. Windows Terminal
+## Windows Terminal
 
 Open Windows Terminal settings JSON with `Ctrl+Shift+,` and replace the contents with `windows-terminal/settings.json`.
 
 Alternatively, edit the file directly at:
 
-```
+```text
 %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
 ```
 
-### 10. Neovim Plugins
+## Private Git Identity
 
-Open neovim to trigger plugin installation:
+The shared Git config from `dotfiles-arch` expects private identity to live in an untracked local file:
 
-```bash
-nvim
+```text
+~/.config/git/config.local
 ```
+
+Example:
+
+```ini
+[user]
+  name = Your Name
+  email = your-email@example.com
+```
+
+## References
+
+- `README.md` - WSL setup, stow order, and Windows Terminal application
+- `APPROACH.md` - WSL-specific deviations from the shared baseline
+- `CLAUDE.md` - repo-specific assistant context
+
+## Related Repos
+
+- `~/projects/repos/dotfiles/dotfiles-arch` - shared baseline required before this overlay
+- `~/projects/repos/references/omarchy` - upstream Omarchy reference repo
+- `~/projects/repos/references/omarchy-pkgs` - upstream package reference repo
+- `~/projects/repos/references/miasma.nvim` - Miasma theme reference repo
+- `~/projects/repos/references/windows-terminal` - Windows Terminal reference repo
 
 ## Credits
 
-Adapted from [Omarchy](https://github.com/basecamp/omarchy). See [APPROACH.md](APPROACH.md) for methodology and deviations.
+Adapted from [Omarchy](https://github.com/basecamp/omarchy). See [APPROACH.md](APPROACH.md) for overlay rationale and deviations.
 
 ## License
 

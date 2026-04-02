@@ -1,62 +1,61 @@
 ---
 name: synchronize
-description: Keep WSL configs current. Sync with Omarchy repos and verify against official docs. Covers all tools in the stack.
+description: Sync this WSL overlay against dotfiles-arch, upstream references, and official WSL and Windows Terminal docs.
 ---
 
-# Synchronize Configs
+# Synchronize Overlay
 
-Source configs from Omarchy repos and official docs, compare against dotfiles-wsl, and apply changes.
+Source configs from `dotfiles-arch`, reference repos, and official docs, compare against `dotfiles-wsl`, and apply changes only where they belong in the WSL and Windows-specific overlay.
 
 ## Sources
 
-### Omarchy Repos
+### Local Baseline
 
-Cloned in the sibling `../upstream/` directory:
+- `~/projects/repos/dotfiles/dotfiles-arch` - shared Linux baseline that this overlay depends on
 
-- `../upstream/omarchy/` - Main repo (bash, tmux, starship, git, fastfetch, btop configs)
-- `../upstream/omarchy-pkgs/` - Package builds (omarchy-nvim at `pkgbuilds/stable/omarchy-nvim/`)
-- `../upstream/miasma.nvim/` - Miasma color scheme source (palette, terminal exports in `extras/`)
+### Reference Repos
+
+Reference repos live under `~/projects/repos/references/`:
+
+- `omarchy/` - main repo for bash, tmux, starship, git, fastfetch, btop, and editorconfig references
+- `omarchy-pkgs/` - package builds, including the Omarchy Neovim package
+- `miasma.nvim/` - Miasma color scheme source
+- `windows-terminal/` - Windows Terminal reference repo for settings structure and feature changes
 
 ### Official Docs
 
-- [The Omarchy Manual](https://learn.omacom.io/2/the-omarchy-manual) - Setup guides, keybindings, workflows
-- [WSL Docs](https://learn.microsoft.com/en-us/windows/wsl/) - Installation, configuration, networking
+- [The Omarchy Manual](https://learn.omacom.io/2/the-omarchy-manual) - setup guides, keybindings, workflows
+- [WSL Docs](https://learn.microsoft.com/en-us/windows/wsl/) - installation, configuration, and interop
 - [Install Arch Linux on WSL](https://wiki.archlinux.org/title/Install_Arch_Linux_on_WSL) - Arch Wiki guide
-- [Windows Terminal Docs](https://learn.microsoft.com/en-us/windows/terminal/) - Settings, profiles, color schemes, keybindings
-- [Bash Reference Manual](https://www.gnu.org/software/bash/manual/bash.html) - Builtins, expansion, scripting
-- [GNU Stow Manual](https://www.gnu.org/software/stow/manual/stow.html) - Symlink management, package structure
-- [Starship Configuration](https://starship.rs/config/) - Module options, format strings, presets
-- [Tmux Wiki](https://github.com/tmux/tmux/wiki) - Getting started, FAQ, recipes
-- [LazyVim Docs](https://www.lazyvim.org/) - Installation, keymaps, plugins, extras
-- [Neovim Docs](https://neovim.io/doc/) - Options, API, Lua reference
-- [lazy.nvim Docs](https://lazy.folke.io/) - Plugin manager, spec format, lazy loading
-- [Git Docs](https://git-scm.com/docs) - Reference, config options
-- [LazyGit](https://github.com/jesseduffield/lazygit) - Keybindings, custom commands, config
-- [Yazi Docs](https://yazi-rs.github.io/docs/) - Configuration, keymaps, themes, plugins
-- [btop](https://github.com/aristocratos/btop) - Config options, themes, keybindings
-- [fastfetch Wiki](https://github.com/fastfetch-cli/fastfetch/wiki) - Modules, JSON config schema
-- [Claude Code Docs](https://code.claude.com/docs/en/overview) - Skills, memory, subagents, hooks
-- [OpenCode Docs](https://opencode.ai/docs/) - Installation, configuration
+- [Windows Terminal Docs](https://learn.microsoft.com/en-us/windows/terminal/) - settings, profiles, color schemes, and keybindings
+- [LazyVim Docs](https://www.lazyvim.org/) - installation and plugin conventions
+- [Neovim Docs](https://neovim.io/doc/) - options and Lua reference
+- [lazy.nvim Docs](https://lazy.folke.io/) - plugin manager configuration
+- [GNU Stow Manual](https://www.gnu.org/software/stow/manual/stow.html) - symlink management and package structure
+- [Git Docs](https://git-scm.com/docs) - config options and behavior
 
 ## Workflow
 
-1. Pull latest changes from all three Omarchy repos
-2. Compare Omarchy configs against dotfiles-wsl equivalents
-3. For non-Omarchy tools (yazi, Windows Terminal), check official docs for changes
-4. For each difference, classify it:
-   - **Intentional deviation**: Documented in `APPROACH.md`, should stay different
-   - **New upstream addition**: Added in Omarchy after last sync, should be applied
-   - **Upstream change to existing config**: Modified in Omarchy, needs review
-5. Check `git log --format="%h %ad %s" --date=short -- <file>` on upstream repos to determine when differences were introduced
-6. Cross-reference differences against `APPROACH.md` deviations. If a difference is NOT listed as a deviation, it is likely a new upstream change that should be synced
-7. Apply new upstream additions and changes, adapting for WSL where needed
-8. Document any new deviations in `APPROACH.md` with rationale
-9. Remove deviations from `APPROACH.md` that no longer apply
+1. Compare `dotfiles-wsl` against the WSL-relevant parts of `dotfiles-arch`
+2. Compare overlay-owned files against relevant upstream references:
+   - `nvim-wsl/` against `omarchy-pkgs/` plus the WSL clipboard deviation
+   - `windows-terminal/` against `windows-terminal/` and official docs
+3. For each difference, classify it:
+   - **Intentional deviation**: documented in `APPROACH.md`, should stay different
+   - **New upstream addition**: added after the last sync, should be reviewed for inclusion
+   - **Upstream change to existing config**: modified upstream, needs review
+4. Check `git log --format="%h %ad %s" --date=short -- <file>` on the relevant reference repo when you need to determine when a difference was introduced
+5. Cross-check differences against `APPROACH.md`. If a difference is not documented there, treat it as a likely upstream change that needs review
+6. Apply new upstream additions and changes only where they belong in the WSL overlay
+7. Update `README.md` and `APPROACH.md` when overlay ownership, setup steps, or documented deviations change
 
 ## Rules
 
 - Present proposed changes to the user before editing
-- Omarchy is the source of truth; deviate only when something breaks or does not apply on WSL
-- Always check all three repos, not just one
+- `dotfiles-arch` is the baseline source of truth for shared Linux behavior
+- Omarchy remains the upstream reference for the baseline design
+- Always check all relevant sources, not just one
 - Never assume a difference is intentional without verifying it is documented in `APPROACH.md`
-- Do not add WSL-specific changes that contradict Omarchy without documenting in APPROACH.md
+- Do not copy shared Linux behavior into this repo if it belongs in `dotfiles-arch`
+- Keep the Neovim split clean: shared config in `dotfiles-arch/nvim/`, Arch-native options in `dotfiles-arch/nvim-arch/`, WSL options in `nvim-wsl/`
+- Keep Windows-specific behavior explicit and confined to this overlay
