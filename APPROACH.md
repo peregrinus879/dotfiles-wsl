@@ -23,6 +23,7 @@ This repo exists to keep WSL-specific behavior isolated from that baseline.
 
 - Windows Terminal replaces Ghostty and any Linux-native terminal assumption from the baseline.
 - Miasma colors, JetBrainsMono Nerd Font, and padding are adapted into `windows-terminal/settings.json`.
+- Nerd Font installation remains a Windows-side concern. WSL does not need a separate Linux font package for icon rendering in Windows Terminal.
 
 ### Neovim
 
