@@ -27,6 +27,7 @@ It does not own:
 
 - `README.md` - overlay setup, stow order, and Windows Terminal application
 - `APPROACH.md` - WSL-specific deviations from the shared baseline
+- `.claude/skills/synchronize/SKILL.md` - repo-specific sync workflow for the overlay
 
 ## Stow Packages
 
@@ -39,6 +40,14 @@ Manual config:
 - `windows-terminal/` - Windows Terminal `settings.json`, not stowed from WSL
 
 WSL should consume `dotfiles-arch` first, and must not stow `nvim-arch/`.
+
+## Setup Invariants
+
+- Complete the full `dotfiles-arch` setup before applying this overlay
+- `~/.config/nvim` should already exist as a real LazyVim starter directory from the baseline setup
+- Do not stow `nvim-arch/` on WSL; unstow it first if it was previously applied
+- `windows-terminal/settings.json` is applied manually from Windows, not stowed from WSL
+- Git identity still comes from the baseline Git config via `~/.config/git/config.local`
 
 ## Reference Repos
 

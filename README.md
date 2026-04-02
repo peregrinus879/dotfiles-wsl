@@ -4,6 +4,8 @@ WSL overlay dotfiles for making an Arch Linux WSL environment look and feel like
 
 This repo is applied on top of `dotfiles-arch`. It owns only the WSL and Windows-specific pieces needed to complete the Omarchy-like setup on Arch Linux running inside WSL.
 
+This repo does not replace the shared Linux baseline. Complete `dotfiles-arch` first, then apply this overlay.
+
 ## Stack
 
 - **Base Layer**: `dotfiles-arch`
@@ -191,6 +193,8 @@ Example:
 - `CLAUDE.md` - repo-specific assistant context
 
 ## Related Repos
+
+Clone these locally if you plan to use `/synchronize` or compare this overlay against upstream references.
 
 - `~/projects/repos/dotfiles/dotfiles-arch` - shared baseline required before this overlay
 - `~/projects/repos/references/omarchy` - upstream Omarchy reference repo
