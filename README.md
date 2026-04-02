@@ -31,6 +31,8 @@ winget install DEVCOM.JetBrainsMonoNerdFont
 wsl --install
 ```
 
+Windows Terminal uses the Windows-installed Nerd Font directly. WSL does not need a separate Linux font package for `tmux`, `nvim`, `yazi`, `starship`, or `fastfetch` icons to render correctly.
+
 Restart Windows if prompted, then install Arch Linux:
 
 ```powershell
