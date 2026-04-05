@@ -190,7 +190,8 @@ Example:
 
 - `README.md` - WSL setup, stow order, and Windows Terminal application
 - `APPROACH.md` - WSL-specific deviations from the shared baseline
-- `CLAUDE.md` - repo-specific assistant context
+- `AGENTS.md` - canonical repo-specific assistant context
+- `CLAUDE.md` - thin Claude Code wrapper importing `AGENTS.md`
 
 ## Related Repos
 
