@@ -42,13 +42,13 @@ Reference repos live under `~/projects/repos/references/`:
    - `nvim-wsl/` against `omarchy-pkgs/` plus the WSL clipboard deviation
    - `windows-terminal/` against `windows-terminal/` and official docs
 3. For each difference, classify it:
-   - **Intentional deviation**: documented in `APPROACH.md`, should stay different
+   - **Intentional deviation**: documented in `DEVIATIONS.md`, should stay different
    - **New upstream addition**: added after the last sync, should be reviewed for inclusion
    - **Upstream change to existing config**: modified upstream, needs review
 4. Check `git log --format="%h %ad %s" --date=short -- <file>` on the relevant reference repo when you need to determine when a difference was introduced
-5. Cross-check differences against `APPROACH.md`. If a difference is not documented there, treat it as a likely upstream change that needs review
+5. Cross-check differences against `DEVIATIONS.md`. If a difference is not documented there, treat it as a likely upstream change that needs review
 6. Apply new upstream additions and changes only where they belong in the WSL overlay
-7. Update `README.md` and `APPROACH.md` when overlay ownership, setup steps, or documented deviations change
+7. Update `README.md` and `DEVIATIONS.md` when overlay ownership, setup steps, or documented deviations change
 
 ## Rules
 
@@ -56,7 +56,7 @@ Reference repos live under `~/projects/repos/references/`:
 - `dotfiles-arch` is the baseline source of truth for shared Linux behavior
 - Omarchy remains the upstream reference for the baseline design
 - Always check all relevant sources, not just one
-- Never assume a difference is intentional without verifying it is documented in `APPROACH.md`
+- Never assume a difference is intentional without verifying it is documented in `DEVIATIONS.md`
 - Do not copy shared Linux behavior into this repo if it belongs in `dotfiles-arch`
 - Keep the Neovim overlay additive: shared config stays in `dotfiles-arch/nvim/`, while `nvim-wsl/` only carries the WSL-specific overlay module
 - Keep the Bash overlay additive: shared helpers stay in `dotfiles-arch`, while `bash-wsl/` only enables WSL-specific behavior
