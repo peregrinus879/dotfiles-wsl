@@ -1,8 +1,8 @@
 # dotfiles-wsl
 
-WSL (Arch Linux) dotfiles adapted from Omarchy, managed with [GNU Stow](https://www.gnu.org/software/stow/).
+WSL overlay for [`dotfiles-arch`](https://github.com/peregrinus879/dotfiles-arch) (Arch Linux), managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
-`dotfiles-wsl` is the additive WSL and Windows-specific overlay on top of `dotfiles-arch`. It owns only the WSL-specific and Windows-specific pieces needed to finish the setup on Arch Linux running inside WSL while preserving the shared Omarchy-derived baseline.
+`dotfiles-wsl` is the additive WSL and Windows-specific overlay on top of `dotfiles-arch`. It owns only the WSL-specific and Windows-specific pieces needed to finish the setup on Arch Linux running inside WSL while preserving the shared baseline.
 
 This repo does not replace the shared Linux baseline. Complete `dotfiles-arch` first, then layer this overlay on top.
 
@@ -10,8 +10,8 @@ This repo does not replace the shared Linux baseline. Complete `dotfiles-arch` f
 
 - [`dotfiles-ai`](https://github.com/peregrinus879/dotfiles-ai) - Claude Code and OpenCode global dotfiles, managed with GNU Stow
 - [`dotfiles-arch`](https://github.com/peregrinus879/dotfiles-arch) - Headless Arch Linux dotfiles adapted from Omarchy, managed with GNU Stow
-- [`dotfiles-wsl`](https://github.com/peregrinus879/dotfiles-wsl) - WSL (Arch Linux) dotfiles adapted from Omarchy, managed with GNU Stow
-- [`dotfiles-omarchy`](https://github.com/peregrinus879/dotfiles-omarchy) - Omarchy personal dotfiles, managed with GNU
+- [`dotfiles-wsl`](https://github.com/peregrinus879/dotfiles-wsl) - WSL overlay for dotfiles-arch (Arch Linux), managed with GNU Stow
+- [`dotfiles-omarchy`](https://github.com/peregrinus879/dotfiles-omarchy) - Omarchy personal dotfiles, managed with GNU Stow
 
 ## Stack
 
@@ -35,7 +35,7 @@ Key ownership rules:
 
 - `dotfiles-arch` keeps ownership of shared Bash and Neovim behavior
 - `bash-wsl/` only enables WSL-side repo auto-refresh for the shared Bash helper
-- `nvim-wsl/` only adds `lua/config/overlay.lua` for WSL clipboard integration
+- `nvim-wsl/` only adds `lua/config/overlay.lua` for WSL clipboard integration; loaded automatically by `dotfiles-arch`'s `lua/config/options.lua` when present
 - `windows-terminal/` stays Windows-side, is applied manually, and intentionally tracks the full paste-ready `settings.json`
 
 ## Setup
@@ -198,7 +198,7 @@ Manual refresh for the current repo:
 repo-refresh-now
 ```
 
-## Windows Terminal
+### 9. Windows Terminal
 
 Open Windows Terminal settings JSON with `Ctrl+Shift+,` and replace the contents with `windows-terminal/settings.json`.
 
@@ -210,7 +210,7 @@ Alternatively, edit the file directly at:
 %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
 ```
 
-## Private Git Identity
+### 10. Private Git Identity
 
 The shared Git config from `dotfiles-arch` expects private identity to live in an untracked local file:
 
@@ -235,28 +235,22 @@ After applying the baseline and the overlay:
 - In Neovim, confirm yanks reach the Windows clipboard and pastes from the Windows clipboard reach Neovim.
 - Confirm Windows Terminal uses JetBrainsMono Nerd Font and the Miasma color scheme after applying `windows-terminal/settings.json`.
 
-## Maintainer Checklist
+## Troubleshooting
 
-When updating this overlay:
-
-1. Review `dotfiles-arch` first and keep any shared Linux behavior there.
-2. Review the current official WSL and Windows Terminal docs before changing setup or config structure.
-3. Use `/synchronize` when comparing this overlay against the baseline and upstream references.
-4. Confirm every intentional difference is still documented in `DEVIATIONS.md`.
-5. Keep `windows-terminal/settings.json` as a full paste-ready file unless the application model changes.
-6. Update `README.md` when setup order, verification steps, or Windows-side application steps change.
-7. Start fresh WSL and Windows Terminal sessions after structural changes and verify the overlay still applies cleanly.
+- **`stow` reports "existing target is not a symlink"**: Remove the conflicting file listed in the error, then re-run the stow command. Step 6 lists the expected cleanup targets.
+- **Neovim clipboard not working**: Confirm `clip.exe` and `powershell.exe` are accessible from WSL (`which clip.exe`). If Windows interop is disabled, check `[interop]` in `/etc/wsl.conf`.
+- **Bash overlay not loading**: Confirm the symlink exists (`test -L ~/.config/bash-overlays/20-repo-auto-refresh`) and that `dotfiles-arch` was stowed first so `enable_repo_auto_refresh` is defined.
 
 ## References
 
 - `README.md` - WSL setup, stow order, and Windows Terminal application
 - `DEVIATIONS.md` - intentional deviations from the shared baseline
-- `AGENTS.md` - canonical repo-specific assistant context
+- `AGENTS.md` - canonical repo-specific assistant context and maintainer checklist
 - `CLAUDE.md` - thin Claude Code wrapper importing `AGENTS.md`
 
 ## Related Repos
 
-Clone these locally if you plan to use `/synchronize` or compare this overlay against upstream references.
+Clone these locally if you plan to use `/synchronize` or compare this overlay against upstream references. The `/synchronize` skill expects reference repos under `~/projects/repos/references/`.
 
 - `~/projects/repos/dotfiles/dotfiles-arch` - shared baseline required before this overlay
 - `~/projects/repos/references/omarchy` - upstream Omarchy reference repo

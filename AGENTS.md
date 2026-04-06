@@ -35,6 +35,7 @@ It does not own:
 - WSL should consume `dotfiles-arch` first, then layer `bash-wsl/` and `nvim-wsl/` on top for WSL-only additions
 - Complete the full `dotfiles-arch` setup before applying this overlay
 - `~/.config/nvim` should already exist as a real LazyVim starter directory from the baseline setup
+- `nvim-wsl/overlay.lua` is loaded automatically by `dotfiles-arch`'s `lua/config/options.lua` when present via `require("config.overlay").setup()`
 - `~/.config/bash-overlays/` is reserved for additive machine-specific shell behavior layered on top of the baseline
 - `windows-terminal/settings.json` is a full paste-ready config applied manually from Windows, not stowed from WSL
 - Git identity still comes from the baseline Git config via `~/.config/git/config.local`
@@ -59,3 +60,13 @@ It does not own:
 - Keep all intentional differences documented in `DEVIATIONS.md`
 - Update `README.md`, `AGENTS.md`, and `DEVIATIONS.md` together when ownership, setup, or sync assumptions change
 - Put shared Linux behavior in `dotfiles-arch`, not here
+
+## Maintainer Checklist
+
+1. Review `dotfiles-arch` first and keep any shared Linux behavior there.
+2. Review the current official WSL and Windows Terminal docs before changing setup or config structure.
+3. Use `/synchronize` when comparing this overlay against the baseline and upstream references.
+4. Confirm every intentional difference is still documented in `DEVIATIONS.md`.
+5. Keep `windows-terminal/settings.json` as a full paste-ready file unless the application model changes.
+6. Update `README.md` when setup order, verification steps, or Windows-side application steps change.
+7. Start fresh WSL and Windows Terminal sessions after structural changes and verify the overlay still applies cleanly.
