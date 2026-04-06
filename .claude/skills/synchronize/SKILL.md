@@ -38,6 +38,7 @@ Reference repos live under `~/projects/repos/references/`:
 
 1. Compare `dotfiles-wsl` against the WSL-relevant parts of `dotfiles-arch`
 2. Compare overlay-owned files against relevant upstream references:
+   - `bash-wsl/` against `dotfiles-arch` plus the documented personal repo auto-refresh deviation
    - `nvim-wsl/` against `omarchy-pkgs/` plus the WSL clipboard deviation
    - `windows-terminal/` against `windows-terminal/` and official docs
 3. For each difference, classify it:
@@ -57,5 +58,6 @@ Reference repos live under `~/projects/repos/references/`:
 - Always check all relevant sources, not just one
 - Never assume a difference is intentional without verifying it is documented in `APPROACH.md`
 - Do not copy shared Linux behavior into this repo if it belongs in `dotfiles-arch`
-- Keep the Neovim split clean: shared config in `dotfiles-arch/nvim/`, Arch-native options in `dotfiles-arch/nvim-arch/`, WSL options in `nvim-wsl/`
+- Keep the Neovim overlay additive: shared config stays in `dotfiles-arch/nvim/`, while `nvim-wsl/` only carries the WSL-specific overlay module
+- Keep the Bash overlay additive: shared helpers stay in `dotfiles-arch`, while `bash-wsl/` only enables WSL-specific behavior
 - Keep Windows-specific behavior explicit and confined to this overlay

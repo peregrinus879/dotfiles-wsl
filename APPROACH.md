@@ -2,19 +2,19 @@
 
 This document describes the methodology behind the WSL-specific overlay carried by `dotfiles-wsl`.
 
-`dotfiles-arch` is the shared Linux baseline. This repo documents only the deviations that are required because the environment is WSL with Windows Terminal.
+`dotfiles-arch` is the shared Linux baseline. This repo documents only the deviations required because the environment is WSL with Windows Terminal and Windows interoperability.
 
 ## Methodology
 
 The baseline for shell, terminal tooling, theming, and shared Neovim behavior lives in `dotfiles-arch`.
 
-This repo exists to keep WSL-specific behavior isolated from that baseline.
+This repo exists to keep WSL-specific behavior isolated and additive.
 
 **Guiding principles:**
 
 - **Keep the overlay thin.** If a config works unchanged on headless Arch and WSL, it belongs in `dotfiles-arch`, not here.
 - **Adapt only what breaks or does not apply on WSL.** Windows interop, Windows Terminal, and clipboard integration belong here because they are not part of a portable Linux baseline.
-- **Avoid path collisions with the baseline.** WSL-specific Neovim behavior is isolated in `nvim-wsl/` so it can replace `nvim-arch/` cleanly.
+- **Keep the overlay additive.** If WSL only needs to extend a shared file, add a small overlay module instead of replacing baseline ownership.
 - **Keep Windows-specific behavior explicit.** Anything that depends on `clip.exe`, `powershell.exe`, or Windows Terminal should be documented as an overlay concern.
 
 ## Deviations
@@ -25,11 +25,17 @@ This repo exists to keep WSL-specific behavior isolated from that baseline.
 - Miasma colors, JetBrainsMono Nerd Font, and padding are adapted into `windows-terminal/settings.json`.
 - Nerd Font installation remains a Windows-side concern. WSL does not need a separate Linux font package for icon rendering in Windows Terminal.
 
+### Bash
+
+- `bash-wsl/` enables the shared repo auto-refresh helper from `dotfiles-arch` through an additive file in `~/.config/bash-overlays/`.
+- This is a personal workflow deviation from Omarchy. It exists because the headless machine is the primary push source, while WSL benefits from automatic fetch plus fast-forward checks when entering repos under `~/projects/repos`.
+- The helper remains disabled by default in `dotfiles-arch` so the shared headless baseline does not auto-refresh repos unless an overlay opts in.
+
 ### Neovim
 
-- `nvim-wsl/` provides the WSL-specific `lua/config/options.lua`.
+- `nvim-wsl/` provides `lua/config/overlay.lua`, which is loaded by the shared `dotfiles-arch` `lua/config/options.lua` when present.
 - WSL clipboard integration is implemented with `clip.exe` for copy and `powershell.exe Get-Clipboard` for paste.
-- This overlay exists so WSL can avoid stowing `nvim-arch/` while still consuming the shared `nvim/` package from `dotfiles-arch`.
+- This overlay stays additive so `dotfiles-arch` keeps ownership of the shared Neovim options file while WSL contributes only the Windows interoperability it needs.
 
 ### Git Identity
 

@@ -2,25 +2,34 @@
 
 WSL overlay dotfiles for making an Arch Linux WSL environment look and feel like Omarchy, managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
-This repo is applied on top of `dotfiles-arch`. It owns only the WSL and Windows-specific pieces needed to complete the Omarchy-like setup on Arch Linux running inside WSL.
+`dotfiles-wsl` is an additive overlay on top of `dotfiles-arch`. It owns only the WSL-specific and Windows-specific pieces needed to finish the setup on Arch Linux running inside WSL.
 
-This repo does not replace the shared Linux baseline. Complete `dotfiles-arch` first, then apply this overlay.
+This repo does not replace the shared Linux baseline. Complete `dotfiles-arch` first, then layer this overlay on top.
 
 ## Stack
 
 - **Base Layer**: `dotfiles-arch`
 - **Terminal**: [Windows Terminal](https://github.com/microsoft/terminal)
+- **Shell Overlay**: Bash repo auto-refresh enablement for `~/projects/repos`
 - **Editor Overlay**: [Neovim](https://github.com/neovim/neovim) WSL clipboard integration
 - **Theme**: [Miasma](https://github.com/xero/miasma.nvim)
 
-## Stow Packages
+## Package Layout
 
-Each directory is a GNU Stow package or a manually applied config:
+Each top-level directory is either a GNU Stow package or a manually applied config:
 
 ```text
-nvim-wsl/          WSL-specific Neovim options.lua overlay
+bash-wsl/          WSL Bash overlay (enables repo auto-refresh)
+nvim-wsl/          WSL-specific Neovim overlay (adds lua/config/overlay.lua)
 windows-terminal/  Windows Terminal settings.json, applied manually, not stowed
 ```
+
+Key ownership rules:
+
+- `dotfiles-arch` keeps ownership of shared Bash and Neovim behavior
+- `bash-wsl/` only enables WSL-side repo auto-refresh for the shared Bash helper
+- `nvim-wsl/` only adds `lua/config/overlay.lua` for WSL clipboard integration
+- `windows-terminal/` stays Windows-side and is applied manually
 
 ## Setup
 
@@ -84,7 +93,7 @@ sudo sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 sudo locale-gen
 ```
 
-### 4. Apply dotfiles-arch First
+### 4. Apply `dotfiles-arch` First
 
 Before using this repo, complete the full `dotfiles-arch` setup first:
 
@@ -92,9 +101,9 @@ Before using this repo, complete the full `dotfiles-arch` setup first:
 - clone the LazyVim starter into `~/.config/nvim`
 - create `~/.config/git/config.local`
 - clone `dotfiles-arch`
-- run the Arch baseline stow command without `nvim-arch`
+- run the Arch baseline stow command
 
-On WSL, apply the shared baseline packages from `dotfiles-arch` without `nvim-arch`:
+On WSL, apply the shared baseline packages from `dotfiles-arch`:
 
 ```bash
 cd ~/path/to/dotfiles-arch
@@ -115,40 +124,35 @@ Or with SSH:
 git clone git@github.com:peregrinus879/dotfiles-wsl.git ~/path/to/dotfiles-wsl
 ```
 
-### 6. Stow
+### 6. Prepare Overlay
 
 Checklist before stowing the overlay:
 
 - `dotfiles-arch` prerequisites and shared baseline stow are already complete
 - `~/.config/nvim` exists as a real LazyVim starter directory
-- `nvim-arch` is not currently stowed on this WSL machine
-- Any existing conflicting WSL overlay file was removed
+- Any existing conflicting WSL overlay files were removed
 
-If `nvim-arch` was ever stowed on this WSL machine, unstow it first from the `dotfiles-arch` repo:
-
-```bash
-cd ~/path/to/dotfiles-arch
-stow -D -v -t ~ nvim-arch
-```
-
-Remove any existing conflicting WSL overlay file:
+Remove any existing conflicting WSL overlay files:
 
 ```bash
-rm -f ~/.config/nvim/lua/config/options.lua
+rm -f ~/.config/bash-overlays/20-repo-auto-refresh
+rm -f ~/.config/nvim/lua/config/overlay.lua
 ```
 
-Then stow the WSL overlay:
+### 7. Stow
+
+Stow the WSL overlay packages:
 
 ```bash
 cd ~/path/to/dotfiles-wsl
-stow -v -t ~ nvim-wsl
+stow -v -t ~ bash-wsl nvim-wsl
 ```
 
 ### Unstow
 
 ```bash
 cd ~/path/to/dotfiles-wsl
-stow -D -v -t ~ nvim-wsl
+stow -D -v -t ~ bash-wsl nvim-wsl
 ```
 
 ### Dry Run
@@ -157,7 +161,32 @@ Preview what stow would do without making changes:
 
 ```bash
 cd ~/path/to/dotfiles-wsl
-stow -v -n -t ~ nvim-wsl
+stow -v -n -t ~ bash-wsl nvim-wsl
+```
+
+### 8. Bash Auto-Refresh
+
+`bash-wsl/` enables the shared repo auto-refresh helper from `dotfiles-arch`.
+
+Behavior:
+
+- only checks repos under `~/projects/repos`
+- runs when the shell prompt returns after you change directories
+- fetches remote updates quietly
+- fast-forwards only when the repo is clean and behind upstream only
+- warns and skips when the repo is dirty, diverged, detached, or mid-operation
+
+Optional tuning:
+
+```bash
+export REPO_AUTO_REFRESH_INTERVAL=300
+export REPO_AUTO_REFRESH_ROOT="$HOME/projects/repos"
+```
+
+Manual refresh for the current repo:
+
+```bash
+repo-refresh-now
 ```
 
 ## Windows Terminal
