@@ -1,8 +1,8 @@
 # dotfiles-wsl
 
-WSL overlay dotfiles for making an Arch Linux WSL environment look and feel like Omarchy, managed with [GNU Stow](https://www.gnu.org/software/stow/).
+WSL and Windows-specific overlay dotfiles on top of `dotfiles-arch`, managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
-`dotfiles-wsl` is an additive overlay on top of `dotfiles-arch`. It owns only the WSL-specific and Windows-specific pieces needed to finish the setup on Arch Linux running inside WSL.
+`dotfiles-wsl` is the additive WSL and Windows-specific overlay on top of `dotfiles-arch`. It owns only the WSL-specific and Windows-specific pieces needed to finish the setup on Arch Linux running inside WSL while preserving the shared Omarchy-derived baseline.
 
 This repo does not replace the shared Linux baseline. Complete `dotfiles-arch` first, then layer this overlay on top.
 
@@ -29,7 +29,7 @@ Key ownership rules:
 - `dotfiles-arch` keeps ownership of shared Bash and Neovim behavior
 - `bash-wsl/` only enables WSL-side repo auto-refresh for the shared Bash helper
 - `nvim-wsl/` only adds `lua/config/overlay.lua` for WSL clipboard integration
-- `windows-terminal/` stays Windows-side and is applied manually
+- `windows-terminal/` stays Windows-side, is applied manually, and intentionally tracks the full paste-ready `settings.json`
 
 ## Setup
 
@@ -193,6 +193,8 @@ repo-refresh-now
 
 Open Windows Terminal settings JSON with `Ctrl+Shift+,` and replace the contents with `windows-terminal/settings.json`.
 
+This repo intentionally tracks the full `settings.json` so it can be copied and pasted as-is without reconstructing a partial JSON fragment.
+
 Alternatively, edit the file directly at:
 
 ```text
@@ -215,10 +217,32 @@ Example:
   email = your-email@example.com
 ```
 
+## Verify
+
+After applying the baseline and the overlay:
+
+- Confirm the overlay symlinks exist: `test -L ~/.config/bash-overlays/20-repo-auto-refresh && test -L ~/.config/nvim/lua/config/overlay.lua`
+- Start a fresh shell and confirm the overlay loads without Bash startup errors.
+- In Neovim, confirm yanks reach the Windows clipboard and pastes from the Windows clipboard reach Neovim.
+- Run `repo-refresh-now` inside a clean repo under `~/projects/repos` to confirm the shared helper is available through the overlay.
+- Confirm Windows Terminal uses JetBrainsMono Nerd Font and the Miasma color scheme after applying `windows-terminal/settings.json`.
+
+## Maintainer Checklist
+
+When updating this overlay:
+
+1. Review `dotfiles-arch` first and keep any shared Linux behavior there.
+2. Review the current official WSL and Windows Terminal docs before changing setup or config structure.
+3. Use `/synchronize` when comparing this overlay against the baseline and upstream references.
+4. Confirm every intentional difference is still documented in `DEVIATIONS.md`.
+5. Keep `windows-terminal/settings.json` as a full paste-ready file unless the application model changes.
+6. Update `README.md` when setup order, verification steps, or Windows-side application steps change.
+7. Start fresh WSL and Windows Terminal sessions after structural changes and verify the overlay still applies cleanly.
+
 ## References
 
 - `README.md` - WSL setup, stow order, and Windows Terminal application
-- `APPROACH.md` - WSL-specific deviations from the shared baseline
+- `DEVIATIONS.md` - intentional deviations from the shared baseline
 - `AGENTS.md` - canonical repo-specific assistant context
 - `CLAUDE.md` - thin Claude Code wrapper importing `AGENTS.md`
 
@@ -234,7 +258,7 @@ Clone these locally if you plan to use `/synchronize` or compare this overlay ag
 
 ## Credits
 
-Adapted from [Omarchy](https://github.com/basecamp/omarchy). See [APPROACH.md](APPROACH.md) for overlay rationale and deviations.
+Adapted from [Omarchy](https://github.com/basecamp/omarchy). See [DEVIATIONS.md](DEVIATIONS.md) for intentional differences and overlay boundaries.
 
 ## License
 

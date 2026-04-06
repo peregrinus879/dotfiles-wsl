@@ -1,10 +1,12 @@
-# Approach
+# Deviations
 
-This document describes the methodology behind the WSL-specific overlay carried by `dotfiles-wsl`.
+## Purpose
 
-`dotfiles-arch` is the shared Linux baseline. This repo documents only the deviations required because the environment is WSL with Windows Terminal and Windows interoperability.
+This document records the intentional differences carried by `dotfiles-wsl` relative to the `dotfiles-arch` baseline, and defines the boundary between shared Linux behavior and WSL or Windows-specific overlay behavior.
 
-## Methodology
+Omarchy remains the upstream reference for the baseline design. `dotfiles-arch` is the baseline source of truth for shared Linux behavior. This repo exists only to document and carry the additive overlay required for WSL with Windows Terminal and Windows interoperability.
+
+## Deviation Policy
 
 The baseline for shell, terminal tooling, theming, and shared Neovim behavior lives in `dotfiles-arch`.
 
@@ -17,7 +19,7 @@ This repo exists to keep WSL-specific behavior isolated and additive.
 - **Keep the overlay additive.** If WSL only needs to extend a shared file, add a small overlay module instead of replacing baseline ownership.
 - **Keep Windows-specific behavior explicit.** Anything that depends on `clip.exe`, `powershell.exe`, or Windows Terminal should be documented as an overlay concern.
 
-## Deviations
+## Intentional Deviations
 
 ### Terminal
 

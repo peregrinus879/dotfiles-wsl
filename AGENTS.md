@@ -1,10 +1,10 @@
 # AGENTS.md - dotfiles-wsl
 
-WSL overlay dotfiles adapted from [Omarchy](https://github.com/basecamp/omarchy). Omarchy is the upstream reference, but `dotfiles-arch` is the baseline source of truth for shared Linux behavior.
+WSL overlay dotfiles adapted from [Omarchy](https://github.com/basecamp/omarchy). Omarchy is the upstream reference, and `dotfiles-arch` is the baseline source of truth for shared Linux behavior.
 
 ## Scope
 
-This repo is the WSL and Windows-specific overlay for the shared Linux baseline.
+This repo is the additive WSL and Windows-specific overlay for the shared Linux baseline.
 
 It owns:
 
@@ -27,7 +27,7 @@ It does not own:
 ## Key Files
 
 - `README.md` - overlay setup, stow order, and Windows Terminal application
-- `APPROACH.md` - WSL-specific deviations from the shared baseline
+- `DEVIATIONS.md` - intentional deviations from the shared baseline
 - `.claude/skills/synchronize/SKILL.md` - repo-specific sync workflow for the overlay
 
 ## Stow Packages
@@ -48,7 +48,7 @@ WSL should consume `dotfiles-arch` first, then layer `bash-wsl/` and `nvim-wsl/`
 - Complete the full `dotfiles-arch` setup before applying this overlay
 - `~/.config/nvim` should already exist as a real LazyVim starter directory from the baseline setup
 - `~/.config/bash-overlays/` is reserved for additive machine-specific shell behavior layered on top of the baseline
-- `windows-terminal/settings.json` is applied manually from Windows, not stowed from WSL
+- `windows-terminal/settings.json` is a full paste-ready config applied manually from Windows, not stowed from WSL
 - Git identity still comes from the baseline Git config via `~/.config/git/config.local`
 
 ## Reference Repos
@@ -72,4 +72,5 @@ Related local repos:
 
 - Use `/synchronize` when syncing this overlay against the baseline and upstream references
 - Keep changes within the overlay scope of this repo
+- Keep all intentional differences documented in `DEVIATIONS.md`
 - Put shared Linux behavior in `dotfiles-arch`, not here
