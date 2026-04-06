@@ -4,7 +4,7 @@
 
 This document records the intentional differences carried by `dotfiles-wsl` relative to the `dotfiles-arch` baseline, and defines the boundary between shared Linux behavior and WSL or Windows-specific overlay behavior.
 
-Omarchy remains the upstream reference for the baseline design. `dotfiles-arch` is the baseline source of truth for shared Linux behavior. This repo exists only to document and carry the additive overlay required for WSL with Windows Terminal and Windows interoperability.
+Omarchy remains the upstream reference for the baseline design. `dotfiles-arch` provides the shared Linux baseline used by this overlay. This repo exists only to document and carry the additive overlay required for WSL with Windows Terminal and Windows interoperability.
 
 ## Deviation Policy
 

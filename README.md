@@ -1,10 +1,17 @@
 # dotfiles-wsl
 
-WSL and Windows-specific overlay dotfiles on top of `dotfiles-arch`, managed with [GNU Stow](https://www.gnu.org/software/stow/).
+WSL (Arch Linux) dotfiles adapted from Omarchy, managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
 `dotfiles-wsl` is the additive WSL and Windows-specific overlay on top of `dotfiles-arch`. It owns only the WSL-specific and Windows-specific pieces needed to finish the setup on Arch Linux running inside WSL while preserving the shared Omarchy-derived baseline.
 
 This repo does not replace the shared Linux baseline. Complete `dotfiles-arch` first, then layer this overlay on top.
+
+## Repo Family
+
+- [`dotfiles-ai`](https://github.com/peregrinus879/dotfiles-ai) - Claude Code and OpenCode global dotfiles, managed with GNU Stow
+- [`dotfiles-arch`](https://github.com/peregrinus879/dotfiles-arch) - Headless Arch Linux dotfiles adapted from Omarchy, managed with GNU Stow
+- [`dotfiles-wsl`](https://github.com/peregrinus879/dotfiles-wsl) - WSL (Arch Linux) dotfiles adapted from Omarchy, managed with GNU Stow
+- [`dotfiles-omarchy`](https://github.com/peregrinus879/dotfiles-omarchy) - Omarchy personal dotfiles, managed with GNU
 
 ## Stack
 
@@ -224,9 +231,8 @@ Example:
 After applying the baseline and the overlay:
 
 - Confirm the overlay symlinks exist: `test -L ~/.config/bash-overlays/20-repo-auto-refresh && test -L ~/.config/nvim/lua/config/overlay.lua`
-- Start a fresh shell and confirm the overlay loads without Bash startup errors.
+- Start a fresh shell, confirm the overlay loads without Bash startup errors, and run `repo-refresh-now` inside a clean repo under `~/projects/repos`.
 - In Neovim, confirm yanks reach the Windows clipboard and pastes from the Windows clipboard reach Neovim.
-- Run `repo-refresh-now` inside a clean repo under `~/projects/repos` to confirm the shared helper is available through the overlay.
 - Confirm Windows Terminal uses JetBrainsMono Nerd Font and the Miasma color scheme after applying `windows-terminal/settings.json`.
 
 ## Maintainer Checklist

@@ -34,6 +34,13 @@ Reference repos live under `~/projects/repos/references/`:
 - [GNU Stow Manual](https://www.gnu.org/software/stow/manual/stow.html) - symlink management and package structure
 - [Git Docs](https://git-scm.com/docs) - config options and behavior
 
+## When To Use
+
+- Use this skill when `dotfiles-arch` or a reference repo changed materially.
+- Use this skill when overlay-owned behavior or ownership changed materially.
+- Use this skill when you suspect undocumented drift between this repo, the baseline, and its references.
+- Use this skill before broad sync-oriented doc updates.
+
 ## Workflow
 
 1. Compare `dotfiles-wsl` against the WSL-relevant parts of `dotfiles-arch`
@@ -48,13 +55,20 @@ Reference repos live under `~/projects/repos/references/`:
 4. Check `git log --format="%h %ad %s" --date=short -- <file>` on the relevant reference repo when you need to determine when a difference was introduced
 5. Cross-check differences against `DEVIATIONS.md`. If a difference is not documented there, treat it as a likely upstream change that needs review
 6. Apply new upstream additions and changes only where they belong in the WSL overlay
-7. Update `README.md` and `DEVIATIONS.md` when overlay ownership, setup steps, or documented deviations change
+7. Update `README.md`, `AGENTS.md`, and `DEVIATIONS.md` when overlay ownership, setup steps, or documented deviations change
+8. Summarize which changes were adopted, rejected, or intentionally kept different
+
+## Completion Checks
+
+- `README.md`, `AGENTS.md`, and `DEVIATIONS.md` reflect any ownership, setup, or workflow changes
+- Every retained difference is still documented in `DEVIATIONS.md`
+- The final summary distinguishes adopted changes, rejected changes, and intentional retained differences
 
 ## Rules
 
 - Present proposed changes to the user before editing
-- `dotfiles-arch` is the baseline source of truth for shared Linux behavior
-- Omarchy remains the upstream reference for the baseline design
+- Omarchy, official docs, official package docs, and `DEVIATIONS.md` are the source of truth for inherited behavior and intentional differences
+- `dotfiles-arch` provides the shared Linux baseline used by this overlay
 - Always check all relevant sources, not just one
 - Never assume a difference is intentional without verifying it is documented in `DEVIATIONS.md`
 - Do not copy shared Linux behavior into this repo if it belongs in `dotfiles-arch`
