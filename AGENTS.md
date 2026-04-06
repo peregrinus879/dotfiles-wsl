@@ -53,7 +53,7 @@ WSL should consume `dotfiles-arch` first, then layer `bash-wsl/` and `nvim-wsl/`
 
 ## Reference Repos
 
-Reference repos live under `~/projects/repos/references/`:
+Reference repos should be cloned locally under the canonical `~/projects/repos/references/` root used by `/synchronize`:
 
 - `omarchy/` - main repo for bash, tmux, starship, git, fastfetch, btop, and editorconfig references
 - `omarchy-pkgs/` - package builds, including the Omarchy Neovim package
@@ -62,7 +62,7 @@ Reference repos live under `~/projects/repos/references/`:
 
 Related local repos:
 
-- `~/projects/repos/dotfiles/dotfiles-arch` - shared Linux baseline this overlay depends on
+- `dotfiles-arch` should be available locally at `~/projects/repos/dotfiles/dotfiles-arch`, which is the canonical baseline path used by `/synchronize`
 
 ## Skills
 

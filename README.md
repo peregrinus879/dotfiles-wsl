@@ -106,7 +106,7 @@ Before using this repo, complete the full `dotfiles-arch` setup first:
 On WSL, apply the shared baseline packages from `dotfiles-arch`:
 
 ```bash
-cd ~/path/to/dotfiles-arch
+cd ~/projects/repos/dotfiles/dotfiles-arch
 stow -v -t ~ bash btop editorconfig fastfetch git nvim starship tmux yazi
 ```
 
@@ -114,14 +114,16 @@ This repo assumes the shared shell, tmux, git, fastfetch, btop, Yazi, and shared
 
 ### 5. Clone
 
-```bash
-git clone https://github.com/peregrinus879/dotfiles-wsl.git ~/path/to/dotfiles-wsl
+Recommended local layout for this repo family:
+
+```text
+~/projects/repos/dotfiles/dotfiles-wsl
 ```
 
-Or with SSH:
+Stow can work from any clone location, but the related docs and cross-repo maintenance workflows assume this layout.
 
 ```bash
-git clone git@github.com:peregrinus879/dotfiles-wsl.git ~/path/to/dotfiles-wsl
+git clone https://github.com/peregrinus879/dotfiles-wsl.git ~/projects/repos/dotfiles/dotfiles-wsl
 ```
 
 ### 6. Prepare Overlay
@@ -144,14 +146,14 @@ rm -f ~/.config/nvim/lua/config/overlay.lua
 Stow the WSL overlay packages:
 
 ```bash
-cd ~/path/to/dotfiles-wsl
+cd ~/projects/repos/dotfiles/dotfiles-wsl
 stow -v -t ~ bash-wsl nvim-wsl
 ```
 
 ### Unstow
 
 ```bash
-cd ~/path/to/dotfiles-wsl
+cd ~/projects/repos/dotfiles/dotfiles-wsl
 stow -D -v -t ~ bash-wsl nvim-wsl
 ```
 
@@ -160,7 +162,7 @@ stow -D -v -t ~ bash-wsl nvim-wsl
 Preview what stow would do without making changes:
 
 ```bash
-cd ~/path/to/dotfiles-wsl
+cd ~/projects/repos/dotfiles/dotfiles-wsl
 stow -v -n -t ~ bash-wsl nvim-wsl
 ```
 
