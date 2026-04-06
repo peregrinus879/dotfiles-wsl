@@ -8,14 +8,15 @@ This repo is the WSL and Windows-specific overlay for the shared Linux baseline.
 
 It owns:
 
-- WSL-native Neovim overlay in `nvim-wsl/`
+- WSL-only additive Bash overlay in `bash-wsl/`
+- WSL-only additive Neovim overlay in `nvim-wsl/`
 - Windows Terminal configuration in `windows-terminal/`
 - WSL-specific setup and overlay docs
 
 It does not own:
 
 - shared shell and terminal configs from `dotfiles-arch`
-- Arch-native Neovim overlay in `dotfiles-arch/nvim-arch/`
+- shared Neovim options ownership from `dotfiles-arch/nvim/`
 
 ## Environment
 
@@ -33,19 +34,20 @@ It does not own:
 
 Each top-level package is managed with GNU Stow and symlinked into `$HOME` where applicable.
 
+- `bash-wsl/`
 - `nvim-wsl/`
 
 Manual config:
 
 - `windows-terminal/` - Windows Terminal `settings.json`, not stowed from WSL
 
-WSL should consume `dotfiles-arch` first, and must not stow `nvim-arch/`.
+WSL should consume `dotfiles-arch` first, then layer `bash-wsl/` and `nvim-wsl/` on top for WSL-only additions.
 
 ## Setup Invariants
 
 - Complete the full `dotfiles-arch` setup before applying this overlay
 - `~/.config/nvim` should already exist as a real LazyVim starter directory from the baseline setup
-- Do not stow `nvim-arch/` on WSL; unstow it first if it was previously applied
+- `~/.config/bash-overlays/` is reserved for additive machine-specific shell behavior layered on top of the baseline
 - `windows-terminal/settings.json` is applied manually from Windows, not stowed from WSL
 - Git identity still comes from the baseline Git config via `~/.config/git/config.local`
 
