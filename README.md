@@ -142,9 +142,13 @@ Checklist before stowing the overlay:
 - `~/.config/nvim` exists as a real LazyVim starter directory
 - Any existing conflicting WSL overlay files were removed
 
-Remove any existing conflicting WSL overlay files:
+Remove existing files that would conflict with stow. The first block removes tree-folded directory symlinks left by a previous stow (harmless on a fresh machine). The second block removes individual config files:
 
 ```bash
+# Tree-folded directory symlinks (from a previous stow)
+rm -f ~/.config/bash-overlays
+
+# Individual config files
 rm -f ~/.config/bash-overlays/enable-repo-auto-refresh
 rm -f ~/.config/nvim/lua/config/overlay.lua
 ```
@@ -173,6 +177,26 @@ Preview what stow would do without making changes:
 cd ~/projects/repos/dotfiles/dotfiles-wsl
 stow -v -n -t ~ bash-wsl nvim-wsl
 ```
+
+### Re-stow
+
+To update symlinks after the repo content changes (same clone path):
+
+```bash
+cd ~/projects/repos/dotfiles/dotfiles-wsl
+stow -R -v -t ~ bash-wsl nvim-wsl
+```
+
+To migrate from a different clone path, unstow from the old location first:
+
+```bash
+cd /old/clone/path
+stow -D -v -t ~ bash-wsl nvim-wsl
+cd ~/projects/repos/dotfiles/dotfiles-wsl
+stow -v -t ~ bash-wsl nvim-wsl
+```
+
+If the old clone is no longer available, run the full cleanup in section 6 before stowing.
 
 ### 8. Bash Auto-Refresh
 
