@@ -213,19 +213,7 @@ Alternatively, edit the file directly at:
 
 ### 10. Private Git Identity
 
-The shared Git config from `dotfiles-arch` expects private identity to live in an untracked local file:
-
-```text
-~/.config/git/config.local
-```
-
-Example:
-
-```ini
-[user]
-  name = Your Name
-  email = your-email@example.com
-```
+If you did not already create `~/.config/git/config.local` during `dotfiles-arch` setup (step 4 in its README), do so now. The shared Git config expects private identity in that untracked local file.
 
 ## Verify
 
