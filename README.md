@@ -35,6 +35,7 @@ Key ownership rules:
 
 - `dotfiles-arch` keeps ownership of shared Bash and Neovim behavior
 - `bash-wsl/` only enables WSL-side repo auto-refresh for the shared Bash helper
+- Bash overlay filenames stay descriptive by default; reserve numeric prefixes for cases where multiple overlay files need explicit load ordering
 - `nvim-wsl/` only adds `lua/config/overlay.lua` for WSL clipboard integration; loaded automatically by `dotfiles-arch`'s `lua/config/options.lua` when present
 - `windows-terminal/` stays Windows-side, is applied manually, and intentionally tracks the full paste-ready `settings.json`
 
@@ -42,7 +43,7 @@ Key ownership rules:
 
 ### 1. Windows and WSL
 
-Install the Nerd Font and WSL from PowerShell:
+Open PowerShell as Administrator, then install the Nerd Font and WSL:
 
 ```powershell
 winget install DEVCOM.JetBrainsMonoNerdFont
@@ -51,10 +52,10 @@ wsl --install
 
 Windows Terminal uses the Windows-installed Nerd Font directly. WSL does not need a separate Linux font package for `tmux`, `nvim`, `yazi`, `starship`, or `fastfetch` icons to render correctly.
 
-Restart Windows if prompted, then install Arch Linux:
+Restart Windows if prompted, then install Arch Linux with the distro-specific `-d` form documented by Microsoft:
 
 ```powershell
-wsl --install archlinux
+wsl --install -d archlinux
 ```
 
 ### 2. WSL Initial Setup
@@ -85,7 +86,7 @@ default = <username>
 enabled = true
 ```
 
-Restart WSL from PowerShell:
+Restart WSL from PowerShell so `/etc/wsl.conf` changes are applied:
 
 ```powershell
 wsl --shutdown
@@ -144,7 +145,7 @@ Checklist before stowing the overlay:
 Remove any existing conflicting WSL overlay files:
 
 ```bash
-rm -f ~/.config/bash-overlays/20-repo-auto-refresh
+rm -f ~/.config/bash-overlays/enable-repo-auto-refresh
 rm -f ~/.config/nvim/lua/config/overlay.lua
 ```
 
@@ -230,7 +231,7 @@ Example:
 
 After applying the baseline and the overlay:
 
-- Confirm the overlay symlinks exist: `test -L ~/.config/bash-overlays/20-repo-auto-refresh && test -L ~/.config/nvim/lua/config/overlay.lua`
+- Confirm the overlay symlinks exist: `test -L ~/.config/bash-overlays/enable-repo-auto-refresh && test -L ~/.config/nvim/lua/config/overlay.lua`
 - Start a fresh shell, confirm the overlay loads without Bash startup errors, and run `repo-refresh-now` inside a clean repo under `~/projects/repos`.
 - In Neovim, confirm yanks reach the Windows clipboard and pastes from the Windows clipboard reach Neovim.
 - Confirm Windows Terminal uses JetBrainsMono Nerd Font and the Miasma color scheme after applying `windows-terminal/settings.json`.
@@ -239,7 +240,7 @@ After applying the baseline and the overlay:
 
 - **`stow` reports "existing target is not a symlink"**: Remove the conflicting file listed in the error, then re-run the stow command. Step 6 lists the expected cleanup targets.
 - **Neovim clipboard not working**: Confirm `clip.exe` and `powershell.exe` are accessible from WSL (`which clip.exe`). If Windows interop is disabled, check `[interop]` in `/etc/wsl.conf`.
-- **Bash overlay not loading**: Confirm the symlink exists (`test -L ~/.config/bash-overlays/20-repo-auto-refresh`) and that `dotfiles-arch` was stowed first so `enable_repo_auto_refresh` is defined.
+- **Bash overlay not loading**: Confirm the symlink exists (`test -L ~/.config/bash-overlays/enable-repo-auto-refresh`) and that `dotfiles-arch` was stowed first so `enable_repo_auto_refresh` is defined.
 
 ## References
 
