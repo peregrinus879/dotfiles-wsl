@@ -30,7 +30,7 @@ This repo exists to keep WSL-specific behavior isolated and additive.
 ### Bash
 
 - `bash-wsl/` enables the shared repo auto-refresh helper from `dotfiles-arch` through an additive file in `~/.config/bash-overlays/`.
-- This is a personal workflow deviation from Omarchy. It exists because the headless machine is the primary push source, while WSL benefits from automatic fetch plus fast-forward checks when entering repos under `~/projects/repos`.
+- This is a personal workflow deviation from Omarchy. It exists because the headless machine is the primary push source, while WSL benefits from automatic fetch plus fast-forward checks when entering repos under `~/Projects/repos`.
 - The helper remains disabled by default in `dotfiles-arch` so the shared headless baseline does not auto-refresh repos unless an overlay opts in.
 
 ### Neovim

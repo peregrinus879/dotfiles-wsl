@@ -42,12 +42,12 @@ It does not own:
 
 ## Reference Sources
 
-- `/synchronize` expects the shared baseline locally at `~/projects/repos/dotfiles/dotfiles-arch`
-- `/synchronize` expects local reference repos under the canonical `~/projects/repos/references/` root
-- `~/projects/repos/references/omarchy` - main repo for bash, tmux, starship, git, fastfetch, btop, and editorconfig references
-- `~/projects/repos/references/omarchy-pkgs` - package builds, including the Omarchy Neovim package
-- `~/projects/repos/references/miasma.nvim` - Miasma color scheme source
-- `~/projects/repos/references/windows-terminal` - Windows Terminal reference repo for settings structure and feature changes
+- `/synchronize` expects the shared baseline locally at `~/Projects/repos/dotfiles/dotfiles-arch`
+- `/synchronize` expects local reference repos under the canonical `~/Projects/repos/references/` root
+- `~/Projects/repos/references/omarchy` - main repo for bash, tmux, starship, git, fastfetch, btop, and editorconfig references
+- `~/Projects/repos/references/omarchy-pkgs` - package builds, including the Omarchy Neovim package
+- `~/Projects/repos/references/miasma.nvim` - Miasma color scheme source
+- `~/Projects/repos/references/windows-terminal` - Windows Terminal reference repo for settings structure and feature changes
 
 ## Skills
 
