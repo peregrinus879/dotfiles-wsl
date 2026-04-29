@@ -41,7 +41,8 @@ It does not own:
 - `nvim-wsl/overlay.lua` is loaded automatically by `dotfiles-arch`'s `lua/config/options.lua` when present via `require("config.overlay").setup()`
 - `~/.config/bash-overlays/` is reserved for additive machine-specific shell behavior layered on top of the baseline
 - `opencode-wsl/` stows `~/.config/opencode/themes/miasma.json` so OpenCode can select Miasma in WSL without changing shared `dotfiles-ai` runtime config
-- Use `stow --no-folding` for this overlay so the OpenCode theme file can coexist under `~/.config/opencode/`
+- `~/.config/opencode/` and `~/.config/opencode/themes/` must be real merge directories before stowing `opencode-wsl`
+- Do not use or document `stow --no-folding` as the OpenCode overlay fix; it does not repair directory symlinks owned by `dotfiles-ai`, so convert the directories first and use normal stow
 - `windows-terminal/settings.json` is a full paste-ready config applied manually from Windows, not stowed from WSL
 - Git identity still comes from the baseline Git config via `~/.config/git/config.local`
 
@@ -75,5 +76,5 @@ It does not own:
 4. Confirm every intentional difference is still documented in `DEVIATIONS.md`.
 5. Keep `windows-terminal/settings.json` as a full paste-ready file unless the application model changes.
 6. Update `README.md` when setup order, verification steps, or Windows-side application steps change.
-7. Confirm OpenCode still lists the stowed `miasma` theme from `~/.config/opencode/themes/miasma.json` before changing theme ownership.
+7. Confirm `~/.config/opencode/` and `~/.config/opencode/themes/` are real directories and OpenCode still lists the stowed `miasma` theme from `~/.config/opencode/themes/miasma.json` before changing theme ownership.
 8. Start fresh WSL and Windows Terminal sessions after structural changes and verify the overlay still applies cleanly.
