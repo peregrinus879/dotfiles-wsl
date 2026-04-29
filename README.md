@@ -26,7 +26,7 @@ dotfiles-arch + WSL overlay     → dotfiles-wsl
 
 - **Base Layer**: `dotfiles-arch`
 - **Terminal**: [Windows Terminal](https://github.com/microsoft/terminal)
-- **Shell Overlay**: Bash repo auto-refresh enablement for `~/projects/repos`
+- **Shell Overlay**: Bash repo auto-refresh enablement for `~/Projects/repos`
 - **Editor Overlay**: [Neovim](https://github.com/neovim/neovim) WSL clipboard integration
 - **Theme**: [Miasma](https://github.com/xero/miasma.nvim)
 
@@ -123,7 +123,7 @@ Before using this repo, complete the full `dotfiles-arch` setup first:
 On WSL, apply the shared baseline packages from `dotfiles-arch`:
 
 ```bash
-cd ~/projects/repos/dotfiles/dotfiles-arch
+cd ~/Projects/repos/dotfiles/dotfiles-arch
 stow -v -t ~ bash btop editorconfig fastfetch git nvim starship tmux yazi
 ```
 
@@ -134,13 +134,13 @@ This repo assumes the shared shell, tmux, git, fastfetch, btop, Yazi, and shared
 Recommended local layout for this repo family:
 
 ```text
-~/projects/repos/dotfiles/dotfiles-wsl
+~/Projects/repos/dotfiles/dotfiles-wsl
 ```
 
 Stow can work from any clone location, but the related docs and cross-repo maintenance workflows assume this layout.
 
 ```bash
-git clone https://github.com/peregrinus879/dotfiles-wsl.git ~/projects/repos/dotfiles/dotfiles-wsl
+git clone https://github.com/peregrinus879/dotfiles-wsl.git ~/Projects/repos/dotfiles/dotfiles-wsl
 ```
 
 ### 6. Prepare Overlay
@@ -167,14 +167,14 @@ rm -f ~/.config/nvim/lua/config/overlay.lua
 Stow the WSL overlay packages:
 
 ```bash
-cd ~/projects/repos/dotfiles/dotfiles-wsl
+cd ~/Projects/repos/dotfiles/dotfiles-wsl
 stow -v -t ~ bash-wsl nvim-wsl
 ```
 
 ### Unstow
 
 ```bash
-cd ~/projects/repos/dotfiles/dotfiles-wsl
+cd ~/Projects/repos/dotfiles/dotfiles-wsl
 stow -D -v -t ~ bash-wsl nvim-wsl
 ```
 
@@ -183,7 +183,7 @@ stow -D -v -t ~ bash-wsl nvim-wsl
 Preview what stow would do without making changes:
 
 ```bash
-cd ~/projects/repos/dotfiles/dotfiles-wsl
+cd ~/Projects/repos/dotfiles/dotfiles-wsl
 stow -v -n -t ~ bash-wsl nvim-wsl
 ```
 
@@ -192,7 +192,7 @@ stow -v -n -t ~ bash-wsl nvim-wsl
 To update symlinks after the repo content changes (same clone path):
 
 ```bash
-cd ~/projects/repos/dotfiles/dotfiles-wsl
+cd ~/Projects/repos/dotfiles/dotfiles-wsl
 stow -R -v -t ~ bash-wsl nvim-wsl
 ```
 
@@ -201,7 +201,7 @@ To migrate from a different clone path, unstow from the old location first:
 ```bash
 cd /old/clone/path
 stow -D -v -t ~ bash-wsl nvim-wsl
-cd ~/projects/repos/dotfiles/dotfiles-wsl
+cd ~/Projects/repos/dotfiles/dotfiles-wsl
 stow -v -t ~ bash-wsl nvim-wsl
 ```
 
@@ -213,7 +213,7 @@ If the old clone is no longer available, run the full cleanup in section 6 befor
 
 Behavior:
 
-- only checks repos under `~/projects/repos`
+- only checks repos under `~/Projects/repos`
 - runs when the shell prompt returns after you change directories
 - fetches remote updates quietly
 - fast-forwards only when the repo is clean and behind upstream only
@@ -223,7 +223,7 @@ Optional tuning:
 
 ```bash
 export REPO_AUTO_REFRESH_INTERVAL=300
-export REPO_AUTO_REFRESH_ROOT="$HOME/projects/repos"
+export REPO_AUTO_REFRESH_ROOT="$HOME/Projects/repos"
 ```
 
 Manual refresh for the current repo:
@@ -253,7 +253,7 @@ If you did not already create `~/.config/git/config.local` during `dotfiles-arch
 After applying the baseline and the overlay:
 
 - Confirm the overlay symlinks exist: `test -L ~/.config/bash-overlays/enable-repo-auto-refresh && test -L ~/.config/nvim/lua/config/overlay.lua`
-- Start a fresh shell, confirm the overlay loads without Bash startup errors, and run `repo-refresh-now` inside a clean repo under `~/projects/repos`.
+- Start a fresh shell, confirm the overlay loads without Bash startup errors, and run `repo-refresh-now` inside a clean repo under `~/Projects/repos`.
 - In Neovim, confirm yanks reach the Windows clipboard and pastes from the Windows clipboard reach Neovim.
 - Confirm Windows Terminal uses JetBrainsMono Nerd Font and the Miasma color scheme after applying `windows-terminal/settings.json`.
 
@@ -272,13 +272,13 @@ After applying the baseline and the overlay:
 
 ## Related Repos
 
-Clone these locally if you plan to use `/synchronize` or compare this overlay against upstream references. The `/synchronize` skill expects reference repos under `~/projects/repos/references/`.
+Clone these locally if you plan to use `/synchronize` or compare this overlay against upstream references. The `/synchronize` skill expects reference repos under `~/Projects/repos/references/`.
 
-- `~/projects/repos/dotfiles/dotfiles-arch` - shared baseline required before this overlay
-- `~/projects/repos/references/omarchy` - upstream Omarchy reference repo
-- `~/projects/repos/references/omarchy-pkgs` - upstream package reference repo
-- `~/projects/repos/references/miasma.nvim` - Miasma theme reference repo
-- `~/projects/repos/references/windows-terminal` - Windows Terminal reference repo
+- `~/Projects/repos/dotfiles/dotfiles-arch` - shared baseline required before this overlay
+- `~/Projects/repos/references/omarchy` - upstream Omarchy reference repo
+- `~/Projects/repos/references/omarchy-pkgs` - upstream package reference repo
+- `~/Projects/repos/references/miasma.nvim` - Miasma theme reference repo
+- `~/Projects/repos/references/windows-terminal` - Windows Terminal reference repo
 
 ## Credits
 

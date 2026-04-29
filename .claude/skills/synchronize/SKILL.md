@@ -11,11 +11,11 @@ Source configs from `dotfiles-arch`, reference repos, and official docs, compare
 
 ### Local Baseline
 
-- `~/projects/repos/dotfiles/dotfiles-arch` - shared Linux baseline that this overlay depends on
+- `~/Projects/repos/dotfiles/dotfiles-arch` - shared Linux baseline that this overlay depends on
 
 ### Reference Repos
 
-Reference repos live under `~/projects/repos/references/`:
+Reference repos live under `~/Projects/repos/references/`:
 
 - `omarchy/` - main repo for bash, tmux, starship, git, fastfetch, btop, and editorconfig references
 - `omarchy-pkgs/` - package builds, including the Omarchy Neovim package

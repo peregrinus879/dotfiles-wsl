@@ -1,6 +1,6 @@
 # Personal workflow deviation: keep WSL repo clones current with safe fast-forwards.
 export REPO_AUTO_REFRESH=1
-export REPO_AUTO_REFRESH_ROOT="${HOME}/projects/repos"
+export REPO_AUTO_REFRESH_ROOT="${HOME}/Projects/repos"
 export REPO_AUTO_REFRESH_INTERVAL="${REPO_AUTO_REFRESH_INTERVAL:-300}"
 
 if declare -F enable_repo_auto_refresh > /dev/null; then
