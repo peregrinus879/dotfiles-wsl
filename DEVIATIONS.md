@@ -27,6 +27,12 @@ This repo exists to keep WSL-specific behavior isolated and additive.
 - Miasma colors, JetBrainsMono Nerd Font, and padding are adapted into `windows-terminal/settings.json`.
 - Nerd Font installation remains a Windows-side concern. WSL does not need a separate Linux font package for icon rendering in Windows Terminal.
 
+### OpenCode
+
+- `.opencode/themes/miasma.json` provides a repo-local OpenCode Miasma theme for this WSL repo.
+- The theme is project-local instead of global because shared OpenCode runtime config belongs to `dotfiles-ai`, and this repo only needs Miasma available when working in the WSL overlay.
+- The repo does not force OpenCode's selected theme. Select `miasma` with `/theme` so the choice remains a user-level OpenCode preference.
+
 ### Bash
 
 - `bash-wsl/` enables the shared repo auto-refresh helper from `dotfiles-arch` through an additive file in `~/.config/bash-overlays/`.
@@ -55,4 +61,5 @@ The following do **not** belong in `dotfiles-wsl` because they are part of the s
 
 - Bash, tmux, starship, git, fastfetch, btop, editorconfig, and Yazi shared config
 - Shared Neovim plugins and common LazyVim configuration
+- Shared OpenCode runtime config from `dotfiles-ai`
 - Omarchy-derived baseline rationale that applies equally to headless Arch and WSL
