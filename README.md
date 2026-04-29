@@ -47,6 +47,7 @@ Key ownership rules:
 - `dotfiles-arch` keeps ownership of shared Bash and Neovim behavior
 - `dotfiles-ai` keeps ownership of shared OpenCode runtime config; this repo only adds WSL-specific theme availability
 - `opencode-wsl/` stows `~/.config/opencode/themes/miasma.json`, making Miasma selectable in OpenCode without forcing the selected theme
+- `~/.config/bash-overlays/`, `~/.config/opencode/`, and `~/.config/opencode/themes/` must be real merge directories so multiple dotfiles packages can link files inside them
 - `bash-wsl/` only enables WSL-side repo auto-refresh for the shared Bash helper
 - Bash overlay filenames stay descriptive by default; reserve numeric prefixes for cases where multiple overlay files need explicit load ordering
 - `nvim-wsl/` only adds `lua/config/overlay.lua` for WSL clipboard integration; loaded automatically by `dotfiles-arch`'s `lua/config/options.lua` when present
@@ -152,16 +153,27 @@ git clone https://github.com/peregrinus879/dotfiles-wsl.git ~/Projects/repos/dot
 Checklist before stowing the overlay:
 
 - `dotfiles-arch` prerequisites and shared baseline stow are already complete
+- `dotfiles-ai` OpenCode config is already stowed if you use OpenCode on this WSL install
 - `~/.config/nvim` exists as a real LazyVim starter directory
 - Any existing conflicting WSL overlay files were removed
 
-Remove existing files that would conflict with stow. The first block removes tree-folded directory symlinks left by a previous stow (harmless on a fresh machine). The second block removes individual config files:
+Remove existing files that would conflict with stow. The first block removes directory symlinks left by a previous stow (harmless on a fresh machine). The second block prepares shared merge directories, then re-stows `dotfiles-ai` so any shared OpenCode entries remain linked there. The final block removes individual WSL overlay files:
 
 ```bash
-# Tree-folded directory symlinks (from a previous stow)
-for path in ~/.config/bash-overlays ~/.config/opencode/themes; do
+# Directory symlinks (from a previous stow)
+for path in ~/.config/bash-overlays ~/.config/opencode; do
   [[ -L "$path" ]] && rm -f "$path"
 done
+
+# Shared merge directories
+mkdir -p ~/.config/bash-overlays ~/.config/opencode
+if [[ -L ~/.config/opencode/themes ]]; then
+  rm -f ~/.config/opencode/themes
+fi
+mkdir -p ~/.config/opencode/themes
+
+cd ~/Projects/repos/dotfiles/dotfiles-ai
+stow -v -t ~ opencode
 
 # Individual config files
 rm -f ~/.config/bash-overlays/enable-repo-auto-refresh
@@ -175,16 +187,14 @@ Stow the WSL overlay packages:
 
 ```bash
 cd ~/Projects/repos/dotfiles/dotfiles-wsl
-stow --no-folding -v -t ~ bash-wsl nvim-wsl opencode-wsl
+stow -v -t ~ bash-wsl nvim-wsl opencode-wsl
 ```
-
-Use `--no-folding` so the WSL overlay can add files under shared config directories such as `~/.config/opencode/` without replacing directories owned by another dotfiles package.
 
 ### Unstow
 
 ```bash
 cd ~/Projects/repos/dotfiles/dotfiles-wsl
-stow --no-folding -D -v -t ~ bash-wsl nvim-wsl opencode-wsl
+stow -D -v -t ~ bash-wsl nvim-wsl opencode-wsl
 ```
 
 ### Dry Run
@@ -193,7 +203,7 @@ Preview what stow would do without making changes:
 
 ```bash
 cd ~/Projects/repos/dotfiles/dotfiles-wsl
-stow --no-folding -v -n -t ~ bash-wsl nvim-wsl opencode-wsl
+stow -v -n -t ~ bash-wsl nvim-wsl opencode-wsl
 ```
 
 ### Re-stow
@@ -202,16 +212,16 @@ To update symlinks after the repo content changes (same clone path):
 
 ```bash
 cd ~/Projects/repos/dotfiles/dotfiles-wsl
-stow --no-folding -R -v -t ~ bash-wsl nvim-wsl opencode-wsl
+stow -R -v -t ~ bash-wsl nvim-wsl opencode-wsl
 ```
 
 To migrate from a different clone path, unstow from the old location first:
 
 ```bash
 cd /old/clone/path
-stow --no-folding -D -v -t ~ bash-wsl nvim-wsl opencode-wsl
+stow -D -v -t ~ bash-wsl nvim-wsl opencode-wsl
 cd ~/Projects/repos/dotfiles/dotfiles-wsl
-stow --no-folding -v -t ~ bash-wsl nvim-wsl opencode-wsl
+stow -v -t ~ bash-wsl nvim-wsl opencode-wsl
 ```
 
 If the old clone is no longer available, run the full cleanup in section 6 before stowing.
@@ -280,7 +290,7 @@ After applying the baseline and the overlay:
 - **`stow` reports "existing target is not a symlink"**: Remove the conflicting file listed in the error, then re-run the stow command. Step 6 lists the expected cleanup targets.
 - **Neovim clipboard not working**: Confirm `clip.exe` and `powershell.exe` are accessible from WSL (`which clip.exe`). If Windows interop is disabled, check `[interop]` in `/etc/wsl.conf`.
 - **Bash overlay not loading**: Confirm the symlink exists (`test -L ~/.config/bash-overlays/enable-repo-auto-refresh`) and that `dotfiles-arch` was stowed first so `enable_repo_auto_refresh` is defined.
-- **OpenCode Miasma not listed**: Confirm `~/.config/opencode/themes/miasma.json` is a symlink to `opencode-wsl/.config/opencode/themes/miasma.json`. If `~/.config/opencode/themes` is still a folded symlink to another dotfiles package, remove that symlink and re-run the WSL stow command with `--no-folding`.
+- **OpenCode Miasma not listed**: Confirm `~/.config/opencode/themes/miasma.json` is a symlink to `opencode-wsl/.config/opencode/themes/miasma.json`. If `~/.config/opencode` or `~/.config/opencode/themes` is still a directory symlink to another dotfiles package, repeat the merge directory prep in step 6, then re-run the WSL stow command.
 - **`tdl c` still reports Neovim `E21` after selecting Miasma**: Treat the theme as ruled out and investigate the tmux/OpenCode startup path separately.
 
 ## References
