@@ -28,25 +28,25 @@ dotfiles-arch + WSL overlay     → dotfiles-wsl
 - **Terminal**: [Windows Terminal](https://github.com/microsoft/terminal)
 - **Shell Overlay**: Bash repo auto-refresh enablement for `~/Projects/repos`
 - **Editor Overlay**: [Neovim](https://github.com/neovim/neovim) WSL clipboard integration
-- **AI TUI Theme**: repo-local OpenCode Miasma theme, selectable with `/theme`
+- **AI TUI Theme**: stowed OpenCode Miasma theme, selectable with `/theme`
 - **Theme**: [Miasma](https://github.com/xero/miasma.nvim)
 
 ## Package Layout
 
-Each top-level directory is either a GNU Stow package, a manually applied config, or repo-local project config:
+Each top-level directory is either a GNU Stow package or a manually applied config:
 
 ```text
-.opencode/          Repo-local OpenCode project config (adds Miasma theme)
 bash-wsl/          WSL Bash overlay (enables repo auto-refresh)
 nvim-wsl/          WSL-specific Neovim overlay (adds lua/config/overlay.lua)
+opencode-wsl/      WSL OpenCode overlay (adds the Miasma theme)
 windows-terminal/  Windows Terminal settings.json, applied manually, not stowed
 ```
 
 Key ownership rules:
 
 - `dotfiles-arch` keeps ownership of shared Bash and Neovim behavior
-- `dotfiles-ai` keeps ownership of shared OpenCode runtime config; this repo only adds a repo-local theme file for this project
-- `.opencode/themes/miasma.json` makes Miasma selectable in OpenCode when working in this repo; it does not force the theme globally
+- `dotfiles-ai` keeps ownership of shared OpenCode runtime config; this repo only adds WSL-specific theme availability
+- `opencode-wsl/` stows `~/.config/opencode/themes/miasma.json`, making Miasma selectable in OpenCode without forcing the selected theme
 - `bash-wsl/` only enables WSL-side repo auto-refresh for the shared Bash helper
 - Bash overlay filenames stay descriptive by default; reserve numeric prefixes for cases where multiple overlay files need explicit load ordering
 - `nvim-wsl/` only adds `lua/config/overlay.lua` for WSL clipboard integration; loaded automatically by `dotfiles-arch`'s `lua/config/options.lua` when present
@@ -159,11 +159,14 @@ Remove existing files that would conflict with stow. The first block removes tre
 
 ```bash
 # Tree-folded directory symlinks (from a previous stow)
-rm -f ~/.config/bash-overlays
+for path in ~/.config/bash-overlays ~/.config/opencode/themes; do
+  [[ -L "$path" ]] && rm -f "$path"
+done
 
 # Individual config files
 rm -f ~/.config/bash-overlays/enable-repo-auto-refresh
 rm -f ~/.config/nvim/lua/config/overlay.lua
+rm -f ~/.config/opencode/themes/miasma.json
 ```
 
 ### 7. Stow
@@ -172,14 +175,16 @@ Stow the WSL overlay packages:
 
 ```bash
 cd ~/Projects/repos/dotfiles/dotfiles-wsl
-stow -v -t ~ bash-wsl nvim-wsl
+stow --no-folding -v -t ~ bash-wsl nvim-wsl opencode-wsl
 ```
+
+Use `--no-folding` so the WSL overlay can add files under shared config directories such as `~/.config/opencode/` without replacing directories owned by another dotfiles package.
 
 ### Unstow
 
 ```bash
 cd ~/Projects/repos/dotfiles/dotfiles-wsl
-stow -D -v -t ~ bash-wsl nvim-wsl
+stow --no-folding -D -v -t ~ bash-wsl nvim-wsl opencode-wsl
 ```
 
 ### Dry Run
@@ -188,7 +193,7 @@ Preview what stow would do without making changes:
 
 ```bash
 cd ~/Projects/repos/dotfiles/dotfiles-wsl
-stow -v -n -t ~ bash-wsl nvim-wsl
+stow --no-folding -v -n -t ~ bash-wsl nvim-wsl opencode-wsl
 ```
 
 ### Re-stow
@@ -197,16 +202,16 @@ To update symlinks after the repo content changes (same clone path):
 
 ```bash
 cd ~/Projects/repos/dotfiles/dotfiles-wsl
-stow -R -v -t ~ bash-wsl nvim-wsl
+stow --no-folding -R -v -t ~ bash-wsl nvim-wsl opencode-wsl
 ```
 
 To migrate from a different clone path, unstow from the old location first:
 
 ```bash
 cd /old/clone/path
-stow -D -v -t ~ bash-wsl nvim-wsl
+stow --no-folding -D -v -t ~ bash-wsl nvim-wsl opencode-wsl
 cd ~/Projects/repos/dotfiles/dotfiles-wsl
-stow -v -t ~ bash-wsl nvim-wsl
+stow --no-folding -v -t ~ bash-wsl nvim-wsl opencode-wsl
 ```
 
 If the old clone is no longer available, run the full cleanup in section 6 before stowing.
@@ -238,9 +243,11 @@ repo-refresh-now
 
 ### 9. OpenCode Theme
 
-This repo provides a repo-local OpenCode Miasma theme at `.opencode/themes/miasma.json`.
+This repo provides an OpenCode Miasma theme through the `opencode-wsl/` Stow package.
 
-OpenCode loads project-local themes from `.opencode/themes/*.json`, so no global WSL OpenCode config or Bash environment override is required. Start OpenCode from this repo and select `miasma` with `/theme`.
+Stowing the package links `opencode-wsl/.config/opencode/themes/miasma.json` to `~/.config/opencode/themes/miasma.json`. OpenCode loads user-wide themes from that directory, so `miasma` is available from any WSL repo.
+
+This overlay does not set OpenCode's selected theme because shared OpenCode runtime config belongs to `dotfiles-ai`, and theme selection remains a user preference. Select `miasma` with `/theme`.
 
 ### 10. Windows Terminal
 
@@ -262,10 +269,10 @@ If you did not already create `~/.config/git/config.local` during `dotfiles-arch
 
 After applying the baseline and the overlay:
 
-- Confirm the overlay symlinks exist: `test -L ~/.config/bash-overlays/enable-repo-auto-refresh && test -L ~/.config/nvim/lua/config/overlay.lua`
+- Confirm the overlay symlinks exist: `test -L ~/.config/bash-overlays/enable-repo-auto-refresh && test -L ~/.config/nvim/lua/config/overlay.lua && test -L ~/.config/opencode/themes/miasma.json`
 - Start a fresh shell, confirm the overlay loads without Bash startup errors, and run `repo-refresh-now` inside a clean repo under `~/Projects/repos`.
 - In Neovim, confirm yanks reach the Windows clipboard and pastes from the Windows clipboard reach Neovim.
-- In OpenCode from this repo, run `/theme` and confirm `miasma` is available. Select it if OpenCode is still using the `system` theme.
+- In OpenCode, run `/theme` and confirm `miasma` is available. Select it if OpenCode is still using the `system` theme.
 - Confirm Windows Terminal uses JetBrainsMono Nerd Font and the Miasma color scheme after applying `windows-terminal/settings.json`.
 
 ## Troubleshooting
@@ -273,7 +280,7 @@ After applying the baseline and the overlay:
 - **`stow` reports "existing target is not a symlink"**: Remove the conflicting file listed in the error, then re-run the stow command. Step 6 lists the expected cleanup targets.
 - **Neovim clipboard not working**: Confirm `clip.exe` and `powershell.exe` are accessible from WSL (`which clip.exe`). If Windows interop is disabled, check `[interop]` in `/etc/wsl.conf`.
 - **Bash overlay not loading**: Confirm the symlink exists (`test -L ~/.config/bash-overlays/enable-repo-auto-refresh`) and that `dotfiles-arch` was stowed first so `enable_repo_auto_refresh` is defined.
-- **OpenCode Miasma not listed**: Start OpenCode from the repo root and confirm `.opencode/themes/miasma.json` exists. The theme is repo-local and is not installed globally in `~/.config/opencode/themes/`.
+- **OpenCode Miasma not listed**: Confirm `~/.config/opencode/themes/miasma.json` is a symlink to `opencode-wsl/.config/opencode/themes/miasma.json`. If `~/.config/opencode/themes` is still a folded symlink to another dotfiles package, remove that symlink and re-run the WSL stow command with `--no-folding`.
 - **`tdl c` still reports Neovim `E21` after selecting Miasma**: Treat the theme as ruled out and investigate the tmux/OpenCode startup path separately.
 
 ## References
@@ -282,7 +289,7 @@ After applying the baseline and the overlay:
 - `DEVIATIONS.md` - intentional deviations from the shared baseline
 - `AGENTS.md` - canonical repo-specific assistant context and maintainer checklist
 - `CLAUDE.md` - thin Claude Code wrapper importing `AGENTS.md`
-- `.opencode/themes/miasma.json` - repo-local OpenCode Miasma theme
+- `opencode-wsl/.config/opencode/themes/miasma.json` - WSL OpenCode Miasma theme
 
 ## Related Repos
 
