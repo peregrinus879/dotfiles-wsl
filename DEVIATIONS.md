@@ -29,8 +29,9 @@ This repo exists to keep WSL-specific behavior isolated and additive.
 
 ### OpenCode
 
-- `.opencode/themes/miasma.json` provides a repo-local OpenCode Miasma theme for this WSL repo.
-- The theme is project-local instead of global because shared OpenCode runtime config belongs to `dotfiles-ai`, and this repo only needs Miasma available when working in the WSL overlay.
+- `opencode-wsl/` stows `~/.config/opencode/themes/miasma.json` so OpenCode can select Miasma in WSL.
+- The theme file is WSL-specific theme availability, not shared OpenCode runtime config. Runtime config remains owned by `dotfiles-ai`.
+- Stow uses `--no-folding` so the WSL theme file can coexist with other OpenCode config files under `~/.config/opencode/`.
 - The repo does not force OpenCode's selected theme. Select `miasma` with `/theme` so the choice remains a user-level OpenCode preference.
 
 ### Bash

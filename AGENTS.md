@@ -10,7 +10,7 @@ It owns:
 
 - WSL-only additive Bash overlay in `bash-wsl/`
 - WSL-only additive Neovim overlay in `nvim-wsl/`
-- repo-local OpenCode Miasma theme in `.opencode/themes/`
+- WSL-only OpenCode Miasma theme in `opencode-wsl/`
 - Windows Terminal configuration in `windows-terminal/`
 - WSL-specific setup and overlay docs
 
@@ -30,17 +30,18 @@ It does not own:
 
 - `README.md` - overlay setup, stow order, and Windows Terminal application
 - `DEVIATIONS.md` - intentional deviations from the shared baseline
-- `.opencode/themes/miasma.json` - repo-local OpenCode Miasma theme
+- `opencode-wsl/.config/opencode/themes/miasma.json` - WSL OpenCode Miasma theme
 - `.claude/skills/synchronize/SKILL.md` - repo-specific sync workflow for the overlay
 
 ## Setup Invariants
 
-- WSL should consume `dotfiles-arch` first, then layer `bash-wsl/` and `nvim-wsl/` on top for WSL-only additions
+- WSL should consume `dotfiles-arch` first, then layer `bash-wsl/`, `nvim-wsl/`, and `opencode-wsl/` on top for WSL-only additions
 - Complete the full `dotfiles-arch` setup before applying this overlay
 - `~/.config/nvim` should already exist as a real LazyVim starter directory from the baseline setup
 - `nvim-wsl/overlay.lua` is loaded automatically by `dotfiles-arch`'s `lua/config/options.lua` when present via `require("config.overlay").setup()`
 - `~/.config/bash-overlays/` is reserved for additive machine-specific shell behavior layered on top of the baseline
-- `.opencode/themes/miasma.json` is intentionally repo-local so OpenCode can select Miasma in this WSL repo without changing shared `dotfiles-ai` config
+- `opencode-wsl/` stows `~/.config/opencode/themes/miasma.json` so OpenCode can select Miasma in WSL without changing shared `dotfiles-ai` runtime config
+- Use `stow --no-folding` for this overlay so the OpenCode theme file can coexist under `~/.config/opencode/`
 - `windows-terminal/settings.json` is a full paste-ready config applied manually from Windows, not stowed from WSL
 - Git identity still comes from the baseline Git config via `~/.config/git/config.local`
 
@@ -63,7 +64,7 @@ It does not own:
 - Keep changes within the overlay scope of this repo
 - Keep all intentional differences documented in `DEVIATIONS.md`
 - Update `README.md`, `AGENTS.md`, and `DEVIATIONS.md` together when ownership, setup, or sync assumptions change
-- Keep shared OpenCode runtime behavior in `dotfiles-ai`; use `.opencode/` here only for repo-local project config
+- Keep shared OpenCode runtime behavior in `dotfiles-ai`; use `opencode-wsl/` here only for WSL-specific OpenCode theme availability
 - Put shared Linux behavior in `dotfiles-arch`, not here
 
 ## Maintainer Checklist
@@ -74,5 +75,5 @@ It does not own:
 4. Confirm every intentional difference is still documented in `DEVIATIONS.md`.
 5. Keep `windows-terminal/settings.json` as a full paste-ready file unless the application model changes.
 6. Update `README.md` when setup order, verification steps, or Windows-side application steps change.
-7. Confirm OpenCode still lists the repo-local `miasma` theme from this repo before changing theme ownership.
+7. Confirm OpenCode still lists the stowed `miasma` theme from `~/.config/opencode/themes/miasma.json` before changing theme ownership.
 8. Start fresh WSL and Windows Terminal sessions after structural changes and verify the overlay still applies cleanly.
