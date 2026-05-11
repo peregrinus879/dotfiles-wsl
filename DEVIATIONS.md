@@ -35,7 +35,7 @@ This repo exists to keep WSL-specific behavior isolated and additive.
 - `~/.config/opencode/` and `~/.config/opencode/themes/` stay real merge directories so `dotfiles-ai` and `opencode-wsl` can both link files inside them.
 - The repo does not force OpenCode's selected theme. Select `miasma` with `/theme` so the choice remains a user-level OpenCode preference.
 - `miasma.json` uses flat string values rather than the `{dark, light}` object pairs used by upstream OpenCode themes in `packages/ui/src/theme/themes/`. The flat form is valid against `https://opencode.ai/theme.json`. Miasma is dark-only upstream in `miasma.nvim`, so inventing a light variant would not be faithful to the canonical palette.
-- Palette values and role mappings track `miasma.nvim/lua/miasma/palette.lua` and the highlight definitions in `colors/miasma.vim`. `text` mirrors `M.text` (`#d7c483`, Normal fg), `olive` mirrors `M.accent_primary` (`#78834b`), and `primary` maps to that olive accent rather than the amber/string color.
+- Palette defs and role mappings track `miasma.nvim/lua/miasma/palette.lua` and the highlight definitions in `colors/miasma.vim`. Def names mirror the canonical palette (`base`, `surface`, `surfaceHighlight`, `text`, `textMuted`, `amber`, `orange`, `accentPrimary`, `accentSecondary`, `warning`, `error`). `primary` maps to `accentPrimary` (`#78834b`) so opencode's dominant accent matches miasma.nvim's Type, Function, and selection accent rather than the amber/string color. `syntaxString` maps to `warning` (`#685742`) per `M.string = M.warning` in palette.lua.
 
 ### Bash
 
