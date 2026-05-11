@@ -138,9 +138,9 @@
         {
             "background": "#222222",
             "black": "#000000",
-            "blue": "#78834B",
+            "blue": "#78824B",
             "brightBlack": "#666666",
-            "brightBlue": "#78834B",
+            "brightBlue": "#78824B",
             "brightCyan": "#C9A554",
             "brightGreen": "#5F875F",
             "brightPurple": "#BB7744",
@@ -154,7 +154,7 @@
             "name": "Miasma",
             "purple": "#BB7744",
             "red": "#685742",
-            "selectionBackground": "#78834B",
+            "selectionBackground": "#78824B",
             "white": "#D7C483",
             "yellow": "#B36D43"
         },

@@ -25,6 +25,7 @@ This repo exists to keep WSL-specific behavior isolated and additive.
 
 - Windows Terminal replaces Ghostty and any Linux-native terminal assumption from the baseline.
 - Miasma colors, JetBrainsMono Nerd Font, and padding are adapted into `windows-terminal/settings.json`.
+- The Miasma color scheme tracks Omarchy's terminal-side canonical palette in `references/omarchy/themes/miasma/colors.toml` and `btop.theme`. That source uses `#78824b` as the olive accent (slightly dimmer than `miasma.nvim`'s `accent_primary = #78834b`), `#c2c2b0` as the terminal main fg, and intentionally identical ANSI bright and dark pairs (`color1..color7` equal `color9..color15`). The scheme keeps those choices to stay consistent with Omarchy's terminal experience.
 - Nerd Font installation remains a Windows-side concern. WSL does not need a separate Linux font package for icon rendering in Windows Terminal.
 
 ### OpenCode
