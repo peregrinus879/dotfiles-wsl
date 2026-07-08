@@ -3,10 +3,18 @@
 -- Add any additional options here
 vim.opt.relativenumber = false
 
-local uv = vim.uv or vim.loop
-local overlay = vim.fn.stdpath("config") .. "/lua/config/overlay.lua"
-
--- Allow environment overlays to extend shared options without replacing them.
-if uv.fs_stat(overlay) then
-  require("config.overlay").setup()
+-- WSL clipboard: requires clip.exe (copy) and powershell.exe (paste) from Windows interop.
+if vim.fn.executable("clip.exe") == 1 and vim.fn.executable("powershell.exe") == 1 then
+  vim.g.clipboard = {
+    name = "WslClipboard",
+    copy = {
+      ["+"] = "clip.exe",
+      ["*"] = "clip.exe",
+    },
+    paste = {
+      ["+"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+      ["*"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+    },
+    cache_enabled = 0,
+  }
 end
