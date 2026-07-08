@@ -60,10 +60,6 @@ It does not own:
 - Update `README.md`, `AGENTS.md`, and `DEVIATIONS.md` together when ownership, setup, or sync assumptions change
 - Keep shared AI harness runtime config in `dotfiles-ai`; use `opencode-wsl/` here only for WSL-specific OpenCode theme availability
 
-## Future Enhancements
-
-- **Windows Terminal drift detection**: Script to checksum tracked `settings.json` against the deployed Windows-side file at `/mnt/c/Users/.../LocalState/settings.json`.
-
 ## Maintainer Checklist
 
 1. Review the local reference repos and the current official WSL and Windows Terminal docs for upstream changes to owned packages.
@@ -72,5 +68,6 @@ It does not own:
 4. Update `README.md` when package ownership, setup steps, or verification steps change.
 5. Confirm the setup invariants still hold: LazyVim starter, `~/.config/git/config.local`, package list, Stow targets, and OpenCode merge directories.
 6. Run `make verify` and `make lint` from the repo root after changing owned packages.
+7. Run `make wt-diff` before and after editing `windows-terminal/settings.json` so tracked and deployed stay in sync.
 6. Keep `windows-terminal/settings.json` as a full paste-ready file unless the application model changes.
 7. Start fresh WSL and Windows Terminal sessions after structural changes and verify the shell, Neovim, clipboard round-trip, and OpenCode theme still load cleanly.

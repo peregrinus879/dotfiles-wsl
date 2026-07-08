@@ -318,11 +318,14 @@ A repo-root `Makefile` keeps the package list in one place and wraps the routine
 - `make verify` - the Verify symlink and identity checks plus shell and Lua syntax checks
 - `make clean` - the Prepare cleanup steps
 - `make lint` - ShellCheck over the bash package; `.shellcheckrc` disables the pre-existing upstream-derived warnings so new issues stand out
+- `make wt-diff` - diff the tracked Windows Terminal settings against the deployed Windows-side file (normalized with `jq`, since Windows Terminal rewrites key order)
+- `make wt-pull` - copy the deployed Windows Terminal settings into the repo for review with `git diff`
 
 ## References
 
 - `README.md` - package layout, setup, and verification
-- `Makefile` - stow, verification, and cleanup automation
+- `Makefile` - stow, verification, cleanup, lint, and drift-detection automation
+- `scripts/wt-diff.sh` - Windows Terminal settings drift detection
 - `DEVIATIONS.md` - intentional deviations from Omarchy and boundary definitions
 - `AGENTS.md` - canonical repo-specific assistant context and maintainer checklist
 - `CLAUDE.md` - thin Claude Code wrapper importing `AGENTS.md`

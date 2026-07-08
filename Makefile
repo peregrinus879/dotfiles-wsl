@@ -5,7 +5,7 @@ SHELL := /bin/bash
 PACKAGES := bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
 AI_REPO := ../dotfiles-ai
 
-.PHONY: help stow unstow dry-run restow stow-all verify clean lint
+.PHONY: help stow unstow dry-run restow stow-all verify clean lint wt-diff wt-pull
 
 help:
 	@echo "Targets:"
@@ -17,6 +17,8 @@ help:
 	@echo "  verify    Check symlinks, git identity, and shell/Lua syntax"
 	@echo "  clean     Remove files that would conflict with stow (README Prepare steps)"
 	@echo "  lint      ShellCheck over the bash package (.shellcheckrc holds the disable list)"
+	@echo "  wt-diff   Diff tracked Windows Terminal settings against the deployed file"
+	@echo "  wt-pull   Copy the deployed Windows Terminal settings into the repo for review"
 
 stow:
 	stow -v -t ~ $(PACKAGES)
@@ -78,5 +80,12 @@ clean:
 
 lint:
 	shellcheck -s bash bash/.bashrc bash/.config/bash/envs bash/.config/bash/shell \
-	  bash/.config/bash/aliases bash/.config/bash/init bash/.config/bash/functions/*
+	  bash/.config/bash/aliases bash/.config/bash/init bash/.config/bash/functions/* \
+	  scripts/wt-diff.sh
 	@echo "ok:   shellcheck clean"
+
+wt-diff:
+	scripts/wt-diff.sh
+
+wt-pull:
+	scripts/wt-diff.sh --pull
