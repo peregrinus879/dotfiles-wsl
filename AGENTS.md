@@ -17,7 +17,6 @@ It does not own:
 
 - shared Claude Code and OpenCode runtime config from `dotfiles-ai`
 - Omarchy desktop customizations from `dotfiles-omarchy`
-- runbooks and hardware guides for the retiring headless host, which remain in the frozen `dotfiles-arch`
 
 ## Environment
 

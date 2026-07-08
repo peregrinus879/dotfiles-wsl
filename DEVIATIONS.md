@@ -145,4 +145,3 @@ The following do **not** belong in `dotfiles-wsl`:
 
 - Shared OpenCode and Claude Code runtime config (belongs in `dotfiles-ai`)
 - Omarchy desktop customizations such as Hyprland bindings (belong in `dotfiles-omarchy`)
-- Runbooks and hardware guides for the retiring headless host (remain in the frozen `dotfiles-arch`)
