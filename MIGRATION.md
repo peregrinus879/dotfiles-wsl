@@ -14,6 +14,27 @@ Rules for this migration:
   needs the old package names (`bash-wsl`, `nvim-wsl`) that no longer
   exist after the pull.
 
+## 0. Disable repo auto-refresh for this session
+
+The old `bash-wsl` overlay is still active and auto-fast-forwards any
+clean repo under `~/Projects/repos` on `cd`. Left on, it would pull
+this repo before step 2's unstow and delete the old package dirs that
+`stow -D` needs.
+
+```bash
+export REPO_AUTO_REFRESH=0
+```
+
+If the repo already fast-forwarded before the unstow (step 2 reports
+`bash-wsl`/`nvim-wsl` missing), recover by checking out the last
+pre-restructure commit, unstowing from it, then returning to main:
+
+```bash
+git -C ~/Projects/repos/dotfiles/dotfiles-wsl checkout 72abe94
+# run step 2, then:
+git -C ~/Projects/repos/dotfiles/dotfiles-wsl checkout main
+```
+
 ## 1. Back up the git identity
 
 If `~/.config/git` is a tree-folded symlink, `config.local` physically
