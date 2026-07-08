@@ -317,6 +317,7 @@ A repo-root `Makefile` keeps the package list in one place and wraps the routine
 - `make stow-all` - stows `dotfiles-ai`'s `opencode` package first, then all packages here
 - `make verify` - the Verify symlink and identity checks plus shell and Lua syntax checks
 - `make clean` - the Prepare cleanup steps
+- `make lint` - ShellCheck over the bash package; `.shellcheckrc` disables the pre-existing upstream-derived warnings so new issues stand out
 
 ## References
 

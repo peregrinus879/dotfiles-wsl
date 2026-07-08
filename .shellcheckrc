@@ -1,0 +1,4 @@
+# Upstream-derived dotfiles patterns kept verbatim for Omarchy diffability:
+# SC1090/SC1091 (non-constant/unfollowed source paths, inherent to dotfiles),
+# SC2155 (declare-and-assign), SC2164 (cd without || return).
+disable=SC1090,SC1091,SC2155,SC2164

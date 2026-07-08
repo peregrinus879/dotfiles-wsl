@@ -62,7 +62,6 @@ It does not own:
 
 ## Future Enhancements
 
-- **ShellCheck**: Makefile target or pre-commit hook covering `bash/.bashrc` and `bash/.config/bash/*`. `shellcheck` is already in the baseline package list. Known pre-existing SC2164/SC2155 warnings in upstream-derived functions are kept for Omarchy diffability.
 - **Windows Terminal drift detection**: Script to checksum tracked `settings.json` against the deployed Windows-side file at `/mnt/c/Users/.../LocalState/settings.json`.
 
 ## Maintainer Checklist
@@ -72,6 +71,6 @@ It does not own:
 3. Confirm every intentional difference is still documented in `DEVIATIONS.md`.
 4. Update `README.md` when package ownership, setup steps, or verification steps change.
 5. Confirm the setup invariants still hold: LazyVim starter, `~/.config/git/config.local`, package list, Stow targets, and OpenCode merge directories.
-6. Run `make verify` from the repo root after changing owned packages.
+6. Run `make verify` and `make lint` from the repo root after changing owned packages.
 6. Keep `windows-terminal/settings.json` as a full paste-ready file unless the application model changes.
 7. Start fresh WSL and Windows Terminal sessions after structural changes and verify the shell, Neovim, clipboard round-trip, and OpenCode theme still load cleanly.
