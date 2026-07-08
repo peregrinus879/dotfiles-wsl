@@ -2,31 +2,94 @@
 
 ## Purpose
 
-This document records the intentional differences carried by `dotfiles-wsl` relative to the `dotfiles-arch` baseline, and defines the boundary between shared Linux behavior and WSL or Windows-specific overlay behavior.
+This document records the intentional differences carried by `dotfiles-wsl` relative to [Omarchy](https://github.com/basecamp/omarchy), and defines the boundary between this repo and its siblings.
 
-Omarchy remains the upstream reference for the baseline design. `dotfiles-arch` provides the shared Linux baseline used by this overlay. This repo exists only to document and carry the additive overlay required for WSL with Windows Terminal and Windows interoperability.
+Omarchy remains the upstream reference. This repo carries the full terminal baseline for Arch Linux inside WSL, plus the WSL and Windows-specific behavior that a Linux desktop distribution does not cover.
 
 ## Deviation Policy
 
-The baseline for shell, terminal tooling, theming, and shared Neovim behavior lives in `dotfiles-arch`.
-
-This repo exists to keep WSL-specific behavior isolated and additive.
+Omarchy is an opinionated Arch Linux distribution targeting a full desktop environment with Hyprland, systemd user services, GUI applications, and hardware-specific integrations. This repo extracts the terminal-layer configuration that remains useful inside WSL and restructures it into GNU Stow packages.
 
 **Guiding principles:**
 
-1. **Keep the overlay thin.** If a config works unchanged on headless Arch and WSL, it belongs in `dotfiles-arch`, not here.
-2. **Adapt only what breaks or does not apply on WSL.** Windows interop, Windows Terminal, and clipboard integration belong here because they are not part of a portable Linux baseline.
-3. **Keep the overlay additive.** If WSL only needs to extend a shared file, add a small overlay module instead of replacing baseline ownership.
-4. **Keep Windows-specific behavior explicit.** Anything that depends on `clip.exe`, `powershell.exe`, or Windows Terminal should be documented as an overlay concern.
+1. **Follow Omarchy conventions by default.** Aliases, keybindings, tmux layout ratios, and tool choices should stay close to Omarchy unless a WSL or non-desktop constraint requires a change.
+2. **Adapt only what breaks or does not apply.** Desktop-bound behavior, GUI launchers, and hardware workflows are omitted because they do not fit WSL.
+3. **Keep Windows-specific behavior explicit.** Anything that depends on `clip.exe`, `powershell.exe`, or Windows Terminal should be documented as a Windows interop concern.
+4. **Use GNU Stow for dotfile management.** Omarchy uses direct file copies and packaged assets. This repo uses symlink-based package ownership for clearer separation and reuse.
+5. **Single theme, no switching.** Omarchy supports many themes and hot-reload infrastructure. This repo uses Miasma only, so theme switching infrastructure is intentionally omitted.
+6. **Official Arch repos only.** The baseline depends on no AUR packages and installs no AUR helper.
+
+## Reference Sources
+
+- [basecamp/omarchy](https://github.com/basecamp/omarchy) - main repo for bash, tmux, starship, git, fastfetch, btop, and editorconfig references
+- [omacom-io/omarchy-pkgs](https://github.com/omacom-io/omarchy-pkgs) - package builds, including the Omarchy Neovim package
+- [OldJobobo/miasma.nvim](https://github.com/OldJobobo/miasma.nvim) - Miasma Neovim plugin used by Omarchy (optimized fork of `xero/miasma.nvim`)
+- [microsoft/terminal](https://github.com/microsoft/terminal) - Windows Terminal settings structure and feature changes
+- `themes/miasma/colors.toml` in `basecamp/omarchy` - canonical terminal-side Miasma palette
+
+The Miasma palette has two intentional canons in this repo. Terminal-side files (tmux status, btop theme, Yazi theme, Windows Terminal scheme) track `themes/miasma/colors.toml` with the `#78824b` olive accent. Plugin-side files (the Neovim colorscheme and the OpenCode theme) track `miasma.nvim` with the slightly brighter `accent_primary = #78834b`. Keep each file aligned with its own canon.
 
 ## Intentional Deviations
 
+### Environment Target
+
+- Arch Linux inside WSL, not a full Omarchy desktop.
+- Desktop services, GUI launchers, display manager integration, and Hyprland-specific behavior are intentionally excluded.
+- Nerd Font rendering is a Windows-side concern. Windows Terminal uses the Windows-installed JetBrainsMono Nerd Font; WSL needs no Linux font package.
+
+### Dotfile Management
+
+- GNU Stow with symlinked package ownership replaces Omarchy's file-copy and package-install model.
+
+### Theme
+
+- Only Miasma is configured. Omarchy's multi-theme plugin set and theme hot-reload infrastructure are omitted.
+
 ### Terminal
 
-- Windows Terminal replaces Ghostty and any Linux-native terminal assumption from the baseline.
+- Windows Terminal replaces Ghostty from the Omarchy desktop.
 - Miasma colors, JetBrainsMono Nerd Font, and padding are adapted into `windows-terminal/settings.json`.
 - The Miasma color scheme tracks Omarchy's terminal-side canonical palette in `references/omarchy/themes/miasma/colors.toml` and `btop.theme`. That source uses `#78824b` as the olive accent (slightly dimmer than `miasma.nvim`'s `accent_primary = #78834b`), `#c2c2b0` as the terminal main fg, and intentionally identical ANSI bright and dark pairs (`color1..color7` equal `color9..color15`). The scheme keeps those choices to stay consistent with Omarchy's terminal experience.
-- Nerd Font installation remains a Windows-side concern. WSL does not need a separate Linux font package for icon rendering in Windows Terminal.
+
+### Bash
+
+- Config location is `~/.config/bash/` using an XDG-style layout instead of Omarchy's internal default path.
+- Modular shell functions live in `~/.config/bash/functions/` and are sourced via a loop in `.bashrc`.
+- Optional Bash overlays are sourced from `~/.config/bash-overlays/*` after the shared init. The directory is untracked and reserved for machine-local additions.
+- Dropped aliases: `open` (GUI-only), `d='docker'`, and `r='rails'`.
+- `cx` omits Omarchy's permission-bypass flag (currently `--permission-mode bypassPermissions` upstream).
+- `y()` is added for Yazi cd-on-exit support. Yazi is not part of Omarchy.
+- `mise`-specific shell handling is omitted.
+- No `pacman` alias and no AUR helper. Omarchy routes updates through `omarchy-update-perform`, which is Hyprland/desktop-bound; this repo uses plain `pacman` against official repos only.
+
+### Git
+
+- `~/.config/git/config` opens with `[include] path = ~/.config/git/config.local` so the local untracked `[user]` block is loaded first. Omarchy installs identity into the tracked file directly during install.
+- `[init] defaultBranch = main` replaces Omarchy's `master`.
+- Inline option comments are removed because the same intent is captured in this file. Omarchy keeps inline comments next to each option.
+- Private Git identity is intentionally not tracked. WSL uses the untracked local file `~/.config/git/config.local` for `[user]` name and email.
+
+### Starship
+
+- The prompt shows `hostname` only during SSH sessions so remote shells are visually distinct from local ones while keeping the local prompt minimal.
+- The `conflicted`, `up_to_date`, and `modified` Git status icons use Material Design Icons codepoints instead of Omarchy's Nerd Font private-use codepoints, matching the same broader-terminal-font compatibility rationale used for Fastfetch.
+
+### Tmux Dev Layout
+
+- `tdl` keeps the local split ratios from this dotfiles setup rather than mirroring Omarchy exactly: 50% editor and 50% AI in the top 85%, with a 15% bottom terminal pane.
+- `tdl` guards AI panes with a per-pane `allow-passthrough off` during initialization, restoring it after 1 second via a background subshell. This prevents DCS passthrough responses from OpenCode's TUI init being misrouted to the editor pane during the focus transition, which causes Neovim E349 on startup. Claude Code is not affected. Proposed upstream in [basecamp/omarchy#5256](https://github.com/basecamp/omarchy/pull/5256).
+
+### Tmux Status Theme
+
+- Status bar accents are hardcoded to the canonical Miasma palette (`#78824b` accent, `#222222` background) sourced from `themes/miasma/colors.toml` in `basecamp/omarchy`. Omarchy uses terminal-palette names (`blue`, `black`) and relies on the active theme to bind those palette slots to Miasma values at runtime via `omarchy-theme-set`. This repo has no theme-switching infrastructure, so hardcoded hex locks the tmux status bar to Miasma and keeps it consistent with the Windows Terminal scheme.
+
+### Neovim
+
+- `lua/config/options.lua` keeps Omarchy's `vim.opt.relativenumber = false` baseline and adds WSL clipboard integration directly, guarded by `clip.exe` and `powershell.exe` availability so the block is a no-op outside WSL. Copy uses `clip.exe`; paste uses `powershell.exe Get-Clipboard`.
+- `all-themes.lua` and `omarchy-theme-hotreload.lua` are omitted because this repo uses Miasma only.
+- Kept verbatim from `omarchy-nvim`: `disable-news-alert.lua`, `snacks-animated-scrolling-off.lua`, and `vim.opt.relativenumber = false`.
+- `transparency.lua` content is verbatim from `omarchy-nvim` but relocated from `plugin/after/` to `after/plugin/` to use Neovim's actual after-load mechanism. Upstream `omarchy-nvim` still uses the incorrect path.
+- Owned Lua files use 2-space indentation per the shared `.editorconfig` in this repo. Upstream `omarchy-nvim` uses tabs. Contents are otherwise unchanged.
 
 ### OpenCode
 
@@ -37,33 +100,49 @@ This repo exists to keep WSL-specific behavior isolated and additive.
 - `miasma.json` uses flat string values rather than the `{dark, light}` object pairs used by upstream OpenCode themes in `packages/ui/src/theme/themes/`. The flat form is valid against `https://opencode.ai/theme.json`. Miasma is dark-only upstream in `miasma.nvim`, so inventing a light variant would not be faithful to the canonical palette.
 - Palette defs and role mappings track `miasma.nvim/lua/miasma/palette.lua` and the highlight definitions in `colors/miasma.vim`. Def names mirror the canonical palette (`base`, `surface`, `surfaceHighlight`, `text`, `textMuted`, `amber`, `orange`, `accentPrimary`, `accentSecondary`, `warning`, `error`). `primary` maps to `accentPrimary` (`#78834b`) so opencode's dominant accent matches miasma.nvim's Type, Function, and selection accent rather than the amber/string color. `syntaxString` maps to `warning` (`#685742`) per `M.string = M.warning` in palette.lua.
 
-### Bash
+### Fastfetch
 
-- `bash-wsl/` enables the shared repo auto-refresh helper from `dotfiles-arch` through an additive file in `~/.config/bash-overlays/`.
-- This is a personal workflow deviation from Omarchy. It exists because the headless machine is the primary push source, while WSL benefits from automatic fetch plus fast-forward checks when entering repos under `~/Projects/repos`.
-- The helper remains disabled by default in `dotfiles-arch` so the shared headless baseline does not auto-refresh repos unless an overlay opts in.
+- Fastfetch is rewritten for a terminal-first environment instead of Omarchy's desktop-oriented presentation.
+- The same box-drawing structure and section layout are kept: Hardware, Software, and Uptime.
+- Desktop modules are omitted: `display`, `wm`, `de`, and `wmtheme`.
+- Omarchy-specific helper commands are omitted: `omarchy-version`, `omarchy-version-branch`, `omarchy-version-channel`, `omarchy-version-pkgs`, and `omarchy-theme-current`.
+- `OS Age` is omitted.
+- Omarchy's ASCII logo is replaced with fastfetch's built-in small logo.
+- Icon codepoints use the Material Design Icons range for broader terminal font compatibility.
+- Standard modules `shell` and `os` are added.
 
-### Neovim
+### Btop
 
-- `nvim-wsl/` provides `lua/config/overlay.lua`, which is loaded by the shared `dotfiles-arch` `lua/config/options.lua` when present.
-- WSL clipboard integration is implemented with `clip.exe` for copy and `powershell.exe Get-Clipboard` for paste.
-- This overlay stays additive so `dotfiles-arch` keeps ownership of the shared Neovim options file while WSL contributes only the Windows interoperability it needs.
+- `btop.conf` is based on the generated config format produced by current `btop`, including lowercase booleans and additional default settings.
+- The intentional baseline change is `color_theme = "miasma"` instead of Omarchy's `"current"`.
 
-### Git Identity
+### Yazi
 
-- Private Git identity is intentionally not tracked in the shared dotfiles repos.
-- WSL should use the untracked local file `~/.config/git/config.local` for `[user]` name and email.
+- Added entirely. Yazi is not part of Omarchy.
+- `yazi.toml` keeps the local layout and behavior choices: ratio `[2, 4, 4]`, hidden files shown, directories sorted first, `sort_by = "natural"`, and `linemode = "size"`.
+- `theme.toml` carries the Miasma palette.
+- One off-palette color, `#333333`, is kept for alternate and inactive backgrounds to create subtle separation from the base terminal background `#222222`.
 
 ### WSL Bootstrap
 
-- `/etc/wsl.conf` remains a WSL concern because default user and Windows interop settings do not apply to native Arch.
-- Windows-side installation of WSL and Windows Terminal is documented here, not in `dotfiles-arch`.
+- `/etc/wsl.conf` carries the default user and keeps Windows interop enabled, which the clipboard integration requires.
+- Windows-side installation of WSL, the Nerd Font, and Windows Terminal is documented in this repo's README.
+
+## Skipped From Omarchy
+
+- GUI and desktop components, including Hyprland, Waybar, SDDM, Plymouth, Mako, Walker, Fcitx5, and related user services
+- SwayOSD, hardware drivers, Elephant widgets, and other desktop-bound integrations
+- `omarchy-fish`, `omarchy-zsh`, and `omarchy-walker`
+- `drives` functions such as `iso2sd` and `format-drive`
+- `transcoding` functions for video and image conversion
+- Hardware-focused tooling and desktop automation
+- Theme switching infrastructure not needed for a single-theme setup
+- Shell or app packages outside the chosen Bash plus terminal-tooling baseline
 
 ## Out Of Scope
 
-The following do **not** belong in `dotfiles-wsl` because they are part of the shared baseline:
+The following do **not** belong in `dotfiles-wsl`:
 
-- Bash, tmux, starship, git, fastfetch, btop, editorconfig, and Yazi shared config
-- Shared Neovim plugins and common LazyVim configuration
-- Shared OpenCode runtime config from `dotfiles-ai`
-- Omarchy-derived baseline rationale that applies equally to headless Arch and WSL
+- Shared OpenCode and Claude Code runtime config (belongs in `dotfiles-ai`)
+- Omarchy desktop customizations such as Hyprland bindings (belong in `dotfiles-omarchy`)
+- Runbooks and hardware guides for the retiring headless host (remain in the frozen `dotfiles-arch`)
