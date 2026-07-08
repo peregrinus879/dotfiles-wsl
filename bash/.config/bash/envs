@@ -8,4 +8,4 @@ export MANROFFOPT="-c"
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
 # Path
-export PATH="$HOME/.local/bin:$HOME/.claude/bin:$HOME/.opencode/bin:/opt/rocm/bin:/usr/local/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/.claude/bin:$HOME/.opencode/bin:/usr/local/bin:$PATH"
