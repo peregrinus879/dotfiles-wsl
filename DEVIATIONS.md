@@ -91,7 +91,8 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 - `transparency.lua` content is verbatim from `omarchy-nvim` but relocated from `plugin/after/` to `after/plugin/` to use Neovim's actual after-load mechanism. Upstream `omarchy-nvim` still uses the incorrect path.
 - Owned Lua files use 2-space indentation per the shared `.editorconfig` in this repo. Upstream `omarchy-nvim` uses tabs. Contents are otherwise unchanged.
 - Two additive plugin specs are adopted from the vault's former `nvim-vault` package: `obsidian.lua` (obsidian.nvim against the vault at `~/Projects/vault`, override with `OBSIDIAN_VAULT`) and `render-markdown.lua` (visual markdown rendering companion). `python` joins the baseline package list because the vault keybindings shell out to the vault's `normalize.py`.
-- Known WSL limitations of the vault specs: `:Obsidian open` needs `wsl-open`, which is not in official Arch repos and is skipped per the official-repos-only policy; `:Obsidian paste_img` expects `wl-clipboard` or `xclip`, unavailable under WSL.
+- The spec's `open.func` routes `obsidian://` and web URIs through Windows interop (`powershell.exe Start-Process`) when running under WSL, so `:Obsidian open` and link-following reach the Windows apps without `wsl-open`, which is not in official Arch repos. The override is guarded by `vim.fn.has("wsl")` and inert elsewhere; both repos track byte-identical copies of the spec.
+- Remaining WSL limitation: `:Obsidian paste_img` expects `wl-clipboard` or `xclip`, unavailable under WSL.
 
 ### OpenCode
 

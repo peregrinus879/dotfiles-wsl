@@ -5,7 +5,8 @@
 -- also supports.
 --
 -- Required system packages: ripgrep, wl-clipboard (Wayland) or xclip (X11).
--- On WSL, also install wsl-open for :Obsidian open.
+-- On WSL, obsidian:// and web URIs route through Windows interop
+-- (powershell.exe); no Linux-side opener like wsl-open is needed.
 --
 -- Set OBSIDIAN_VAULT to override the default vault path (~/Projects/vault).
 -- render-markdown.lua in this directory is a recommended companion for visual
@@ -38,6 +39,10 @@
 --                                      rendering; obsidian.nvim's UI would
 --                                      overlap.
 --   completion.blink + nvim_cmp        LazyVim ships blink.cmp; match it.
+--   open.func                          On WSL, URIs open via Windows
+--                                      interop (powershell.exe, already
+--                                      required by the clipboard); inert
+--                                      elsewhere (vim.ui.open default).
 --
 -- Vault-specific keybindings (not obsidian.nvim commands):
 --   <leader>o<space>   Slug-rename and normalize note (slug rename +
@@ -237,6 +242,14 @@ return {
       },
       attachments = {
         folder = "6-assets",
+      },
+      open = {
+        -- WSL has no Linux desktop to handle obsidian:// or https URIs, so
+        -- route them through Windows interop; single quotes in the encoded
+        -- URI are doubled for PowerShell. Non-WSL keeps the default opener.
+        func = vim.fn.has("wsl") == 1 and function(uri)
+          vim.system({ "powershell.exe", "-NoProfile", "-Command", ("Start-Process '%s'"):format(uri:gsub("'", "''")) })
+        end or vim.ui.open,
       },
       note_id_func = function(title)
         if title ~= nil then
