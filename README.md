@@ -282,6 +282,8 @@ Open Windows Terminal settings JSON with `Ctrl+Shift+,` and replace the contents
 
 This repo intentionally tracks the full `settings.json` so it can be copied and pasted as-is without reconstructing a partial JSON fragment.
 
+After pasting on a fresh Windows install, confirm the default profile still resolves to `archlinux`; if Windows Terminal warns about a missing default profile, re-select it once in the settings UI.
+
 Alternatively, edit the file directly at:
 
 ```text
