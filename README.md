@@ -183,7 +183,7 @@ Checklist before stowing:
 - `dotfiles-ai` OpenCode config is already stowed if you use OpenCode on this WSL install
 - Any existing conflicting files were removed
 
-Remove existing files that would conflict with stow. The first block removes tree-folded directory symlinks left by a previous stow (harmless on a fresh machine). The second block prepares shared OpenCode merge directories, then re-stows `dotfiles-ai` so any shared OpenCode entries remain linked there. The final block removes individual config files:
+Remove existing files that would conflict with stow. The first block removes tree-folded directory symlinks left by a previous stow; entries that are already real directories (such as `~/.config/git` after step 7) error harmlessly and are left in place. The second block prepares shared OpenCode merge directories, then re-stows `dotfiles-ai` when present so any shared OpenCode entries remain linked there. The final block removes individual config files:
 
 ```bash
 # Tree-folded directory symlinks (from a previous stow)
@@ -200,8 +200,9 @@ if [[ -L ~/.config/opencode/themes ]]; then
 fi
 mkdir -p ~/.config/opencode/themes
 
-cd ~/Projects/repos/dotfiles/dotfiles-ai
-stow -v -t ~ opencode
+if [[ -d ~/Projects/repos/dotfiles/dotfiles-ai ]]; then
+  (cd ~/Projects/repos/dotfiles/dotfiles-ai && stow -v -t ~ opencode)
+fi
 
 # Individual config files
 rm -f ~/.bashrc ~/.inputrc
@@ -319,9 +320,9 @@ A repo-root `Makefile` keeps the package list in one place and wraps the routine
 
 - `make stow` / `make unstow` / `make dry-run` / `make restow` - the stow command sets from Setup
 - `make stow-all` - stows `dotfiles-ai`'s `opencode` package first, then all packages here
-- `make verify` - the Verify symlink and identity checks plus shell and Lua syntax checks
+- `make verify` - the Verify symlink and identity checks plus shell and Lua syntax checks (the Lua checks need the optional `lua` package for `luac` and are skipped otherwise)
 - `make clean` - the Prepare cleanup steps
-- `make lint` - ShellCheck over the bash package; `.shellcheckrc` disables the pre-existing upstream-derived warnings so new issues stand out
+- `make lint` - ShellCheck over the bash package and `scripts/`; `.shellcheckrc` disables the pre-existing upstream-derived warnings so new issues stand out
 - `make wt-diff` - diff the tracked Windows Terminal settings against the deployed Windows-side file (normalized with `jq`, since Windows Terminal rewrites key order)
 - `make wt-pull` - copy the deployed Windows Terminal settings into the repo for review with `git diff`
 

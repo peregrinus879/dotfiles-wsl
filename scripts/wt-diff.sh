@@ -27,7 +27,9 @@ if [[ -z "${deployed}" || ! -f "${deployed}" ]]; then
 fi
 
 if [[ "${1:-}" == "--pull" ]]; then
-  cp "${deployed}" "${tracked}"
+  # Strip a possible UTF-8 BOM so it never lands in the tracked file, where
+  # the normalized diff below could no longer see it.
+  sed '1s/^\xEF\xBB\xBF//' "${deployed}" > "${tracked}"
   echo "pulled deployed settings into the repo; review with: git diff -- windows-terminal/settings.json"
   exit 0
 fi

@@ -4,7 +4,7 @@
 -- for pickers). Older LazyVim installs may use fzf-lua, which obsidian.nvim
 -- also supports.
 --
--- Required system packages: ripgrep, wl-clipboard (Wayland) or xclip (X11).
+-- Required system packages: ripgrep, python3, wl-clipboard (Wayland) or xclip (X11).
 -- On WSL, obsidian:// and web URIs route through Windows interop
 -- (powershell.exe); no Linux-side opener like wsl-open is needed.
 --

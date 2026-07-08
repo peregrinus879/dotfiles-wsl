@@ -8,8 +8,8 @@ Rules for this migration:
 
 - Do everything in **one terminal session**. Between unstow and re-stow,
   `~/.bashrc` is dangling; if a shell breaks, `bash --norc` still works.
-- **Do not pull `dotfiles-arch`** on this machine. Its packages are being
-  removed upstream; the unstow step needs the old checkout as-is.
+- **Do not pull `dotfiles-arch`** on this machine. The repo is frozen
+  upstream; the unstow step needs the old checkout as-is.
 - Unstow the **old layouts before pulling this repo**, because `stow -D`
   needs the old package names (`bash-wsl`, `nvim-wsl`) that no longer
   exist after the pull.
@@ -35,6 +35,12 @@ ls -l ~/.config/bash-overlays/enable-repo-auto-refresh 2>/dev/null || echo "bash
 ```bash
 export REPO_AUTO_REFRESH=0
 ```
+
+Two notes. First, start this migration shell with a working directory
+outside `~/Projects/repos`: the old overlay runs a refresh check at
+shell startup, before this export can take effect. Second, the
+retirement is permanent by design: the restructured repo no longer
+ships the auto-refresh feature, so it does not return after migration.
 
 If the repo already fast-forwarded before the unstow (step 2 reports
 `bash-wsl`/`nvim-wsl` missing), recover by checking out the last
@@ -89,6 +95,9 @@ conflicts (dangling vault symlinks are expected here, since the vault's
 rm -f ~/.config/nvim/lua/plugins/obsidian.lua ~/.config/nvim/lua/plugins/render-markdown.lua
 sudo pacman -S --needed python
 ```
+
+If you edited either file locally after the vault package was removed,
+diff them against `nvim/.config/nvim/lua/plugins/` before deleting.
 
 ```bash
 cd ~/Projects/repos/dotfiles/dotfiles-wsl

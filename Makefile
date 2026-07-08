@@ -16,7 +16,7 @@ help:
 	@echo "  stow-all  Stow dotfiles-ai's opencode package first, then all packages here"
 	@echo "  verify    Check symlinks, git identity, and shell/Lua syntax"
 	@echo "  clean     Remove files that would conflict with stow (README Prepare steps)"
-	@echo "  lint      ShellCheck over the bash package (.shellcheckrc holds the disable list)"
+	@echo "  lint      ShellCheck over the bash package and scripts (.shellcheckrc holds the disable list)"
 	@echo "  wt-diff   Diff tracked Windows Terminal settings against the deployed file"
 	@echo "  wt-pull   Copy the deployed Windows Terminal settings into the repo for review"
 
@@ -74,6 +74,8 @@ clean:
 	-rm -f ~/.config/nvim/lua/plugins/colorscheme.lua
 	-rm -f ~/.config/nvim/lua/plugins/disable-news-alert.lua
 	-rm -f ~/.config/nvim/lua/plugins/snacks-animated-scrolling-off.lua
+	-rm -f ~/.config/nvim/lua/plugins/obsidian.lua
+	-rm -f ~/.config/nvim/lua/plugins/render-markdown.lua
 	-rm -f ~/.config/nvim/after/plugin/transparency.lua
 	-rm -f ~/.config/opencode/themes/miasma.json
 	@echo "note: run 'make stow-all' next so shared dotfiles-ai opencode entries stay linked"

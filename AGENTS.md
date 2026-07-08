@@ -70,5 +70,5 @@ It does not own:
 5. Confirm the setup invariants still hold: LazyVim starter, `~/.config/git/config.local`, package list, Stow targets, and OpenCode merge directories.
 6. Run `make verify` and `make lint` from the repo root after changing owned packages.
 7. Run `make wt-diff` before and after editing `windows-terminal/settings.json` so tracked and deployed stay in sync.
-6. Keep `windows-terminal/settings.json` as a full paste-ready file unless the application model changes.
-7. Start fresh WSL and Windows Terminal sessions after structural changes and verify the shell, Neovim, clipboard round-trip, and OpenCode theme still load cleanly.
+8. Keep `windows-terminal/settings.json` as a full paste-ready file unless the application model changes.
+9. Start fresh WSL and Windows Terminal sessions after structural changes and verify the shell, Neovim, clipboard round-trip, and OpenCode theme still load cleanly.
