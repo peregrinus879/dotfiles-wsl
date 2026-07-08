@@ -98,6 +98,11 @@ cleanly), open `nvim` once (plugins install, Miasma loads, clipboard
 round-trips with Windows), and confirm `miasma` is selectable in OpenCode
 via `/theme`.
 
+If this machine carries vault or local Neovim plugin specs that are not
+tracked here (for example `obsidian.lua` under `lua/plugins/`), confirm
+they are still present and loading. The migration only relinks the files
+this repo tracks; it never touches other files in `~/.config/nvim`.
+
 ## 7. Fix the Miasma reference clone
 
 The old clone tracks `xero/miasma.nvim`; the canonical fork is the one
