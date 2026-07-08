@@ -14,12 +14,23 @@ Rules for this migration:
   needs the old package names (`bash-wsl`, `nvim-wsl`) that no longer
   exist after the pull.
 
-## 0. Disable repo auto-refresh for this session
+## 0. Check whether repo auto-refresh is active, then disable it
 
-The old `bash-wsl` overlay is still active and auto-fast-forwards any
-clean repo under `~/Projects/repos` on `cd`. Left on, it would pull
-this repo before step 2's unstow and delete the old package dirs that
-`stow -D` needs.
+The old `bash-wsl` overlay may or may not have been stowed on this
+machine. If it was, shells auto-fast-forward any clean repo under
+`~/Projects/repos` on `cd`; left on, that would pull this repo before
+step 2's unstow and delete the old package dirs that `stow -D` needs.
+
+Check first, before any `cd` into a repo:
+
+```bash
+ls -l ~/.config/bash-overlays/enable-repo-auto-refresh 2>/dev/null || echo "bash-wsl not applied"
+```
+
+- **Symlink exists**: the overlay is active. Disable it for this session.
+- **`bash-wsl not applied`**: auto-refresh was never enabled here; the
+  race cannot happen, and `bash-wsl` in step 2's unstow is a harmless
+  no-op. The export below still costs nothing.
 
 ```bash
 export REPO_AUTO_REFRESH=0
