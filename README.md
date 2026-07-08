@@ -15,7 +15,7 @@ Omarchy + WSL deviations        → dotfiles-wsl
 ```
 
 - [`dotfiles-ai`](https://github.com/peregrinus879/dotfiles-ai) - AI harness configs: Claude Code and OpenCode settings, shared guidance, and commit workflow
-- [`dotfiles-omarchy`](https://github.com/peregrinus879/dotfiles-omarchy) - Personal Omarchy customizations: Bash overrides, Hyprland bindings, and Yazi
+- [`dotfiles-omarchy`](https://github.com/peregrinus879/dotfiles-omarchy) - Personal Omarchy customizations: Bash overrides, Hyprland bindings, Neovim plugins, and Yazi
 - [`dotfiles-wsl`](https://github.com/peregrinus879/dotfiles-wsl) - Self-contained WSL Arch dotfiles: terminal baseline plus Windows Terminal, clipboard integration, and OpenCode theme
 
 ## Stack
@@ -54,6 +54,7 @@ windows-terminal/  Windows Terminal settings.json, applied manually, not stowed
 Key ownership rules:
 
 - `nvim/` owns the full Neovim config, including `lua/config/options.lua` with the built-in WSL clipboard integration
+- `nvim/` includes the vault plugin specs (`obsidian.lua`, `render-markdown.lua`); the vault is expected at `~/Projects/vault` (override with `OBSIDIAN_VAULT`)
 - Bash supports additive machine overlays through `~/.config/bash-overlays/*`; the directory is optional and reserved for untracked machine-local additions
 - `dotfiles-ai` keeps ownership of shared OpenCode runtime config; `opencode-wsl/` only adds Miasma theme availability without forcing the selected theme
 - `~/.config/opencode/` and `~/.config/opencode/themes/` must be real merge directories so `dotfiles-ai` and `opencode-wsl` can both link files inside them
@@ -127,7 +128,7 @@ Install the baseline packages required by these dotfiles:
 
 ```bash
 sudo pacman -S --needed bash-completion bat btop eza fastfetch fd fzf gcc git github-cli gum \
-  jq lazygit less neovim openssh ripgrep shellcheck starship stow sudo tmux which yazi zoxide
+  jq lazygit less neovim openssh python ripgrep shellcheck starship stow sudo tmux which yazi zoxide
 ```
 
 All baseline packages come from official Arch repositories. This repo intentionally depends on no AUR packages and installs no AUR helper.
@@ -217,6 +218,8 @@ rm -f ~/.config/nvim/lua/plugins/example.lua
 rm -f ~/.config/nvim/lua/plugins/colorscheme.lua
 rm -f ~/.config/nvim/lua/plugins/disable-news-alert.lua
 rm -f ~/.config/nvim/lua/plugins/snacks-animated-scrolling-off.lua
+rm -f ~/.config/nvim/lua/plugins/obsidian.lua
+rm -f ~/.config/nvim/lua/plugins/render-markdown.lua
 rm -f ~/.config/nvim/after/plugin/transparency.lua
 rm -f ~/.config/opencode/themes/miasma.json
 ```
@@ -299,6 +302,7 @@ After stowing:
 - Start a fresh shell and confirm Bash, Starship, and Tmux load without errors.
 - Run `nvim` once and confirm plugins install successfully and Miasma loads.
 - In Neovim, confirm yanks reach the Windows clipboard and pastes from the Windows clipboard reach Neovim.
+- If the vault is synced to this machine, open a vault note and confirm obsidian.nvim loads (`<leader>oo` opens the note switcher).
 - In OpenCode, run `/theme` and confirm `miasma` is available. Select it if OpenCode is still using the `system` theme.
 - Confirm Windows Terminal uses JetBrainsMono Nerd Font and the Miasma color scheme after applying `windows-terminal/settings.json`.
 

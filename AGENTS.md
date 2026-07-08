@@ -35,6 +35,7 @@ It does not own:
 ## Setup Invariants
 
 - `nvim/` assumes the LazyVim starter was cloned into `~/.config/nvim` first
+- the vault plugin specs expect the vault at `~/Projects/vault` (override with `OBSIDIAN_VAULT`)
 - Bash may load additive machine-specific overlays from `~/.config/bash-overlays/` after the shared init; the directory is untracked and optional
 - Git identity is expected in the untracked local file `~/.config/git/config.local`
 - Nerd Font rendering comes from the Windows-installed font via Windows Terminal; WSL needs no Linux font package

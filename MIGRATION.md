@@ -80,6 +80,16 @@ cp ~/config.local.backup ~/.config/git/config.local
 
 ## 5. Stow the new package set
 
+The nvim package now tracks the vault plugin specs. If this machine has
+vault-stowed or local copies, remove them first or stow will report
+conflicts (dangling vault symlinks are expected here, since the vault's
+`nvim-vault` package was removed upstream and the deletion synced):
+
+```bash
+rm -f ~/.config/nvim/lua/plugins/obsidian.lua ~/.config/nvim/lua/plugins/render-markdown.lua
+sudo pacman -S --needed python
+```
+
 ```bash
 cd ~/Projects/repos/dotfiles/dotfiles-wsl
 make dry-run    # resolve any reported conflicts first (see README section 8)
@@ -98,10 +108,9 @@ cleanly), open `nvim` once (plugins install, Miasma loads, clipboard
 round-trips with Windows), and confirm `miasma` is selectable in OpenCode
 via `/theme`.
 
-If this machine carries vault or local Neovim plugin specs that are not
-tracked here (for example `obsidian.lua` under `lua/plugins/`), confirm
-they are still present and loading. The migration only relinks the files
-this repo tracks; it never touches other files in `~/.config/nvim`.
+If the vault is synced to this machine, open a vault note and confirm
+obsidian.nvim loads from the newly stowed specs (`<leader>oo` opens the
+note switcher; the slug and promote bindings need `python` from step 5).
 
 ## 7. Fix the Miasma reference clone
 
