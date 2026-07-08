@@ -309,9 +309,19 @@ After stowing:
 - **OpenCode Miasma not listed**: Confirm `~/.config/opencode/themes/miasma.json` is a symlink to `opencode-wsl/.config/opencode/themes/miasma.json`. If `~/.config/opencode` or `~/.config/opencode/themes` is still a directory symlink to another dotfiles package, repeat the merge directory prep in section 8, then re-run the stow command.
 - **`tdl c` still reports Neovim `E21` after selecting Miasma**: Treat the theme as ruled out and investigate the tmux/OpenCode startup path separately.
 
+## Maintenance
+
+A repo-root `Makefile` keeps the package list in one place and wraps the routine commands. Run targets from the repo root on the WSL machine:
+
+- `make stow` / `make unstow` / `make dry-run` / `make restow` - the stow command sets from Setup
+- `make stow-all` - stows `dotfiles-ai`'s `opencode` package first, then all packages here
+- `make verify` - the Verify symlink and identity checks plus shell and Lua syntax checks
+- `make clean` - the Prepare cleanup steps
+
 ## References
 
 - `README.md` - package layout, setup, and verification
+- `Makefile` - stow, verification, and cleanup automation
 - `DEVIATIONS.md` - intentional deviations from Omarchy and boundary definitions
 - `AGENTS.md` - canonical repo-specific assistant context and maintainer checklist
 - `CLAUDE.md` - thin Claude Code wrapper importing `AGENTS.md`

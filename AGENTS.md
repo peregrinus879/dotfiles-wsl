@@ -27,6 +27,7 @@ It does not own:
 ## Key Files
 
 - `README.md` - package layout, setup, and verification
+- `Makefile` - stow, verification, and cleanup automation; single source of the package list
 - `DEVIATIONS.md` - intentional deviations from Omarchy and boundary definitions
 - `opencode-wsl/.config/opencode/themes/miasma.json` - OpenCode Miasma theme
 - `.claude/skills/synchronize/SKILL.md` - repo-specific sync workflow against upstream references
@@ -61,7 +62,6 @@ It does not own:
 
 ## Future Enhancements
 
-- **Makefile automation**: Wrap stow/unstow/dry-run, `make verify` for symlink and syntax checks, `make clean` for README "Prepare" cleanup steps. Combined stow order across repos: dotfiles-ai, dotfiles-wsl.
 - **ShellCheck**: Makefile target or pre-commit hook covering `bash/.bashrc` and `bash/.config/bash/*`. `shellcheck` is already in the baseline package list. Known pre-existing SC2164/SC2155 warnings in upstream-derived functions are kept for Omarchy diffability.
 - **Windows Terminal drift detection**: Script to checksum tracked `settings.json` against the deployed Windows-side file at `/mnt/c/Users/.../LocalState/settings.json`.
 
@@ -72,5 +72,6 @@ It does not own:
 3. Confirm every intentional difference is still documented in `DEVIATIONS.md`.
 4. Update `README.md` when package ownership, setup steps, or verification steps change.
 5. Confirm the setup invariants still hold: LazyVim starter, `~/.config/git/config.local`, package list, Stow targets, and OpenCode merge directories.
+6. Run `make verify` from the repo root after changing owned packages.
 6. Keep `windows-terminal/settings.json` as a full paste-ready file unless the application model changes.
 7. Start fresh WSL and Windows Terminal sessions after structural changes and verify the shell, Neovim, clipboard round-trip, and OpenCode theme still load cleanly.
