@@ -343,6 +343,7 @@ Clone these locally if you plan to use `/synchronize` or compare against upstrea
 - `~/Projects/repos/references/omarchy-pkgs` - upstream package reference repo
 - `~/Projects/repos/references/miasma.nvim` - Miasma theme reference repo (the `OldJobobo/miasma.nvim` fork used by Omarchy)
 - `~/Projects/repos/references/yazi` - Yazi reference repo
+- `~/Projects/repos/references/obsidian.nvim` - obsidian.nvim reference repo for the vault plugin spec
 - `~/Projects/repos/references/terminal` - Windows Terminal reference repo
 
 ## Credits

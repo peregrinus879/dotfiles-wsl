@@ -17,6 +17,7 @@ Reference repos live under `~/Projects/repos/references/`:
 - `omarchy-pkgs/` - package builds, including the Omarchy Neovim package
 - `miasma.nvim/` - Miasma Neovim plugin source (the `OldJobobo/miasma.nvim` optimized fork used by Omarchy)
 - `yazi/` - Yazi reference repo for configuration, theme, and feature changes
+- `obsidian.nvim/` - obsidian.nvim upstream for the vault plugin spec
 - `terminal/` - Windows Terminal reference repo for settings structure and feature changes
 
 ### Official Docs
@@ -48,7 +49,7 @@ Reference repos live under `~/Projects/repos/references/`:
 
 1. Compare reference repos against the packages owned by `dotfiles-wsl`
 2. For Omarchy-derived packages, compare against `omarchy/`, `omarchy-pkgs/`, and `miasma.nvim/`
-3. For non-Omarchy tools such as Yazi, compare against `yazi/` and official docs
+3. For non-Omarchy tools, compare Yazi against `yazi/` and official docs, and the vault plugin specs against `obsidian.nvim/` and the render-markdown.nvim README
 4. For Windows Terminal, compare `windows-terminal/settings.json` against `terminal/` and official docs
 5. For each difference, classify it:
    - **Intentional deviation**: documented in `DEVIATIONS.md`, should stay different
