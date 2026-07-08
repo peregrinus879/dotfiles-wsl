@@ -1,10 +1,8 @@
 # dotfiles-wsl
 
-WSL overlay for [`dotfiles-arch`](https://github.com/peregrinus879/dotfiles-arch) (Arch Linux), managed with [GNU Stow](https://www.gnu.org/software/stow/).
+Self-contained Arch Linux dotfiles for WSL, adapted from [Omarchy](https://github.com/basecamp/omarchy), managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
-`dotfiles-wsl` is the additive WSL and Windows-specific overlay on top of `dotfiles-arch`. It owns only the WSL-specific and Windows-specific pieces needed to finish the setup on Arch Linux running inside WSL while preserving the shared baseline.
-
-This repo does not replace the shared Linux baseline. Complete `dotfiles-arch` first, then layer this overlay on top.
+`dotfiles-wsl` carries the full terminal baseline for Arch Linux running inside WSL, plus the WSL and Windows-specific pieces: Windows Terminal, clipboard integration, and OpenCode theme availability. It keeps Omarchy's terminal tooling and general feel while dropping desktop-specific components that do not apply inside WSL.
 
 ## Repo Family
 
@@ -13,44 +11,54 @@ Derivation model for this repo family:
 ```text
 AI harness configs              → dotfiles-ai
 Omarchy + personal deviations   → dotfiles-omarchy
-Omarchy + headless deviations   → dotfiles-arch
-dotfiles-arch + WSL overlay     → dotfiles-wsl
+Omarchy + WSL deviations        → dotfiles-wsl
+Omarchy + headless deviations   → dotfiles-arch (reference-only)
 ```
 
 - [`dotfiles-ai`](https://github.com/peregrinus879/dotfiles-ai) - AI harness configs: Claude Code and OpenCode settings, shared guidance, and commit workflow
-- [`dotfiles-omarchy`](https://github.com/peregrinus879/dotfiles-omarchy) - Personal Omarchy customizations: Bash overrides, Hyprland bindings, Neovim plugins, and Yazi
-- [`dotfiles-arch`](https://github.com/peregrinus879/dotfiles-arch) - Shared Arch Linux terminal baseline: Bash, Tmux, Neovim, Starship, Git, Yazi, btop, and fastfetch
-- [`dotfiles-wsl`](https://github.com/peregrinus879/dotfiles-wsl) - WSL overlay for dotfiles-arch: Windows Terminal, clipboard integration, OpenCode theme availability, and repo auto-refresh
+- [`dotfiles-omarchy`](https://github.com/peregrinus879/dotfiles-omarchy) - Personal Omarchy customizations: Bash overrides, Hyprland bindings, and Yazi
+- [`dotfiles-wsl`](https://github.com/peregrinus879/dotfiles-wsl) - Self-contained WSL Arch dotfiles: terminal baseline plus Windows Terminal, clipboard integration, and OpenCode theme
+- [`dotfiles-arch`](https://github.com/peregrinus879/dotfiles-arch) - Reference-only headless Arch baseline, frozen for the remaining host until retirement
 
 ## Stack
 
-- **Base Layer**: `dotfiles-arch`
+- **Shell**: [Bash](https://www.gnu.org/software/bash/)
+- **Prompt**: [Starship](https://github.com/starship/starship)
+- **Multiplexer**: [Tmux](https://github.com/tmux/tmux)
+- **Editor**: [Neovim](https://github.com/neovim/neovim) ([LazyVim](https://github.com/LazyVim/LazyVim))
+- **Version Control**: [Git](https://git-scm.com/), [GitHub CLI](https://cli.github.com/), [LazyGit](https://github.com/jesseduffield/lazygit)
+- **File Manager**: [Yazi](https://github.com/sxyazi/yazi), [eza](https://github.com/eza-community/eza), [zoxide](https://github.com/ajeetdsouza/zoxide)
+- **Search and Preview**: [fd](https://github.com/sharkdp/fd), [fzf](https://github.com/junegunn/fzf), [bat](https://github.com/sharkdp/bat), [ripgrep](https://github.com/BurntSushi/ripgrep)
+- **System Monitor**: [btop](https://github.com/aristocratos/btop)
+- **System Info**: [fastfetch](https://github.com/fastfetch-cli/fastfetch)
+- **Dotfile Management**: [GNU Stow](https://www.gnu.org/software/stow/)
 - **Terminal**: [Windows Terminal](https://github.com/microsoft/terminal)
-- **Shell Overlay**: Bash repo auto-refresh enablement for `~/Projects/repos`
-- **Editor Overlay**: [Neovim](https://github.com/neovim/neovim) WSL clipboard integration
-- **AI TUI Theme**: stowed OpenCode Miasma theme, selectable with `/theme`
-- **Theme**: [Miasma](https://github.com/xero/miasma.nvim)
+- **Theme**: [Miasma](https://github.com/OldJobobo/miasma.nvim)
 
 ## Package Layout
 
-Each top-level directory is either a GNU Stow package or a manually applied config:
+Each top-level directory is a GNU Stow package that symlinks into `$HOME`, except `windows-terminal/`, which is applied manually on Windows:
 
 ```text
-bash-wsl/          WSL Bash overlay (enables repo auto-refresh)
-nvim-wsl/          WSL-specific Neovim overlay (adds lua/config/overlay.lua)
-opencode-wsl/      WSL OpenCode overlay (adds the Miasma theme)
+bash/              Shell config (.bashrc, .inputrc, .config/bash/)
+btop/              System monitor config (btop.conf, themes/miasma.theme)
+editorconfig/      Editor formatting rules (.editorconfig)
+fastfetch/         System info config (config.jsonc)
+git/               Git config (config, ignore)
+nvim/              Neovim config (lazyvim.json, lua/config/, lua/plugins/, after/plugin/)
+opencode-wsl/      OpenCode Miasma theme (themes/miasma.json)
+starship/          Prompt config (starship.toml)
+tmux/              Tmux config (tmux.conf)
+yazi/              File manager config (yazi.toml, theme.toml)
 windows-terminal/  Windows Terminal settings.json, applied manually, not stowed
 ```
 
 Key ownership rules:
 
-- `dotfiles-arch` keeps ownership of shared Bash and Neovim behavior
-- `dotfiles-ai` keeps ownership of shared OpenCode runtime config; this repo only adds WSL-specific theme availability
-- `opencode-wsl/` stows `~/.config/opencode/themes/miasma.json`, making Miasma selectable in OpenCode without forcing the selected theme
-- `~/.config/bash-overlays/`, `~/.config/opencode/`, and `~/.config/opencode/themes/` must be real merge directories so multiple dotfiles packages can link files inside them
-- `bash-wsl/` only enables WSL-side repo auto-refresh for the shared Bash helper
-- Bash overlay filenames stay descriptive by default; reserve numeric prefixes for cases where multiple overlay files need explicit load ordering
-- `nvim-wsl/` only adds `lua/config/overlay.lua` for WSL clipboard integration; loaded automatically by `dotfiles-arch`'s `lua/config/options.lua` when present
+- `nvim/` owns the full Neovim config, including `lua/config/options.lua` with the built-in WSL clipboard integration
+- Bash supports additive machine overlays through `~/.config/bash-overlays/*`; the directory is optional and reserved for untracked machine-local additions
+- `dotfiles-ai` keeps ownership of shared OpenCode runtime config; `opencode-wsl/` only adds Miasma theme availability without forcing the selected theme
+- `~/.config/opencode/` and `~/.config/opencode/themes/` must be real merge directories so `dotfiles-ai` and `opencode-wsl` can both link files inside them
 - `windows-terminal/` stays Windows-side, is applied manually, and intentionally tracks the full paste-ready `settings.json`
 
 ## Setup
@@ -115,24 +123,16 @@ sudo sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 sudo locale-gen
 ```
 
-### 4. Apply `dotfiles-arch` First
+### 4. Prerequisites
 
-Before using this repo, complete the full `dotfiles-arch` setup first:
-
-- install the baseline packages
-- clone the LazyVim starter into `~/.config/nvim`
-- create `~/.config/git/config.local`
-- clone `dotfiles-arch`
-- run the Arch baseline stow command
-
-On WSL, apply the shared baseline packages from `dotfiles-arch`:
+Install the baseline packages required by these dotfiles:
 
 ```bash
-cd ~/Projects/repos/dotfiles/dotfiles-arch
-stow -v -t ~ bash btop editorconfig fastfetch git nvim starship tmux yazi
+sudo pacman -S --needed bash-completion bat btop eza fastfetch fd fzf gcc git github-cli gum \
+  jq lazygit less neovim openssh ripgrep shellcheck starship stow sudo tmux which yazi zoxide
 ```
 
-This repo assumes the shared shell, tmux, git, fastfetch, btop, Yazi, and shared Neovim config already come from `dotfiles-arch`.
+All baseline packages come from official Arch repositories. This repo intentionally depends on no AUR packages and installs no AUR helper.
 
 ### 5. Clone
 
@@ -148,25 +148,54 @@ Stow can work from any clone location, but the related docs and cross-repo maint
 git clone https://github.com/peregrinus879/dotfiles-wsl.git ~/Projects/repos/dotfiles/dotfiles-wsl
 ```
 
-### 6. Prepare Overlay
+### 6. Neovim Base
 
-Checklist before stowing the overlay:
-
-- `dotfiles-arch` prerequisites and shared baseline stow are already complete
-- `dotfiles-ai` OpenCode config is already stowed if you use OpenCode on this WSL install
-- `~/.config/nvim` exists as a real LazyVim starter directory
-- Any existing conflicting WSL overlay files were removed
-
-Remove existing files that would conflict with stow. The first block removes directory symlinks left by a previous stow (harmless on a fresh machine). The second block prepares shared merge directories, then re-stows `dotfiles-ai` so any shared OpenCode entries remain linked there. The final block removes individual WSL overlay files:
+Clone the LazyVim starter first so the `nvim/` package has a target directory to extend:
 
 ```bash
-# Directory symlinks (from a previous stow)
-for path in ~/.config/bash-overlays ~/.config/opencode; do
-  [[ -L "$path" ]] && rm -f "$path"
-done
+git clone https://github.com/LazyVim/starter ~/.config/nvim
+rm -rf ~/.config/nvim/.git
+```
+
+### 7. Private Git Identity
+
+Tracked Git config intentionally excludes `[user]` identity. Create a local untracked file before using Git:
+
+```bash
+mkdir -p ~/.config/git
+```
+
+Create `~/.config/git/config.local` with your local identity:
+
+```ini
+[user]
+  name = Your Name
+  email = your-email@example.com
+```
+
+### 8. Prepare
+
+Checklist before stowing:
+
+- Required packages are installed
+- `dotfiles-wsl` was cloned locally
+- LazyVim starter was cloned into `~/.config/nvim`
+- `~/.config/git/config.local` exists with your local Git identity
+- `dotfiles-ai` OpenCode config is already stowed if you use OpenCode on this WSL install
+- Any existing conflicting files were removed
+
+Remove existing files that would conflict with stow. The first block removes tree-folded directory symlinks left by a previous stow (harmless on a fresh machine). The second block prepares shared OpenCode merge directories, then re-stows `dotfiles-ai` so any shared OpenCode entries remain linked there. The final block removes individual config files:
+
+```bash
+# Tree-folded directory symlinks (from a previous stow)
+rm -f ~/.config/bash ~/.config/btop ~/.config/fastfetch ~/.config/git \
+  ~/.config/nvim/after ~/.config/tmux ~/.config/yazi
 
 # Shared merge directories
-mkdir -p ~/.config/bash-overlays ~/.config/opencode
+if [[ -L ~/.config/opencode ]]; then
+  rm -f ~/.config/opencode
+fi
+mkdir -p ~/.config/opencode
 if [[ -L ~/.config/opencode/themes ]]; then
   rm -f ~/.config/opencode/themes
 fi
@@ -176,25 +205,40 @@ cd ~/Projects/repos/dotfiles/dotfiles-ai
 stow -v -t ~ opencode
 
 # Individual config files
-rm -f ~/.config/bash-overlays/enable-repo-auto-refresh
-rm -f ~/.config/nvim/lua/config/overlay.lua
+rm -f ~/.bashrc ~/.inputrc
+rm -f ~/.editorconfig
+rm -f ~/.config/git/config ~/.config/git/ignore
+rm -f ~/.config/starship.toml
+rm -f ~/.config/tmux/tmux.conf
+rm -f ~/.config/fastfetch/config.jsonc
+rm -f ~/.config/btop/btop.conf ~/.config/btop/themes/miasma.theme
+rm -f ~/.config/yazi/yazi.toml ~/.config/yazi/theme.toml
+rm -f ~/.config/nvim/lazyvim.json
+rm -f ~/.config/nvim/lua/config/options.lua
+rm -f ~/.config/nvim/lua/plugins/example.lua
+rm -f ~/.config/nvim/lua/plugins/colorscheme.lua
+rm -f ~/.config/nvim/lua/plugins/disable-news-alert.lua
+rm -f ~/.config/nvim/lua/plugins/snacks-animated-scrolling-off.lua
+rm -f ~/.config/nvim/after/plugin/transparency.lua
 rm -f ~/.config/opencode/themes/miasma.json
 ```
 
-### 7. Stow
+### 9. Stow
 
-Stow the WSL overlay packages:
+Create symlinks for all packages:
 
 ```bash
 cd ~/Projects/repos/dotfiles/dotfiles-wsl
-stow -v -t ~ bash-wsl nvim-wsl opencode-wsl
+stow -v -t ~ bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
 ```
+
+Start a new terminal session, or run `source ~/.bashrc`, for the shell config to take effect.
 
 ### Unstow
 
 ```bash
 cd ~/Projects/repos/dotfiles/dotfiles-wsl
-stow -D -v -t ~ bash-wsl nvim-wsl opencode-wsl
+stow -D -v -t ~ bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
 ```
 
 ### Dry Run
@@ -203,7 +247,7 @@ Preview what stow would do without making changes:
 
 ```bash
 cd ~/Projects/repos/dotfiles/dotfiles-wsl
-stow -v -n -t ~ bash-wsl nvim-wsl opencode-wsl
+stow -v -n -t ~ bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
 ```
 
 ### Re-stow
@@ -212,54 +256,29 @@ To update symlinks after the repo content changes (same clone path):
 
 ```bash
 cd ~/Projects/repos/dotfiles/dotfiles-wsl
-stow -R -v -t ~ bash-wsl nvim-wsl opencode-wsl
+stow -R -v -t ~ bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
 ```
 
 To migrate from a different clone path, unstow from the old location first:
 
 ```bash
 cd /old/clone/path
-stow -D -v -t ~ bash-wsl nvim-wsl opencode-wsl
+stow -D -v -t ~ bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
 cd ~/Projects/repos/dotfiles/dotfiles-wsl
-stow -v -t ~ bash-wsl nvim-wsl opencode-wsl
+stow -v -t ~ bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
 ```
 
-If the old clone is no longer available, run the full cleanup in section 6 before stowing.
+If the old clone is no longer available, run the full cleanup in section 8 before stowing.
 
-### 8. Bash Auto-Refresh
+### 10. First Launch
 
-`bash-wsl/` enables the shared repo auto-refresh helper from `dotfiles-arch`.
-
-Behavior:
-
-- only checks repos under `~/Projects/repos`
-- runs when the shell prompt returns after you change directories
-- fetches remote updates quietly
-- fast-forwards only when the repo is clean and behind upstream only
-- warns and skips when the repo is dirty, diverged, detached, or mid-operation
-
-Optional tuning:
+Open Neovim once to trigger plugin installation:
 
 ```bash
-export REPO_AUTO_REFRESH_INTERVAL=300
-export REPO_AUTO_REFRESH_ROOT="$HOME/Projects/repos"
+nvim
 ```
 
-Manual refresh for the current repo:
-
-```bash
-repo-refresh-now
-```
-
-### 9. OpenCode Theme
-
-This repo provides an OpenCode Miasma theme through the `opencode-wsl/` Stow package.
-
-Stowing the package links `opencode-wsl/.config/opencode/themes/miasma.json` to `~/.config/opencode/themes/miasma.json`. OpenCode loads user-wide themes from that directory, so `miasma` is available from any WSL repo.
-
-This overlay does not set OpenCode's selected theme because shared OpenCode runtime config belongs to `dotfiles-ai`, and theme selection remains a user preference. Select `miasma` with `/theme`.
-
-### 10. Windows Terminal
+### 11. Windows Terminal
 
 Open Windows Terminal settings JSON with `Ctrl+Shift+,` and replace the contents with `windows-terminal/settings.json`.
 
@@ -271,49 +290,47 @@ Alternatively, edit the file directly at:
 %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
 ```
 
-### 11. Private Git Identity
-
-If you did not already create `~/.config/git/config.local` during `dotfiles-arch` setup (step 4 in its README), do so now. The shared Git config expects private identity in that untracked local file.
-
 ## Verify
 
-After applying the baseline and the overlay:
+After stowing:
 
-- Confirm the overlay symlinks exist: `test -L ~/.config/bash-overlays/enable-repo-auto-refresh && test -L ~/.config/nvim/lua/config/overlay.lua && test -L ~/.config/opencode/themes/miasma.json`
-- Start a fresh shell, confirm the overlay loads without Bash startup errors, and run `repo-refresh-now` inside a clean repo under `~/Projects/repos`.
+- Confirm the core symlinks and local Git identity exist: `test -L ~/.bashrc && test -L ~/.config/starship.toml && test -L ~/.config/nvim/lua/config/options.lua && test -f ~/.config/git/config.local`
+- Confirm the OpenCode theme symlink exists: `test -L ~/.config/opencode/themes/miasma.json`
+- Start a fresh shell and confirm Bash, Starship, and Tmux load without errors.
+- Run `nvim` once and confirm plugins install successfully and Miasma loads.
 - In Neovim, confirm yanks reach the Windows clipboard and pastes from the Windows clipboard reach Neovim.
 - In OpenCode, run `/theme` and confirm `miasma` is available. Select it if OpenCode is still using the `system` theme.
 - Confirm Windows Terminal uses JetBrainsMono Nerd Font and the Miasma color scheme after applying `windows-terminal/settings.json`.
 
 ## Troubleshooting
 
-- **`stow` reports "existing target is not a symlink"**: Remove the conflicting file listed in the error, then re-run the stow command. Step 6 lists the expected cleanup targets.
+- **`stow` reports "existing target is not a symlink"**: Remove the conflicting file listed in the error, then re-run the stow command. Section 8 lists the expected cleanup targets.
 - **Neovim clipboard not working**: Confirm `clip.exe` and `powershell.exe` are accessible from WSL (`which clip.exe`). If Windows interop is disabled, check `[interop]` in `/etc/wsl.conf`.
-- **Bash overlay not loading**: Confirm the symlink exists (`test -L ~/.config/bash-overlays/enable-repo-auto-refresh`) and that `dotfiles-arch` was stowed first so `enable_repo_auto_refresh` is defined.
-- **OpenCode Miasma not listed**: Confirm `~/.config/opencode/themes/miasma.json` is a symlink to `opencode-wsl/.config/opencode/themes/miasma.json`. If `~/.config/opencode` or `~/.config/opencode/themes` is still a directory symlink to another dotfiles package, repeat the merge directory prep in step 6, then re-run the WSL stow command.
+- **OpenCode Miasma not listed**: Confirm `~/.config/opencode/themes/miasma.json` is a symlink to `opencode-wsl/.config/opencode/themes/miasma.json`. If `~/.config/opencode` or `~/.config/opencode/themes` is still a directory symlink to another dotfiles package, repeat the merge directory prep in section 8, then re-run the stow command.
 - **`tdl c` still reports Neovim `E21` after selecting Miasma**: Treat the theme as ruled out and investigate the tmux/OpenCode startup path separately.
 
 ## References
 
-- `README.md` - WSL setup, stow order, and Windows Terminal application
-- `DEVIATIONS.md` - intentional deviations from the shared baseline
+- `README.md` - package layout, setup, and verification
+- `DEVIATIONS.md` - intentional deviations from Omarchy and boundary definitions
 - `AGENTS.md` - canonical repo-specific assistant context and maintainer checklist
 - `CLAUDE.md` - thin Claude Code wrapper importing `AGENTS.md`
-- `opencode-wsl/.config/opencode/themes/miasma.json` - WSL OpenCode Miasma theme
+- `opencode-wsl/.config/opencode/themes/miasma.json` - OpenCode Miasma theme
 
 ## Related Repos
 
-Clone these locally if you plan to use `/synchronize` or compare this overlay against upstream references. The `/synchronize` skill expects reference repos under `~/Projects/repos/references/`.
+Clone these locally if you plan to use `/synchronize` or compare against upstream references. The `/synchronize` skill expects reference repos under `~/Projects/repos/references/`.
 
-- `~/Projects/repos/dotfiles/dotfiles-arch` - shared baseline required before this overlay
 - `~/Projects/repos/references/omarchy` - upstream Omarchy reference repo
 - `~/Projects/repos/references/omarchy-pkgs` - upstream package reference repo
-- `~/Projects/repos/references/miasma.nvim` - Miasma theme reference repo
-- `~/Projects/repos/references/windows-terminal` - Windows Terminal reference repo
+- `~/Projects/repos/references/miasma.nvim` - Miasma theme reference repo (the `OldJobobo/miasma.nvim` fork used by Omarchy)
+- `~/Projects/repos/references/yazi` - Yazi reference repo
+- `~/Projects/repos/references/terminal` - Windows Terminal reference repo
+- `~/Projects/repos/dotfiles/dotfiles-arch` - frozen reference baseline this repo was derived from
 
 ## Credits
 
-Adapted from [Omarchy](https://github.com/basecamp/omarchy). See [DEVIATIONS.md](DEVIATIONS.md) for intentional differences and overlay boundaries.
+Adapted from [Omarchy](https://github.com/basecamp/omarchy). The terminal baseline was originally extracted through `dotfiles-arch`, now frozen as a reference. See [DEVIATIONS.md](DEVIATIONS.md) for intentional differences and boundary definitions.
 
 ## License
 
