@@ -127,8 +127,9 @@ sudo locale-gen
 Install the baseline packages required by these dotfiles:
 
 ```bash
-sudo pacman -S --needed bash-completion bat btop eza fastfetch fd fzf gcc git github-cli gum \
-  jq lazygit less neovim openssh python ripgrep shellcheck starship stow sudo tmux which yazi zoxide
+sudo pacman -S --needed bash-completion bat btop diffutils eza fastfetch fd fzf gcc git github-cli \
+  gum jq lazygit less make neovim openssh python ripgrep shellcheck starship stow sudo tmux unzip \
+  which yazi zoxide
 ```
 
 All baseline packages come from official Arch repositories. This repo intentionally depends on no AUR packages and installs no AUR helper.
