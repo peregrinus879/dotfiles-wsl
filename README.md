@@ -59,6 +59,7 @@ Key ownership rules:
 - `dotfiles-ai` keeps ownership of shared OpenCode runtime config; `opencode-wsl/` only adds Miasma theme availability without forcing the selected theme
 - `~/.config/opencode/` and `~/.config/opencode/themes/` must be real merge directories so `dotfiles-ai` and `opencode-wsl` can both link files inside them
 - `windows-terminal/` stays Windows-side, is applied manually, and intentionally tracks the full paste-ready `settings.json`
+- repo-root `.claude/settings.json` and `opencode.json` are per-tool project allowlists for the repo's read-only make targets; they are not stowed
 
 ## Setup
 
