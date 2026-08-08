@@ -341,14 +341,7 @@ A repo-root `Makefile` keeps the package list in one place and wraps the routine
 
 ## Related Repos
 
-Clone these locally if you plan to use `/synchronize` or compare against upstream references. The `/synchronize` skill expects reference repos under `~/Projects/repos/references/`.
-
-- `~/Projects/repos/references/omarchy` - upstream Omarchy reference repo
-- `~/Projects/repos/references/omarchy-pkgs` - upstream package reference repo
-- `~/Projects/repos/references/miasma.nvim` - Miasma theme reference repo (the `OldJobobo/miasma.nvim` fork used by Omarchy)
-- `~/Projects/repos/references/yazi` - Yazi reference repo
-- `~/Projects/repos/references/obsidian.nvim` - obsidian.nvim reference repo for the vault plugin spec
-- `~/Projects/repos/references/terminal` - Windows Terminal reference repo
+Upstream comparison runs through the `/synchronize` skill, which carries the local reference clone paths. Upstream URLs and official docs live in [DEVIATIONS.md](DEVIATIONS.md) (Reference Sources).
 
 ## Credits
 

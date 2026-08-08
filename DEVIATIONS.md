@@ -25,9 +25,25 @@ Omarchy is an opinionated Arch Linux distribution targeting a full desktop envir
 - [omacom-io/omarchy-pkgs](https://github.com/omacom-io/omarchy-pkgs) - package builds, including the Omarchy Neovim package
 - [OldJobobo/miasma.nvim](https://github.com/OldJobobo/miasma.nvim) - Miasma Neovim plugin used by Omarchy (optimized fork of `xero/miasma.nvim`)
 - [microsoft/terminal](https://github.com/microsoft/terminal) - Windows Terminal settings structure and feature changes
-- `themes/miasma/colors.toml` in `basecamp/omarchy` - canonical terminal-side Miasma palette
+- [sxyazi/yazi](https://github.com/sxyazi/yazi) and the [Yazi docs](https://yazi-rs.github.io/docs/) - file manager upstream and configuration reference
+- [obsidian-nvim/obsidian.nvim](https://github.com/obsidian-nvim/obsidian.nvim) - upstream for the vault plugin spec
+- [MeanderingProgrammer/render-markdown.nvim](https://github.com/MeanderingProgrammer/render-markdown.nvim) - upstream for the markdown rendering spec
+- [The Omarchy Manual](https://learn.omacom.io/2/the-omarchy-manual) - setup guides, keybindings, workflows
+- [WSL Docs](https://learn.microsoft.com/en-us/windows/wsl/) - installation, configuration, and interop
+- [Install Arch Linux on WSL](https://wiki.archlinux.org/title/Install_Arch_Linux_on_WSL) - Arch Wiki guide
+- [Windows Terminal Docs](https://learn.microsoft.com/en-us/windows/terminal/) - settings, profiles, color schemes, and keybindings
+- [GNU Stow Manual](https://www.gnu.org/software/stow/manual/stow.html) - symlink management and package structure
+- [Bash Reference Manual](https://www.gnu.org/software/bash/manual/bash.html) - builtins, expansion, scripting
+- [Starship Configuration](https://starship.rs/config/) - module options and format strings
+- [Tmux Wiki](https://github.com/tmux/tmux/wiki) - usage and recipes
+- [LazyVim Docs](https://www.lazyvim.org/) - installation, extras, and plugin conventions
+- [Neovim Docs](https://neovim.io/doc/) - options, API, and Lua reference
+- [lazy.nvim Docs](https://lazy.folke.io/) - plugin manager configuration
+- [Git Docs](https://git-scm.com/docs) - config options and behavior
+- [btop](https://github.com/aristocratos/btop) - config options and themes
+- [fastfetch Wiki](https://github.com/fastfetch-cli/fastfetch/wiki) - modules and JSON config
 
-The Miasma palette has two intentional canons in this repo. Terminal-side files (tmux status, btop theme, Yazi theme, Windows Terminal scheme) track `themes/miasma/colors.toml` with the `#78824b` olive accent. Plugin-side files (the Neovim colorscheme and the OpenCode theme) track `miasma.nvim` with the slightly brighter `accent_primary = #78834b`. Keep each file aligned with its own canon.
+The Miasma palette has two intentional canons in this repo. Terminal-side files (tmux status, btop theme, Yazi theme, Windows Terminal scheme) track `themes/miasma/colors.toml` in `basecamp/omarchy`, which uses the `#78824b` olive accent, `#c2c2b0` as the terminal main fg, and intentionally identical ANSI bright and dark pairs (`color1..color7` equal `color9..color15`). Plugin-side files (the Neovim colorscheme and the OpenCode theme) track `miasma.nvim` with the slightly brighter `accent_primary = #78834b`. Keep each file aligned with its own canon.
 
 ## Intentional Deviations
 
@@ -49,7 +65,7 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 
 - Windows Terminal replaces Ghostty from the Omarchy desktop.
 - Miasma colors, JetBrainsMono Nerd Font, and padding are adapted into `windows-terminal/settings.json`.
-- The Miasma color scheme tracks Omarchy's terminal-side canonical palette in `references/omarchy/themes/miasma/colors.toml`. That source uses `#78824b` as the olive accent (slightly dimmer than `miasma.nvim`'s `accent_primary = #78834b`), `#c2c2b0` as the terminal main fg, and intentionally identical ANSI bright and dark pairs (`color1..color7` equal `color9..color15`). The scheme keeps those choices to stay consistent with Omarchy's terminal experience.
+- The Miasma color scheme keeps the terminal-side canonical palette choices (Reference Sources) to stay consistent with Omarchy's terminal experience.
 
 ### Bash
 

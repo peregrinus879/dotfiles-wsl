@@ -9,9 +9,7 @@ Source configs from reference repos and official docs, compare against `dotfiles
 
 ## Sources
 
-### Reference Repos
-
-Reference repos live under `~/Projects/repos/references/`:
+Local reference clones live under `~/Projects/repos/references/`:
 
 - `omarchy/` - main repo for bash, tmux, starship, git, fastfetch, btop, and editorconfig references
 - `omarchy-pkgs/` - package builds, including the Omarchy Neovim package
@@ -20,23 +18,7 @@ Reference repos live under `~/Projects/repos/references/`:
 - `obsidian.nvim/` - obsidian.nvim upstream for the vault plugin spec
 - `terminal/` - Windows Terminal reference repo for settings structure and feature changes
 
-### Official Docs
-
-- [The Omarchy Manual](https://learn.omacom.io/2/the-omarchy-manual) - setup guides, keybindings, workflows
-- [WSL Docs](https://learn.microsoft.com/en-us/windows/wsl/) - installation, configuration, and interop
-- [Install Arch Linux on WSL](https://wiki.archlinux.org/title/Install_Arch_Linux_on_WSL) - Arch Wiki guide
-- [Windows Terminal Docs](https://learn.microsoft.com/en-us/windows/terminal/) - settings, profiles, color schemes, and keybindings
-- [GNU Stow Manual](https://www.gnu.org/software/stow/manual/stow.html) - symlink management and package structure
-- [Bash Reference Manual](https://www.gnu.org/software/bash/manual/bash.html) - builtins, expansion, scripting
-- [Starship Configuration](https://starship.rs/config/) - module options and format strings
-- [Tmux Wiki](https://github.com/tmux/tmux/wiki) - usage and recipes
-- [LazyVim Docs](https://www.lazyvim.org/) - installation, extras, and plugin conventions
-- [Neovim Docs](https://neovim.io/doc/) - options, API, and Lua reference
-- [lazy.nvim Docs](https://lazy.folke.io/) - plugin manager configuration
-- [Git Docs](https://git-scm.com/docs) - config options and behavior
-- [Yazi Docs](https://yazi-rs.github.io/docs/) - configuration and themes
-- [btop](https://github.com/aristocratos/btop) - config options and themes
-- [fastfetch Wiki](https://github.com/fastfetch-cli/fastfetch/wiki) - modules and JSON config
+Upstream URLs, official docs, and descriptions live in `DEVIATIONS.md` (Reference Sources).
 
 ## When To Use
 
