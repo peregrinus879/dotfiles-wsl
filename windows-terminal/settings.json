@@ -22,6 +22,10 @@
         {
             "id": "Terminal.DuplicatePaneAuto",
             "keys": "alt+shift+d"
+        },
+        {
+            "id": null,
+            "keys": "alt+enter"
         }
     ],
     "launchMode": "maximized",

@@ -92,6 +92,10 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 - The prompt shows `hostname` only during SSH sessions so remote shells are visually distinct from local ones while keeping the local prompt minimal.
 - The `conflicted`, `up_to_date`, and `modified` Git status icons use Material Design Icons codepoints instead of Omarchy's Nerd Font private-use codepoints, matching the same broader-terminal-font compatibility rationale used for Fastfetch.
 
+### Tmux
+
+- Upstream's `M-Enter`, `M-S-Enter`, and `M-Escape` pane bindings are adopted verbatim; `alt+enter` is unbound in `windows-terminal/settings.json` (`"id": null`) because Windows Terminal's default binds it to fullscreen and would swallow `M-Enter` before it reaches tmux.
+
 ### Tmux Dev Layout
 
 - `tdl` keeps the local split ratios from this dotfiles setup rather than mirroring Omarchy exactly: 50% editor and 50% AI in the top 85%, with a 15% bottom terminal pane.
