@@ -303,6 +303,7 @@ After stowing:
 - Confirm the core symlinks and local Git identity exist: `test -L ~/.bashrc && test -L ~/.config/starship.toml && test -L ~/.config/nvim/lua/config/options.lua && test -f ~/.config/git/config.local`
 - Confirm the OpenCode theme symlink exists: `test -L ~/.config/opencode/themes/miasma.json`
 - Start a fresh shell and confirm Bash, Starship, and Tmux load without errors.
+- Confirm `type cx` shows `claude` and `type cy` shows `codex`, both without permission-bypass flags.
 - Run `nvim` once and confirm plugins install successfully and Miasma loads.
 - In Neovim, confirm yanks reach the Windows clipboard and pastes from the Windows clipboard reach Neovim.
 - If the vault is synced to this machine, open a vault note and confirm obsidian.nvim loads (`<leader>oo` opens the note switcher).

@@ -32,6 +32,8 @@ alias c='opencode'
 # Launch Claude Code with ultracode; interactive aliases (cx, tdl targets) inherit via alias rescan
 alias claude='claude --effort ultracode'
 alias cx='printf "\033[2J\033[3J\033[H" && claude'
+# Run codex without Omarchy's sandbox-off and no-approval flags
+alias cy='codex'
 alias t='tmux attach || tmux new -s Work'
 alias ic='tdl c'
 alias ix='tdl cx'

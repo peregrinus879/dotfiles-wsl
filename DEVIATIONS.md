@@ -57,7 +57,8 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 - Modular shell functions live in `~/.config/bash/functions/` and are sourced via a loop in `.bashrc`.
 - Optional Bash overlays are sourced from `~/.config/bash-overlays/*` after the shared init. The directory is untracked and reserved for machine-local additions.
 - Dropped aliases: `open` (GUI-only), `d='docker'`, and `r='rails'`.
-- `cx` omits Omarchy's permission-bypass flag (currently `--permission-mode bypassPermissions` upstream).
+- `cx` alias drops Omarchy's permission-bypass flag (currently `--permission-mode bypassPermissions` upstream).
+- `cy` alias drops Omarchy's Codex sandbox-off and no-approval flags (currently `-s danger-full-access -a never` upstream), so no agent launcher skips permissions.
 - `y()` is added for Yazi cd-on-exit support. Yazi is not part of Omarchy.
 - `mise`-specific shell handling is omitted.
 - No `pacman` alias and no AUR helper. Omarchy routes updates through `omarchy-update-perform`, which is Hyprland/desktop-bound; this repo uses plain `pacman` against official repos only.
