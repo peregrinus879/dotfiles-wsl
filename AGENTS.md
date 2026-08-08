@@ -1,74 +1,47 @@
 # AGENTS.md - dotfiles-wsl
 
-Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basecamp/omarchy). Omarchy, official docs, official package docs, and `DEVIATIONS.md` are the source of truth for default behavior and intentional differences.
+Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basecamp/omarchy), managed with [GNU Stow](https://www.gnu.org/software/stow/): the full terminal baseline for Arch Linux inside WSL (Bash, Git, Neovim, tmux, starship, fastfetch, btop, editorconfig, Yazi), plus WSL and Windows-specific behavior (the OpenCode Miasma theme in `opencode-wsl/`, Windows Terminal configuration in `windows-terminal/`). Omarchy, official docs, official package docs, and `DEVIATIONS.md` are the source of truth for default behavior and intentional differences; ownership boundaries live in `DEVIATIONS.md` (Deviation Policy and Out Of Scope).
 
-## Scope
+## Load Map
 
-This repo carries the full terminal baseline for Arch Linux inside WSL, plus WSL and Windows-specific behavior.
+- Claude Code loads this file through the root `CLAUDE.md` `@AGENTS.md` import; skills load on invocation only.
+- The `Makefile` is the single source of the package list; `README.md` carries the human-facing setup, verification, and maintenance detail.
+- Repo-root `.claude/settings.json` and `opencode.json` are per-tool project allowlists for this repo's verification make targets (`verify`, `lint`).
 
-It owns:
+## Invariants
 
-- GNU Stow packages for Bash, Git, Neovim, tmux, starship, fastfetch, btop, editorconfig, and Yazi
-- the WSL-specific OpenCode Miasma theme in `opencode-wsl/`
-- Windows Terminal configuration in `windows-terminal/`
-- WSL setup and maintenance docs
+- Target machine: WSL; run stow and make targets only on the WSL host.
+- When editing sibling dotfiles repos, use identical wording for shared concepts; only repo-specific values (scope, package lists, invariants) differ.
+- The nvim vault plugin specs are byte-identical twins with `dotfiles-omarchy`; `make verify` fails on drift.
+- `nvim/` assumes the LazyVim starter was cloned into `~/.config/nvim` first.
+- The vault is expected at `~/Projects/vault` (override with `OBSIDIAN_VAULT`) for the obsidian.nvim workflow.
+- Git identity lives in the untracked per-host `~/.config/git/config.local`.
+- `~/.config/opencode/` and `~/.config/opencode/themes/` must be real merge directories so `dotfiles-ai` and `opencode-wsl` can both link files inside them; shared AI harness runtime config stays in `dotfiles-ai`.
+- Windows interop stays enabled in `/etc/wsl.conf`; the Neovim clipboard integration requires `clip.exe` and `powershell.exe`.
+- Nerd Font rendering comes from the Windows-installed font via Windows Terminal; WSL needs no Linux font package.
+- Baseline packages come from official Arch repos only; no AUR packages or AUR helper.
+- `windows-terminal/settings.json` is a full paste-ready config applied manually from Windows, not stowed.
+- Bash may load additive machine-specific overlays from `~/.config/bash-overlays/` after the shared init; the directory is untracked and optional.
+- Keep every intentional difference documented in `DEVIATIONS.md`; update `README.md`, `AGENTS.md`, and `DEVIATIONS.md` together when ownership, setup, or sync assumptions change.
+- Known Limitations records repo decisions and behavior official docs do not state; doc-derivable facts (defaults, version gates, upstream status) are fetched at change time, not cached here.
 
-It does not own:
+## Post-Change Verification
 
-- shared Claude Code and OpenCode runtime config from `dotfiles-ai`
-- Omarchy desktop customizations from `dotfiles-omarchy`
+- Run `make verify` and `make lint` from the repo root after changing owned packages.
+- Run `make wt-diff` before and after editing `windows-terminal/settings.json` so tracked and deployed stay in sync.
+- Start fresh WSL and Windows Terminal sessions after structural changes and verify the shell, Neovim, clipboard round-trip, and OpenCode theme still load cleanly.
+- The full human checklist lives in `README.md` (Verify and Maintenance).
 
-## Environment
+## Known Limitations
 
-- OS: WSL (Arch Linux)
-- Terminal: Windows Terminal
-- Dev: Tmux, Neovim (LazyVim), Bash
+- `:Obsidian paste_img` expects `wl-clipboard` or `xclip`, unavailable under WSL.
 
-## Key Files
+## Deferred Items
 
-- `README.md` - package layout, setup, and verification
-- `Makefile` - stow, verification, and cleanup automation; single source of the package list
-- `DEVIATIONS.md` - intentional deviations from Omarchy and boundary definitions
-- `opencode-wsl/.config/opencode/themes/miasma.json` - OpenCode Miasma theme
-- `.claude/skills/synchronize/SKILL.md` - repo-specific sync workflow against upstream references
-
-## Setup Invariants
-
-- `nvim/` assumes the LazyVim starter was cloned into `~/.config/nvim` first
-- the vault plugin specs expect the vault at `~/Projects/vault` (override with `OBSIDIAN_VAULT`)
-- Bash may load additive machine-specific overlays from `~/.config/bash-overlays/` after the shared init; the directory is untracked and optional
-- Git identity is expected in the untracked local file `~/.config/git/config.local`
-- Nerd Font rendering comes from the Windows-installed font via Windows Terminal; WSL needs no Linux font package
-- `~/.config/opencode/` and `~/.config/opencode/themes/` must be real merge directories so `dotfiles-ai` and `opencode-wsl` can both link files inside them
-- `windows-terminal/settings.json` is a full paste-ready config applied manually from Windows, not stowed
-- Baseline packages come from official Arch repos only; no AUR packages or AUR helper
-- Windows interop stays enabled in `/etc/wsl.conf`; the Neovim clipboard integration requires `clip.exe` and `powershell.exe`
-
-## Reference Sources
-
-- `DEVIATIONS.md` for upstream GitHub URLs, the dual Miasma palette canons, and boundary definitions
-- `.claude/skills/synchronize/SKILL.md` for local reference repo paths and official docs
+- watch basecamp/omarchy#5256 (upstream `tdl` DCS passthrough fix): when it merges, align the local `tdl` passthrough guard with upstream and update `DEVIATIONS.md`; the 50/50 split and second-AI-pane deviations stay regardless.
+- check whether the `tdl c` Neovim `E21` (README Troubleshooting) still reproduces; it is distinct from the E349 DCS passthrough issue the `tdl` guard fixes, and the Troubleshooting entry stays until it is ruled out.
+- next `/synchronize`: upstream `tdl` gained a trailing `select-pane -t "$opencode_pane"` referencing an undefined variable (introduced alongside `tds`); verify it is fixed before adopting upstream `tdl` changes.
 
 ## Skills
 
 - `/synchronize` - sync this repo against Omarchy references and official WSL and Windows Terminal docs
-
-## Workflow
-
-- Use `/synchronize` when syncing against upstream references
-- Keep changes within the scope of this repo
-- Keep all intentional differences documented in `DEVIATIONS.md`
-- Update `README.md`, `AGENTS.md`, and `DEVIATIONS.md` together when ownership, setup, or sync assumptions change
-- Keep shared AI harness runtime config in `dotfiles-ai`; use `opencode-wsl/` here only for WSL-specific OpenCode theme availability
-
-## Maintainer Checklist
-
-1. Review the local reference repos and the current official WSL and Windows Terminal docs for upstream changes to owned packages.
-2. Use `/synchronize` or compare manually against the upstream references.
-3. Confirm every intentional difference is still documented in `DEVIATIONS.md`.
-4. Update `README.md` when package ownership, setup steps, or verification steps change.
-5. Confirm the setup invariants still hold: LazyVim starter, `~/.config/git/config.local`, package list, Stow targets, and OpenCode merge directories.
-6. Run `make verify` and `make lint` from the repo root after changing owned packages.
-7. Run `make wt-diff` before and after editing `windows-terminal/settings.json` so tracked and deployed stay in sync.
-8. Keep `windows-terminal/settings.json` as a full paste-ready file unless the application model changes.
-9. Start fresh WSL and Windows Terminal sessions after structural changes and verify the shell, Neovim, clipboard round-trip, and OpenCode theme still load cleanly.
