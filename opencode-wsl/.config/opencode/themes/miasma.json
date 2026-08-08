@@ -1,5 +1,5 @@
 {
-  "$schema": "https://opencode.ai/theme.json",
+  "$schema": "https://opencode.ai/tui.json",
   "defs": {
     "base": "#222222",
     "surface": "#1c1c1c",

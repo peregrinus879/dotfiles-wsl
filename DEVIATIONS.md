@@ -49,7 +49,7 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 
 - Windows Terminal replaces Ghostty from the Omarchy desktop.
 - Miasma colors, JetBrainsMono Nerd Font, and padding are adapted into `windows-terminal/settings.json`.
-- The Miasma color scheme tracks Omarchy's terminal-side canonical palette in `references/omarchy/themes/miasma/colors.toml` and `btop.theme`. That source uses `#78824b` as the olive accent (slightly dimmer than `miasma.nvim`'s `accent_primary = #78834b`), `#c2c2b0` as the terminal main fg, and intentionally identical ANSI bright and dark pairs (`color1..color7` equal `color9..color15`). The scheme keeps those choices to stay consistent with Omarchy's terminal experience.
+- The Miasma color scheme tracks Omarchy's terminal-side canonical palette in `references/omarchy/themes/miasma/colors.toml`. That source uses `#78824b` as the olive accent (slightly dimmer than `miasma.nvim`'s `accent_primary = #78834b`), `#c2c2b0` as the terminal main fg, and intentionally identical ANSI bright and dark pairs (`color1..color7` equal `color9..color15`). The scheme keeps those choices to stay consistent with Omarchy's terminal experience.
 
 ### Bash
 
@@ -78,6 +78,7 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 
 - `tdl` keeps the local split ratios from this dotfiles setup rather than mirroring Omarchy exactly: 50% editor and 50% AI in the top 85%, with a 15% bottom terminal pane.
 - `tdl` guards AI panes with a per-pane `allow-passthrough off` during initialization, restoring it after 1 second via a background subshell. This prevents DCS passthrough responses from OpenCode's TUI init being misrouted to the editor pane during the focus transition, which causes Neovim E349 on startup. Claude Code is not affected. Proposed upstream in [basecamp/omarchy#5256](https://github.com/basecamp/omarchy/pull/5256).
+- `tdl` supports an optional second AI pane.
 
 ### Tmux Status Theme
 
@@ -100,7 +101,7 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 - The theme file is WSL-specific theme availability, not shared OpenCode runtime config. Runtime config remains owned by `dotfiles-ai`.
 - `~/.config/opencode/` and `~/.config/opencode/themes/` stay real merge directories so `dotfiles-ai` and `opencode-wsl` can both link files inside them.
 - The repo does not force OpenCode's selected theme. Select `miasma` with `/theme` so the choice remains a user-level OpenCode preference.
-- `miasma.json` uses flat string values rather than the `{dark, light}` object pairs used by upstream OpenCode themes in `packages/ui/src/theme/themes/`. The flat form is valid against `https://opencode.ai/theme.json`. Miasma is dark-only upstream in `miasma.nvim`, so inventing a light variant would not be faithful to the canonical palette.
+- `miasma.json` uses flat string values rather than the `{dark, light}` object pairs used by upstream OpenCode themes in `packages/ui/src/theme/themes/`. The flat form is valid against `https://opencode.ai/tui.json`. Miasma is dark-only upstream in `miasma.nvim`, so inventing a light variant would not be faithful to the canonical palette.
 - Palette defs and role mappings track `miasma.nvim/lua/miasma/palette.lua` and the highlight definitions in `colors/miasma.vim`. Def names mirror the canonical palette (`base`, `surface`, `surfaceHighlight`, `text`, `textMuted`, `amber`, `orange`, `accentPrimary`, `accentSecondary`, `warning`, `error`). `primary` maps to `accentPrimary` (`#78834b`) so opencode's dominant accent matches miasma.nvim's Type, Function, and selection accent rather than the amber/string color. `syntaxString` maps to `warning` (`#685742`) per `M.string = M.warning` in palette.lua.
 
 ### Fastfetch
