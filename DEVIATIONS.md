@@ -73,6 +73,7 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 - Modular shell functions live in `~/.config/bash/functions/` and are sourced via a loop in `.bashrc`.
 - Optional Bash overlays are sourced from `~/.config/bash-overlays/*` after the shared init. The directory is untracked and reserved for machine-local additions.
 - Dropped aliases: `open` (GUI-only), `d='docker'`, and `r='rails'`.
+- The kitty-conditional `ff` image-preview variant is omitted; Windows Terminal is not kitty, so the conditional would always take the plain `bat` branch kept here.
 - `claude` is aliased to add `--effort ultracode`, so every interactive launch, including `cx` and `tdl`-launched AIs, inherits it via alias expansion; scripts and hooks stay plain. Ultracode is session-only upstream and cannot be set in `settings.json`.
 - `cx` alias drops Omarchy's permission-bypass flag (currently `--permission-mode bypassPermissions` upstream).
 - `cy` alias drops Omarchy's Codex sandbox-off and no-approval flags (currently `-s danger-full-access -a never` upstream), so no agent launcher skips permissions.
@@ -95,6 +96,7 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 ### Tmux
 
 - Upstream's `M-Enter`, `M-S-Enter`, and `M-Escape` pane bindings are adopted verbatim; `alt+enter` is unbound in `windows-terminal/settings.json` (`"id": null`) because Windows Terminal's default binds it to fullscreen and would swallow `M-Enter` before it reaches tmux.
+- The `?` keybindings-popup binding is omitted; it shells out to `omarchy-menu-tmux-keybindings`, which exists only on an Omarchy install.
 
 ### Tmux Dev Layout
 
