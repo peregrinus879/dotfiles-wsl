@@ -35,12 +35,14 @@ Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basec
 ## Known Limitations
 
 - `:Obsidian paste_img` expects `wl-clipboard` or `xclip`, unavailable under WSL.
+- Stow tree-folds directories that do not pre-exist at stow time (the README Prepare list) into directory symlinks pointing at the repo, so anything written there lands in the repo working tree; folding is the accepted repo-family stow convention (do not add `--no-folding`).
 
 ## Deferred Items
 
 - watch basecamp/omarchy#5256 (upstream `tdl` DCS passthrough fix): when it merges, align the local `tdl` passthrough guard with upstream and update `DEVIATIONS.md`; the 50/50 split and second-AI-pane deviations stay regardless.
 - check whether the `tdl c` Neovim `E21` (README Troubleshooting) still reproduces; it is distinct from the E349 DCS passthrough issue the `tdl` guard fixes, and the Troubleshooting entry stays until it is ruled out.
 - next `/synchronize`: upstream `tdl` gained a trailing `select-pane -t "$opencode_pane"` referencing an undefined variable (introduced alongside `tds`); verify it is fixed before adopting upstream `tdl` changes.
+- watch the tree-folded `~/.config/yazi`: the first `ya pkg` install writes `plugins/` and `package.toml` into the repo working tree; decide then whether to track them (the `dotfiles-ai` opencode-deps pattern) or gitignore them (the git-identity pattern already guarded by this repo's `.gitignore`).
 
 ## Skills
 
