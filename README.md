@@ -18,6 +18,8 @@ Omarchy + WSL deviations        → dotfiles-wsl
 - [`dotfiles-omarchy`](https://github.com/peregrinus879/dotfiles-omarchy) - Personal Omarchy customizations: Bash overrides, Hyprland bindings, Neovim plugins, and Yazi
 - [`dotfiles-wsl`](https://github.com/peregrinus879/dotfiles-wsl) - Self-contained WSL Arch dotfiles: terminal baseline plus Windows Terminal, clipboard integration, and OpenCode theme
 
+Local clones live side by side under `~/Projects/repos/dotfiles/`.
+
 ## Stack
 
 - **Shell**: [Bash](https://www.gnu.org/software/bash/)
@@ -59,7 +61,7 @@ Key ownership rules:
 - `dotfiles-ai` keeps ownership of shared OpenCode runtime config; `opencode-wsl/` only adds Miasma theme availability without forcing the selected theme
 - `~/.config/opencode/` and `~/.config/opencode/themes/` must be real merge directories so `dotfiles-ai` and `opencode-wsl` can both link files inside them
 - `windows-terminal/` stays Windows-side, is applied manually, and intentionally tracks the full paste-ready `settings.json`
-- repo-root `.claude/settings.json` and `opencode.json` are per-tool project allowlists for the repo's read-only make targets; they are not stowed
+- repo-root `.claude/settings.json` and `opencode.json` are per-tool project allowlists for this repo's verification make targets (`verify`, `lint`); they are not stowed
 
 ## Setup
 
@@ -329,15 +331,7 @@ A repo-root `Makefile` keeps the package list in one place and wraps the routine
 - `make wt-diff` - diff the tracked Windows Terminal settings against the deployed Windows-side file (normalized with `jq`, since Windows Terminal rewrites key order)
 - `make wt-pull` - copy the deployed Windows Terminal settings into the repo for review with `git diff`
 
-## References
-
-- `README.md` - package layout, setup, and verification
-- `Makefile` - stow, verification, cleanup, lint, and drift-detection automation
-- `scripts/wt-diff.sh` - Windows Terminal settings drift detection
-- `DEVIATIONS.md` - intentional deviations from Omarchy and boundary definitions
-- `AGENTS.md` - canonical repo-specific assistant context and maintainer checklist
-- `CLAUDE.md` - thin Claude Code wrapper importing `AGENTS.md`
-- `opencode-wsl/.config/opencode/themes/miasma.json` - OpenCode Miasma theme
+Periodically, review the local reference repos and official docs for upstream changes to owned packages, sync with `/synchronize` or a manual comparison, and confirm every intentional difference is still documented in `DEVIATIONS.md`.
 
 ## Related Repos
 
