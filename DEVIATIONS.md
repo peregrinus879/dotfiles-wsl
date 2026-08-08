@@ -43,7 +43,7 @@ Omarchy is an opinionated Arch Linux distribution targeting a full desktop envir
 - [btop](https://github.com/aristocratos/btop) - config options and themes
 - [fastfetch Wiki](https://github.com/fastfetch-cli/fastfetch/wiki) - modules and JSON config
 
-The Miasma palette has two intentional canons in this repo. Terminal-side files (tmux status, btop theme, Yazi theme, Windows Terminal scheme) track `themes/miasma/colors.toml` in `basecamp/omarchy`, which uses the `#78824b` olive accent, `#c2c2b0` as the terminal main fg, and intentionally identical ANSI bright and dark pairs (`color1..color7` equal `color9..color15`). Plugin-side files (the Neovim colorscheme and the OpenCode theme) track `miasma.nvim` with the slightly brighter `accent_primary = #78834b`. Keep each file aligned with its own canon.
+The Miasma palette has two intentional canons in this repo. Terminal-side files (btop theme, Yazi theme, Windows Terminal scheme) track `themes/miasma/colors.toml` in `basecamp/omarchy`, which uses the `#78824b` olive accent, `#c2c2b0` as the terminal main fg, and intentionally identical ANSI bright and dark pairs (`color1..color7` equal `color9..color15`). Plugin-side files (the Neovim colorscheme and the OpenCode theme) track `miasma.nvim` with the slightly brighter `accent_primary = #78834b`. The tmux status bar uses upstream's ANSI palette names, resolved through the Windows Terminal scheme. Keep each file aligned with its own canon.
 
 ## Intentional Deviations
 
@@ -103,10 +103,6 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 - `tdl` keeps the local split ratios from this dotfiles setup rather than mirroring Omarchy exactly: 50% editor and 50% AI in the top 85%, with a 15% bottom terminal pane.
 - `tdl` guards AI panes with a per-pane `allow-passthrough off` during initialization, restoring it after 1 second via a background subshell. This prevents DCS passthrough responses from OpenCode's TUI init being misrouted to the editor pane during the focus transition, which causes Neovim E349 on startup. Claude Code is not affected. Proposed upstream in [basecamp/omarchy#5256](https://github.com/basecamp/omarchy/pull/5256).
 - `tdl` supports an optional second AI pane.
-
-### Tmux Status Theme
-
-- Status bar accents are hardcoded to the canonical Miasma palette (`#78824b` accent, `#222222` background) sourced from `themes/miasma/colors.toml` in `basecamp/omarchy`. Omarchy uses terminal-palette names (`blue`, `black`) and relies on the active theme to bind those palette slots to Miasma values at runtime via `omarchy-theme-set`. This repo has no theme-switching infrastructure, so hardcoded hex locks the tmux status bar to Miasma and keeps it consistent with the Windows Terminal scheme.
 
 ### Neovim
 
