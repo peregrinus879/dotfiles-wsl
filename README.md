@@ -325,7 +325,7 @@ A repo-root `Makefile` keeps the package list in one place and wraps the routine
 
 - `make stow` / `make unstow` / `make dry-run` / `make restow` - the stow command sets from Setup
 - `make stow-all` - stows `dotfiles-ai`'s `opencode` package first, then all packages here
-- `make verify` - the Verify symlink and identity checks plus shell and Lua syntax checks (the Lua checks need the optional `lua` package for `luac` and are skipped otherwise)
+- `make verify` - the Verify symlink and identity checks, shell and Lua syntax (the Lua checks need the optional `lua` package for `luac` and are skipped otherwise), and the nvim twin-spec sync check against `dotfiles-omarchy`
 - `make clean` - the Prepare cleanup steps
 - `make lint` - ShellCheck over the bash package and `scripts/`; `.shellcheckrc` disables the pre-existing upstream-derived warnings so new issues stand out
 - `make wt-diff` - diff the tracked Windows Terminal settings against the deployed Windows-side file (normalized with `jq`, since Windows Terminal rewrites key order)

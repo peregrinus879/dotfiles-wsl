@@ -5,6 +5,11 @@ SHELL := /bin/bash
 PACKAGES := bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
 AI_REPO := ../dotfiles-ai
 
+# The nvim vault plugin specs are byte-identical twins with dotfiles-omarchy,
+# synced manually; verify fails on drift so the copies cannot silently diverge.
+SIBLING := $(HOME)/Projects/repos/dotfiles/dotfiles-omarchy
+TWIN_SPECS := obsidian.lua render-markdown.lua
+
 .PHONY: help stow unstow dry-run restow stow-all verify clean lint wt-diff wt-pull
 
 help:
@@ -14,7 +19,7 @@ help:
 	@echo "  dry-run   Preview stow actions without making changes"
 	@echo "  restow    Re-stow after repo content changes"
 	@echo "  stow-all  Stow dotfiles-ai's opencode package first, then all packages here"
-	@echo "  verify    Check symlinks, git identity, and shell/Lua syntax"
+	@echo "  verify    Check symlinks, git identity, shell/Lua syntax, and nvim twin-spec sync"
 	@echo "  clean     Remove files that would conflict with stow (README Prepare steps)"
 	@echo "  lint      ShellCheck over the bash package and scripts (.shellcheckrc holds the disable list)"
 	@echo "  wt-diff   Diff tracked Windows Terminal settings against the deployed file"
@@ -52,6 +57,12 @@ verify:
 	    if luac -p "$$f" > /dev/null; then echo "ok:   luac -p $$f"; else echo "FAIL: luac -p $$f"; fail=1; fi; \
 	  done; \
 	else echo "note: luac not found, skipping Lua syntax checks"; fi; \
+	for f in $(TWIN_SPECS); do \
+	  ours="nvim/.config/nvim/lua/plugins/$$f"; twin="$(SIBLING)/nvim/.config/nvim/lua/plugins/$$f"; \
+	  if [[ ! -e "$$twin" ]]; then echo "note: dotfiles-omarchy clone not found, skipped twin check for $$f"; \
+	  elif cmp -s "$$ours" "$$twin"; then echo "ok:   $$f matches the dotfiles-omarchy twin"; \
+	  else echo "FAIL: $$f drifted from the dotfiles-omarchy twin"; fail=1; fi; \
+	done; \
 	exit $$fail
 
 clean:
