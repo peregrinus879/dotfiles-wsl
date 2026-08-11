@@ -39,6 +39,7 @@ Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basec
 
 ## Deferred Items
 
+- the 2026-08-11 batch (tdl v3.8.4 resync, upstream cx/cy restore, TWIN_SPECS generalization, `trio`, `yazi.toml` twin) was authored and file-checked (bash -n, ShellCheck, twin cmp) from the Omarchy machine; on the next WSL session: `git pull`, `make restow`, `make verify`, `make lint`, start a fresh shell, live-test `trio` and `trio -c` (windows claude-code / opencode / editor+terminal, terminal focused in window 3), and recheck the E21 item below against the resynced `tdl`.
 - check whether the `tdl c` Neovim `E21` (README Troubleshooting) still reproduces; it is distinct from the historical E349 DCS passthrough issue (the local guard was removed as ineffective), and the Troubleshooting entry stays until it is ruled out.
 - next `/synchronize`: upstream `tdl` gained a trailing `select-pane -t "$opencode_pane"` referencing an undefined variable (introduced alongside `tds`); verify it is fixed before adopting upstream `tdl` changes.
 - watch the tree-folded `~/.config/yazi`: the first `ya pkg` install writes `plugins/` and `package.toml` into the repo working tree; decide then whether to track them (the `dotfiles-ai` opencode-deps pattern) or gitignore them (the git-identity pattern already guarded by this repo's `.gitignore`).
