@@ -10,7 +10,8 @@ AI_REPO := ../dotfiles-ai
 # and identical in both repos.
 SIBLING := $(HOME)/Projects/repos/dotfiles/dotfiles-omarchy
 TWIN_SPECS := nvim/.config/nvim/lua/plugins/obsidian.lua \
-  nvim/.config/nvim/lua/plugins/render-markdown.lua
+  nvim/.config/nvim/lua/plugins/render-markdown.lua \
+  bash/.config/bash/functions/trio
 
 .PHONY: help stow unstow dry-run restow stow-all verify clean lint wt-diff wt-pull
 

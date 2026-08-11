@@ -76,6 +76,7 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 - The kitty-conditional `ff` image-preview variant is omitted; Windows Terminal is not kitty, so the conditional would always take the plain `bat` branch kept here.
 - `claude` is aliased to add `--effort ultracode`, so every interactive launch, including `cx` and `tdl`-launched AIs, inherits it via alias expansion; scripts and hooks stay plain. Ultracode is session-only upstream and cannot be set in `settings.json`.
 - `y()` is added for Yazi cd-on-exit support. Yazi is not part of Omarchy.
+- `trio` is added: one tmux session per project (Git root, else current directory) with three windows: full-width Claude Code, full-width OpenCode, and `$EDITOR` above a 25% shell. `trio -c` continues each AI's last conversation in the project; repeated calls resume the existing session. Additive alongside Omarchy's `tdl`/`tds` pane layouts; tracked as a byte-identical twin with `dotfiles-omarchy`.
 - `mise`-specific shell handling is omitted.
 - No `pacman` alias and no AUR helper. Omarchy routes updates through `omarchy-update-perform`, which is Hyprland/desktop-bound; this repo uses plain `pacman` against official repos only.
 
