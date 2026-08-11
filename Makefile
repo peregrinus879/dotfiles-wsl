@@ -11,7 +11,8 @@ AI_REPO := ../dotfiles-ai
 SIBLING := $(HOME)/Projects/repos/dotfiles/dotfiles-omarchy
 TWIN_SPECS := nvim/.config/nvim/lua/plugins/obsidian.lua \
   nvim/.config/nvim/lua/plugins/render-markdown.lua \
-  bash/.config/bash/functions/trio
+  bash/.config/bash/functions/trio \
+  yazi/.config/yazi/yazi.toml
 
 .PHONY: help stow unstow dry-run restow stow-all verify clean lint wt-diff wt-pull
 

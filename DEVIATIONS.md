@@ -139,7 +139,7 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 ### Yazi
 
 - Added entirely. Yazi is not part of Omarchy.
-- `yazi.toml` keeps the local layout and behavior choices: ratio `[2, 4, 4]`, hidden files shown, directories sorted first, `sort_by = "natural"`, and `linemode = "size"`.
+- `yazi.toml` keeps the local layout and behavior choices: ratio `[2, 4, 4]`, hidden files shown, directories sorted first, `sort_by = "natural"`, and `linemode = "size"`. Tracked as a byte-identical twin with `dotfiles-omarchy`.
 - `theme.toml` carries the Miasma palette.
 - One off-palette color, `#333333`, is kept for alternate and inactive backgrounds to create subtle separation from the base terminal background `#222222`.
 

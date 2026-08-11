@@ -12,7 +12,7 @@ Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basec
 
 - Target machine: WSL; run stow and make targets only on the WSL host.
 - When editing sibling dotfiles repos, use identical wording for shared concepts; only repo-specific values (scope, package lists, invariants) differ.
-- The Makefile `TWIN_SPECS` files (nvim vault plugin specs, the `trio` workspace function) are byte-identical twins with `dotfiles-omarchy`; `make verify` fails on drift.
+- The Makefile `TWIN_SPECS` files (nvim vault plugin specs, the `trio` workspace function, `yazi.toml`) are byte-identical twins with `dotfiles-omarchy`; `make verify` fails on drift.
 - `nvim/` assumes the LazyVim starter was cloned into `~/.config/nvim` first.
 - The vault is expected at `~/Projects/vault` (override with `OBSIDIAN_VAULT`) for the obsidian.nvim workflow.
 - Git identity lives in the untracked per-host `~/.config/git/config.local`.
