@@ -317,7 +317,6 @@ After stowing:
 - **`stow` reports "existing target is not a symlink"**: Remove the conflicting file listed in the error, then re-run the stow command. Section 8 lists the expected cleanup targets.
 - **Neovim clipboard not working**: Confirm `clip.exe` and `powershell.exe` are accessible from WSL (`which clip.exe`). If Windows interop is disabled, check `[interop]` in `/etc/wsl.conf`.
 - **OpenCode Miasma not listed**: Confirm `~/.config/opencode/themes/miasma.json` is a symlink to `opencode-wsl/.config/opencode/themes/miasma.json`. If `~/.config/opencode` or `~/.config/opencode/themes` is still a directory symlink to another dotfiles package, repeat the merge directory prep in section 8, then re-run the stow command.
-- **`tdl c` still reports Neovim `E21` after selecting Miasma**: Treat the theme as ruled out and investigate the tmux/OpenCode startup path separately.
 
 ## Maintenance
 
