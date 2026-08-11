@@ -1,0 +1,52 @@
+# Create or resume a Dev Workspace: one tmux session per project with a
+# full-width AI agent window plus an editor/shell window.
+# Layout: 1:<agent> | 2:editor+terminal ($EDITOR over a 25% shell)
+# Usage: dw <cc|oc> [-c]   cc = Claude Code, oc = OpenCode; -c continues the
+# agent's last conversation in this project. Bare dw re-attaches an existing
+# project session. One agent per workspace by design (single writer).
+dw() {
+  local agent="" window="" continue_flag="" arg
+  for arg in "$@"; do
+    case "$arg" in
+      cc) agent="claude" window="claude-code" ;;
+      oc) agent="opencode" window="opencode" ;;
+      -c) continue_flag=" -c" ;;
+      *) echo "Usage: dw <cc|oc> [-c]"; return 1 ;;
+    esac
+  done
+
+  local root session existing_root
+  root=$(git rev-parse --show-toplevel 2>/dev/null) || root=$(pwd -P)
+  # Replace dots/colons, which tmux disallows in session names
+  session=$(basename "$root" | tr '.:' '--')
+
+  if tmux has-session -t "=$session" 2>/dev/null; then
+    existing_root=$(tmux show-option -t "$session" -qv @dw_root)
+    if [[ -n $existing_root && $existing_root != "$root" ]]; then
+      echo "tmux session '$session' belongs to $existing_root; kill it or attach manually."
+      return 1
+    fi
+    [[ -n $agent || -n $continue_flag ]] && echo "dw: session exists, arguments ignored"
+  else
+    if [[ -z $agent ]]; then
+      echo "Usage: dw <cc|oc> [-c]"
+      return 1
+    fi
+    local editor_pane
+    tmux new-session -d -s "$session" -c "$root" -n "$window"
+    tmux set-option -t "$session" @dw_root "$root"
+    editor_pane=$(tmux new-window -t "=$session:" -n editor+terminal -c "$root" -P -F '#{pane_id}')
+    # Shell at bottom 25%; the split leaves the new bottom pane focused on purpose,
+    # so entering the window lands on the terminal ($editor_pane stays the top pane)
+    tmux split-window -v -p 25 -t "$editor_pane" -c "$root"
+    tmux send-keys -t "=$session:$window" "$agent$continue_flag" C-m
+    tmux send-keys -t "$editor_pane" "$EDITOR ." C-m
+    tmux select-window -t "=$session:$window"
+  fi
+
+  if [[ -n $TMUX ]]; then
+    tmux switch-client -t "=$session"
+  else
+    tmux attach-session -t "=$session"
+  fi
+}
