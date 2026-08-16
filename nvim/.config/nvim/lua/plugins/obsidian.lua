@@ -1,8 +1,8 @@
 -- Vault-specific obsidian.nvim overlay for LazyVim.
 --
 -- Assumes a stock LazyVim install (blink.cmp for completion, snacks_picker
--- for pickers). Older LazyVim installs may use fzf-lua, which obsidian.nvim
--- also supports.
+-- for pickers); an install may use fzf-lua instead, which obsidian.nvim also
+-- supports.
 --
 -- Required system packages: ripgrep, python3, wl-clipboard (Wayland) or xclip (X11).
 -- On WSL, obsidian:// and web URIs route through Windows interop
