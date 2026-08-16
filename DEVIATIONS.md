@@ -4,7 +4,7 @@
 
 This document records the intentional differences carried by `dotfiles-wsl` relative to [Omarchy](https://github.com/basecamp/omarchy), and defines the boundary between this repo and its siblings.
 
-Omarchy remains the upstream reference. This repo carries the full terminal baseline for Arch Linux inside WSL, plus the WSL and Windows-specific behavior that a Linux desktop distribution does not cover.
+Omarchy is the upstream reference. This repo carries the full terminal baseline for Arch Linux inside WSL, plus the WSL and Windows-specific behavior that a Linux desktop distribution does not cover.
 
 ## Deviation Policy
 
@@ -106,9 +106,9 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 - `lua/config/options.lua` keeps Omarchy's `vim.opt.relativenumber = false` and `vim.g.autoformat = false` baseline and adds WSL clipboard integration directly, guarded by `clip.exe` and `powershell.exe` availability so the block is a no-op outside WSL. Copy uses `clip.exe`; paste uses `powershell.exe Get-Clipboard`.
 - `all-themes.lua` and `omarchy-theme-hotreload.lua` are omitted because this repo uses Miasma only.
 - Kept verbatim from `omarchy-nvim`: `disable-news-alert.lua`, `snacks-animated-scrolling-off.lua`, `vim.opt.relativenumber = false`, and `vim.g.autoformat = false`.
-- `transparency.lua` content is verbatim from `omarchy-nvim` but relocated from `plugin/after/` to `after/plugin/` to use Neovim's actual after-load mechanism. Upstream `omarchy-nvim` still uses the incorrect path.
+- `transparency.lua` content is verbatim from `omarchy-nvim` but lives at `after/plugin/` instead of upstream's `plugin/after/` to use Neovim's actual after-load mechanism. Upstream `omarchy-nvim` uses the incorrect path.
 - Owned Lua files use 2-space indentation per the shared `.editorconfig` in this repo. Upstream `omarchy-nvim` uses tabs. Contents are otherwise unchanged.
-- Two additive plugin specs are adopted from the vault's former `nvim-vault` package: `obsidian.lua` (obsidian.nvim against the vault at `~/Projects/vault`, override with `OBSIDIAN_VAULT`) and `render-markdown.lua` (visual markdown rendering companion). `python` joins the baseline package list because the vault keybindings shell out to the vault's `normalize.py`.
+- Two additive plugin specs are carried: `obsidian.lua` (obsidian.nvim against the vault at `~/Projects/vault`, override with `OBSIDIAN_VAULT`) and `render-markdown.lua` (visual markdown rendering companion). `python` is in the baseline package list because the vault keybindings shell out to the vault's `normalize.py`.
 - The spec's `open.func` routes `obsidian://` and web URIs through Windows interop (`powershell.exe Start-Process`) when running under WSL, so `:Obsidian open` and link-following reach the Windows apps without `wsl-open`, which is not in official Arch repos. The override is guarded by `vim.fn.has("wsl")` and inert elsewhere; both repos track byte-identical copies of the spec.
 
 ### OpenCode
@@ -133,7 +133,7 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 
 ### Btop
 
-- `btop.conf` is based on the generated config format produced by current `btop`, including lowercase booleans and additional default settings.
+- `btop.conf` is based on the generated config format produced by `btop`, including lowercase booleans and additional default settings.
 - The intentional baseline change is `color_theme = "miasma"` instead of Omarchy's `"current"`.
 
 ### Yazi
