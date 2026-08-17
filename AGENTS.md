@@ -12,7 +12,7 @@ Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basec
 
 - Target machine: WSL; run stow and make targets only on the WSL host.
 - When editing sibling dotfiles repos, use identical wording for shared concepts; only repo-specific values (scope, package lists, invariants) differ.
-- The Makefile `TWIN_SPECS` files (nvim vault plugin specs, the `dw` workspace function, `yazi.toml`) are byte-identical twins with `dotfiles-omarchy`; `make verify` fails on drift.
+- The Makefile `TWIN_SPECS` files (nvim vault plugin specs, the `tdw` workspace function, `yazi.toml`) are byte-identical twins with `dotfiles-omarchy`; `make verify` fails on drift.
 - `nvim/` assumes the LazyVim starter was cloned into `~/.config/nvim` first.
 - The vault is expected at `~/Projects/vault` (override with `OBSIDIAN_VAULT`) for the obsidian.nvim workflow.
 - Git identity lives in the untracked per-host `~/.config/git/config.local`.
@@ -39,6 +39,7 @@ Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basec
 
 ## Deferred Items
 
+- next WSL-host pass: the `dw`-to-`tdw` twin rename was committed from the Omarchy host with host-neutral checks only (`bash -n`, twin `cmp`, reference grep); run `make verify` and `make lint` here, then restow so `~/.config/bash/functions/tdw` links and a fresh shell resolves `type tdw`.
 - next sync: upstream `tdl` ends with `select-pane -t "$opencode_pane"` on a variable it never sets, verified at v4.0.0 `default/bash/fns/tmux` on 2026-08-15 (cosmetic focus regression; `post-4.0-fixes` does not touch it); verify it is fixed before adopting upstream `tdl` changes.
 - watch the tree-folded `~/.config/yazi`: the first `ya pkg` install writes `plugins/` and `package.toml` into the repo working tree; decide then whether to track them (the `dotfiles-ai` opencode-deps pattern) or gitignore them (the git-identity pattern already guarded by this repo's `.gitignore`).
 - resync to the Omarchy quattro baseline: the Omarchy machine runs 4.0.0 (tag `v4.0.0`; the upstream default branch is `quattro`). Verified 3.8.4-to-quattro drift for this repo's packages (captured 2026-08-11 from the pre-release branch; re-verify against the release tag before adopting): aliases gain `c='opencode --auto'` and new `a`/`h` (and `mup`); fns drop `transcoding` and add `herdr`/`rsyncing`/`ssh-reconnect`; `tds` joins the tmux helpers (do not adopt `tdl`'s trailing select-pane bug, see the item above); completions are rewritten; envs adds EDITOR/BROWSER defaults, a locale fallback, and a PATH append; the fastfetch config moves to /etc with small content tweaks; starship/btop/git/editorconfig are zero diff; tmux.conf gains `-N` bind descriptions, a `?` keybindings popup, and the `*:clipboard` terminal-features line. Document the chosen baseline ref in `DEVIATIONS.md`.
