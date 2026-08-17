@@ -38,7 +38,6 @@
 --   ui.enable = false                  render-markdown.nvim handles visual
 --                                      rendering; obsidian.nvim's UI would
 --                                      overlap.
---   completion.blink + nvim_cmp        LazyVim ships blink.cmp; match it.
 --   open.func                          On WSL, URIs open via Windows
 --                                      interop (powershell.exe, already
 --                                      required by the clipboard); inert
@@ -204,9 +203,6 @@ return {
       "BufNewFile " .. vault_path .. "/**.md",
     },
     cmd = { "Obsidian" },
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-    },
     opts = {
       legacy_commands = false,
       workspaces = {
@@ -233,8 +229,6 @@ return {
         template = "permanent.md",
       },
       completion = {
-        blink = true,
-        nvim_cmp = false,
         min_chars = 2,
       },
       ui = {
