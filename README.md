@@ -4,6 +4,8 @@ Self-contained Arch Linux dotfiles for WSL, adapted from [Omarchy](https://githu
 
 EyrWSL carries the full terminal baseline for Arch Linux running inside WSL, plus the WSL and Windows-specific pieces: Windows Terminal, clipboard integration, and OpenCode theme availability. It keeps Omarchy's terminal tooling and general feel while dropping desktop-specific components that do not apply inside WSL.
 
+Eyrie is the shared project habitat, reflected locally in `~/Projects/eyrie/`. `Eyr` is its shortened family prefix, used by EyrAgents, EyrArcHy, and EyrWSL.
+
 ## Repo Family
 
 Derivation model for this repo family:
