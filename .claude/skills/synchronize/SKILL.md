@@ -1,15 +1,15 @@
 ---
 name: synchronize
-description: Sync this WSL repo against Omarchy references and official WSL and Windows Terminal docs. Covers all packages owned by dotfiles-wsl.
+description: Sync EyrWSL against Omarchy references and official WSL and Windows Terminal docs. Covers all packages owned by EyrWSL.
 ---
 
 # Synchronize
 
-Source configs from reference repos and official docs, compare against `dotfiles-wsl`, and apply changes only where they belong in this repo.
+Source configs from reference repos and official docs, compare against EyrWSL, and apply changes only where they belong in this repo.
 
 ## Sources
 
-Local reference clones live under `~/Projects/repos/references/`:
+Local reference clones live under `~/Projects/quarry/`:
 
 - `omarchy/` - main repo for bash, tmux, starship, git, fastfetch, btop, and editorconfig references
 - `omarchy-pkgs/` - package builds, including the Omarchy Neovim package
@@ -29,7 +29,7 @@ Upstream URLs, official docs, and descriptions live in `DEVIATIONS.md` (Referenc
 
 ## Workflow
 
-1. Compare reference repos against the packages owned by `dotfiles-wsl`
+1. Compare reference repos against the packages owned by EyrWSL
 2. For Omarchy-derived packages, compare against `omarchy/`, `omarchy-pkgs/`, and `miasma.nvim/`
 3. For non-Omarchy tools, compare Yazi against `yazi/` and official docs, and the vault plugin specs against `obsidian.nvim/` and the render-markdown.nvim README
 4. For Windows Terminal, compare `windows-terminal/settings.json` against `terminal/` and official docs
@@ -56,6 +56,6 @@ Upstream URLs, official docs, and descriptions live in `DEVIATIONS.md` (Referenc
 - Always check all relevant sources, not just one
 - Never assume a difference is intentional without verifying it is documented in `DEVIATIONS.md`
 - Keep the dual Miasma palette canons: terminal-side files track `themes/miasma/colors.toml` (`#78824b`), plugin-side files track `miasma.nvim` (`#78834b`)
-- Keep shared AI harness runtime config in `dotfiles-ai`; this repo owns only WSL-specific OpenCode theme availability
+- Keep shared AI agent harness runtime config in EyrAgents; this repo owns only WSL-specific OpenCode theme availability
 - Do not add AUR packages or an AUR helper; the baseline depends on official Arch repos only
 - Keep Windows-specific behavior explicit and documented

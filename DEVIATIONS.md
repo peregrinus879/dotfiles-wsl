@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document records the intentional differences carried by `dotfiles-wsl` relative to [Omarchy](https://github.com/basecamp/omarchy), and defines the boundary between this repo and its siblings.
+This document records the intentional differences carried by EyrWSL relative to [Omarchy](https://github.com/basecamp/omarchy), and defines the boundary between this repo and its siblings.
 
 Omarchy is the upstream reference. This repo carries the full terminal baseline for Arch Linux inside WSL, plus the WSL and Windows-specific behavior that a Linux desktop distribution does not cover.
 
@@ -76,7 +76,7 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 - The kitty-conditional `ff` image-preview variant is omitted; Windows Terminal is not kitty, so the conditional would always take the plain `bat` branch kept here.
 - `claude` is aliased to add `--effort ultracode`, so every interactive launch, including `cx` and `tdl`-launched AIs, inherits it via alias expansion; scripts and hooks stay plain. Ultracode is session-only upstream and cannot be set in `settings.json`.
 - `y()` is added for Yazi cd-on-exit support. Yazi is not part of Omarchy.
-- `tdw` is added: one tmux session per project (Git root, else current directory) with two windows: a full-width AI agent (`tdw cc` for Claude Code, `tdw oc` for OpenCode; the choice is mandatory at creation so a single agent owns the working tree) and `$EDITOR` above a 25% shell. `-c` continues that agent's last conversation in the project; bare `tdw` re-attaches an existing session. Additive alongside Omarchy's `tdl`/`tds` pane layouts; tracked as a byte-identical twin with `dotfiles-omarchy`. The `t`/`h` prefix follows Omarchy's multiplexer lettering (`tdl`/`hdl`).
+- `tdw` is added: one tmux session per project (Git root, else current directory) with two windows: a full-width AI agent (`tdw cc` for Claude Code, `tdw oc` for OpenCode; the choice is mandatory at creation so a single agent owns the working tree) and `$EDITOR` above a 25% shell. `-c` continues that agent's last conversation in the project; bare `tdw` re-attaches an existing session. Additive alongside Omarchy's `tdl`/`tds` pane layouts; tracked as a byte-identical twin with EyrArcHy. The `t`/`h` prefix follows Omarchy's multiplexer lettering (`tdl`/`hdl`).
 - `mise`-specific shell handling is omitted.
 - No `pacman` alias and no AUR helper. Omarchy routes updates through `omarchy-update-perform`, which is Hyprland/desktop-bound; this repo uses plain `pacman` against official repos only.
 
@@ -114,8 +114,8 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 ### OpenCode
 
 - `opencode-wsl/` stows `~/.config/opencode/themes/miasma.json` so OpenCode can select Miasma in WSL.
-- The theme file is WSL-specific theme availability, not shared OpenCode runtime config. Runtime config remains owned by `dotfiles-ai`.
-- `~/.config/opencode/` and `~/.config/opencode/themes/` stay real merge directories so `dotfiles-ai` and `opencode-wsl` can both link files inside them.
+- The theme file is WSL-specific theme availability, not shared OpenCode runtime config. Runtime config remains owned by EyrAgents.
+- `~/.config/opencode/` and `~/.config/opencode/themes/` stay real merge directories so EyrAgents and `opencode-wsl` can both link files inside them.
 - The repo does not force OpenCode's selected theme. Select `miasma` with `/theme` so the choice remains a user-level OpenCode preference.
 - `miasma.json` uses flat string values rather than the `{dark, light}` object pairs used by upstream OpenCode themes in `packages/ui/src/theme/themes/`. The flat form is valid against `https://opencode.ai/tui.json`. Miasma is dark-only upstream in `miasma.nvim`, so inventing a light variant would not be faithful to the canonical palette.
 - Palette defs and role mappings track `miasma.nvim/lua/miasma/palette.lua` and the highlight definitions in `colors/miasma.vim`. Def names mirror the canonical palette (`base`, `surface`, `surfaceHighlight`, `text`, `textMuted`, `amber`, `orange`, `accentPrimary`, `accentSecondary`, `warning`, `error`). `primary` maps to `accentPrimary` (`#78834b`) so opencode's dominant accent matches miasma.nvim's Type, Function, and selection accent rather than the amber/string color. `syntaxString` maps to `warning` (`#685742`) per `M.string = M.warning` in palette.lua.
@@ -139,7 +139,7 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 ### Yazi
 
 - Added entirely. Yazi is not part of Omarchy.
-- `yazi.toml` keeps the local layout and behavior choices: ratio `[2, 4, 4]`, hidden files shown, directories sorted first, `sort_by = "natural"`, and `linemode = "size"`. Tracked as a byte-identical twin with `dotfiles-omarchy`.
+- `yazi.toml` keeps the local layout and behavior choices: ratio `[2, 4, 4]`, hidden files shown, directories sorted first, `sort_by = "natural"`, and `linemode = "size"`. Tracked as a byte-identical twin with EyrArcHy.
 - `theme.toml` carries the Miasma palette.
 - One off-palette color, `#333333`, is kept for alternate and inactive backgrounds to create subtle separation from the base terminal background `#222222`.
 
@@ -147,6 +147,7 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 
 - `/etc/wsl.conf` carries the default user and keeps Windows interop enabled, which the clipboard integration requires.
 - Windows-side installation of WSL, the Nerd Font, and Windows Terminal is documented in this repo's README.
+- The WSL baseline includes `inetutils` for the `hostname` host gate, `lua` for EyrWSL's fail-closed syntax verification, and `nodejs` for EyrAgents verification.
 
 ## Skipped From Omarchy
 
@@ -161,7 +162,7 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 
 ## Out Of Scope
 
-The following do **not** belong in `dotfiles-wsl`:
+The following do **not** belong in EyrWSL:
 
-- Shared OpenCode and Claude Code runtime config (belongs in `dotfiles-ai`)
-- Omarchy desktop customizations such as Hyprland bindings (belong in `dotfiles-omarchy`)
+- Shared AI agent runtime configuration (belongs in EyrAgents)
+- Omarchy desktop customizations such as Hyprland bindings (belong in EyrArcHy)

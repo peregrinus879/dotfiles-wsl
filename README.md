@@ -1,24 +1,24 @@
-# dotfiles-wsl
+# EyrWSL
 
 Self-contained Arch Linux dotfiles for WSL, adapted from [Omarchy](https://github.com/basecamp/omarchy), managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
-`dotfiles-wsl` carries the full terminal baseline for Arch Linux running inside WSL, plus the WSL and Windows-specific pieces: Windows Terminal, clipboard integration, and OpenCode theme availability. It keeps Omarchy's terminal tooling and general feel while dropping desktop-specific components that do not apply inside WSL.
+EyrWSL carries the full terminal baseline for Arch Linux running inside WSL, plus the WSL and Windows-specific pieces: Windows Terminal, clipboard integration, and OpenCode theme availability. It keeps Omarchy's terminal tooling and general feel while dropping desktop-specific components that do not apply inside WSL.
 
 ## Repo Family
 
 Derivation model for this repo family:
 
 ```text
-AI harness configs              → dotfiles-ai
-Omarchy + personal deviations   → dotfiles-omarchy
-Omarchy + WSL deviations        → dotfiles-wsl
+AI agent harness                → EyrAgents
+Omarchy + personal deviations   → EyrArcHy
+Omarchy + WSL deviations        → EyrWSL
 ```
 
-- [`dotfiles-ai`](https://github.com/peregrinus879/dotfiles-ai) - AI harness configs: Claude Code and OpenCode settings, shared guidance, and commit workflow
-- [`dotfiles-omarchy`](https://github.com/peregrinus879/dotfiles-omarchy) - Personal Omarchy customizations: Bash overrides, Hyprland bindings, Neovim plugins, and Yazi
-- [`dotfiles-wsl`](https://github.com/peregrinus879/dotfiles-wsl) - Self-contained WSL Arch dotfiles: terminal baseline plus Windows Terminal, clipboard integration, and OpenCode theme
+- [`eyragents`](https://github.com/peregrinus879/eyragents) - AI agent harness: Claude Code, Codex, and OpenCode settings, shared guidance, and commit workflow
+- [`eyrarchy`](https://github.com/peregrinus879/eyrarchy) - Personal Omarchy customizations: Bash overrides, Hyprland bindings, Neovim plugins, and Yazi
+- [`eyrwsl`](https://github.com/peregrinus879/eyrwsl) - Self-contained WSL Arch environment: terminal baseline plus Windows Terminal, clipboard integration, and OpenCode theme
 
-Local clones live side by side under `~/Projects/repos/dotfiles/`.
+Local clones live side by side under `~/Projects/eyrie/`.
 
 ## Stack
 
@@ -58,8 +58,8 @@ Key ownership rules:
 - `nvim/` owns the full Neovim config, including `lua/config/options.lua` with the built-in WSL clipboard integration
 - `nvim/` includes the vault plugin specs (`obsidian.lua`, `render-markdown.lua`); the vault is expected at `~/Projects/vault` (override with `OBSIDIAN_VAULT`)
 - Bash supports additive machine overlays through `~/.config/bash-overlays/*`; the directory is optional and reserved for untracked machine-local additions
-- `dotfiles-ai` keeps ownership of shared OpenCode runtime config; `opencode-wsl/` only adds Miasma theme availability without forcing the selected theme
-- `~/.config/opencode/` and `~/.config/opencode/themes/` must be real merge directories so `dotfiles-ai` and `opencode-wsl` can both link files inside them
+- EyrAgents keeps ownership of shared OpenCode runtime config; `opencode-wsl/` only adds Miasma theme availability without forcing the selected theme
+- `~/.config/opencode/` and `~/.config/opencode/themes/` must be real merge directories so EyrAgents and `opencode-wsl` can both link files inside them
 - `windows-terminal/` stays Windows-side, is applied manually, and intentionally tracks the full paste-ready `settings.json`
 - repo-root `.claude/settings.json` and `opencode.json` are per-tool project allowlists for this repo's verification make targets (`verify`, `lint`); they are not stowed
 
@@ -130,9 +130,9 @@ sudo locale-gen
 Install the baseline packages required by these dotfiles:
 
 ```bash
-sudo pacman -S --needed bash-completion bat btop diffutils eza fastfetch fd fzf gcc git github-cli \
-  gum jq lazygit less make neovim openssh python ripgrep shellcheck starship stow sudo tmux unzip \
-  which yazi zoxide
+sudo pacman -S --needed bash-completion bat btop diffutils eza fastfetch fd findutils fzf gcc git github-cli \
+  gum inetutils jq lazygit less lua make neovim nodejs openssh python ripgrep shellcheck starship \
+  stow sudo tmux unzip which yazi zoxide
 ```
 
 All baseline packages come from official Arch repositories. This repo intentionally depends on no AUR packages and installs no AUR helper.
@@ -142,13 +142,13 @@ All baseline packages come from official Arch repositories. This repo intentiona
 Recommended local layout for this repo family:
 
 ```text
-~/Projects/repos/dotfiles/dotfiles-wsl
+~/Projects/eyrie/eyrwsl
 ```
 
 Stow can work from any clone location, but the related docs and cross-repo maintenance workflows assume this layout.
 
 ```bash
-git clone https://github.com/peregrinus879/dotfiles-wsl.git ~/Projects/repos/dotfiles/dotfiles-wsl
+git clone https://github.com/peregrinus879/eyrwsl.git ~/Projects/eyrie/eyrwsl
 ```
 
 ### 6. Neovim Base
@@ -181,13 +181,13 @@ Create `~/.config/git/config.local` with your local identity:
 Checklist before stowing:
 
 - Required packages are installed
-- `dotfiles-wsl` was cloned locally
+- EyrWSL was cloned locally
 - LazyVim starter was cloned into `~/.config/nvim`
 - `~/.config/git/config.local` exists with your local Git identity
-- `dotfiles-ai` OpenCode config is already stowed if you use OpenCode on this WSL install
+- EyrAgents OpenCode config is already stowed if you use OpenCode on this WSL install
 - Any existing conflicting files were removed
 
-Remove existing files that would conflict with stow. The first block removes tree-folded directory symlinks left by a previous stow; entries that are already real directories (such as `~/.config/git` after step 7) error harmlessly and are left in place. The second block prepares shared OpenCode merge directories, then re-stows `dotfiles-ai` when present so any shared OpenCode entries remain linked there. The final block removes individual config files:
+Remove existing files that would conflict with stow. The first block removes tree-folded directory symlinks left by a previous stow; entries that are already real directories (such as `~/.config/git` after step 7) error harmlessly and are left in place. The second block prepares shared OpenCode merge directories, then re-stows EyrAgents when present so any shared OpenCode entries remain linked there. The final block removes individual config files:
 
 ```bash
 # Tree-folded directory symlinks (from a previous stow)
@@ -204,8 +204,8 @@ if [[ -L ~/.config/opencode/themes ]]; then
 fi
 mkdir -p ~/.config/opencode/themes
 
-if [[ -d ~/Projects/repos/dotfiles/dotfiles-ai ]]; then
-  (cd ~/Projects/repos/dotfiles/dotfiles-ai && stow -v -t ~ opencode)
+if [[ -d ~/Projects/eyrie/eyragents ]]; then
+  (cd ~/Projects/eyrie/eyragents && stow -v -t ~ opencode)
 fi
 
 # Individual config files
@@ -234,7 +234,7 @@ rm -f ~/.config/opencode/themes/miasma.json
 Create symlinks for all packages:
 
 ```bash
-cd ~/Projects/repos/dotfiles/dotfiles-wsl
+cd ~/Projects/eyrie/eyrwsl
 stow -v -t ~ bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
 ```
 
@@ -243,7 +243,7 @@ Start a new terminal session, or run `source ~/.bashrc`, for the shell config to
 ### Unstow
 
 ```bash
-cd ~/Projects/repos/dotfiles/dotfiles-wsl
+cd ~/Projects/eyrie/eyrwsl
 stow -D -v -t ~ bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
 ```
 
@@ -252,7 +252,7 @@ stow -D -v -t ~ bash btop editorconfig fastfetch git nvim opencode-wsl starship 
 Preview what stow would do without making changes:
 
 ```bash
-cd ~/Projects/repos/dotfiles/dotfiles-wsl
+cd ~/Projects/eyrie/eyrwsl
 stow -v -n -t ~ bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
 ```
 
@@ -261,7 +261,7 @@ stow -v -n -t ~ bash btop editorconfig fastfetch git nvim opencode-wsl starship 
 To update symlinks after the repo content changes (same clone path):
 
 ```bash
-cd ~/Projects/repos/dotfiles/dotfiles-wsl
+cd ~/Projects/eyrie/eyrwsl
 stow -R -v -t ~ bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
 ```
 
@@ -270,7 +270,7 @@ To migrate from a different clone path, unstow from the old location first:
 ```bash
 cd /old/clone/path
 stow -D -v -t ~ bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
-cd ~/Projects/repos/dotfiles/dotfiles-wsl
+cd ~/Projects/eyrie/eyrwsl
 stow -v -t ~ bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
 ```
 
@@ -323,8 +323,8 @@ After stowing:
 A repo-root `Makefile` keeps the package list in one place and wraps the routine commands. Run targets from the repo root on the WSL machine:
 
 - `make stow` / `make unstow` / `make dry-run` / `make restow` - the stow command sets from Setup
-- `make stow-all` - stows `dotfiles-ai`'s `opencode` package first, then all packages here
-- `make verify` - the Verify symlink and identity checks, shell and Lua syntax (the Lua checks need the optional `lua` package for `luac` and are skipped otherwise), and the nvim twin-spec sync check against `dotfiles-omarchy`
+- `make stow-all` - stows EyrAgents' `opencode` package first, then all packages here
+- `make verify` - every Git-visible Stow source resolves to its deployed target, the local Git identity exists, Bash and Lua syntax pass, `yazi.toml` parses, and every twin matches EyrArcHy; required verifier tools fail closed
 - `make clean` - the Prepare cleanup steps
 - `make lint` - ShellCheck over the bash package and `scripts/`; `.shellcheckrc` disables the upstream-derived warnings so new issues stand out
 - `make wt-diff` - diff the tracked Windows Terminal settings against the deployed Windows-side file (normalized with `jq`, since Windows Terminal rewrites key order)
