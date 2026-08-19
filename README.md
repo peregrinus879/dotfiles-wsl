@@ -35,7 +35,7 @@ Local clones live side by side under `~/Projects/eyrie/`.
 - **System Info**: [fastfetch](https://github.com/fastfetch-cli/fastfetch)
 - **Dotfile Management**: [GNU Stow](https://www.gnu.org/software/stow/)
 - **Terminal**: [Windows Terminal](https://github.com/microsoft/terminal)
-- **Theme**: [Miasma](https://github.com/OldJobobo/miasma.nvim)
+- **Theme**: [Gruvbox](https://github.com/ellisonleao/gruvbox.nvim) in Neovim; Miasma on the remaining owned theme surfaces
 
 ## Package Layout
 
@@ -47,7 +47,7 @@ btop/              System monitor config (btop.conf, themes/miasma.theme)
 editorconfig/      Editor formatting rules (.editorconfig)
 fastfetch/         System info config (config.jsonc)
 git/               Git config (config, ignore)
-nvim/              Neovim config (lazyvim.json, lua/config/, lua/plugins/, after/plugin/)
+nvim/              Self-contained Neovim config (bootstrap, lock, LazyVim config and plugins)
 opencode-wsl/      OpenCode Miasma theme (themes/miasma.json)
 starship/          Prompt config (starship.toml)
 tmux/              Tmux config (tmux.conf)
@@ -57,7 +57,7 @@ windows-terminal/  Windows Terminal settings.json, deployed explicitly, not stow
 
 Key ownership rules:
 
-- `nvim/` owns the full Neovim config, including `lua/config/options.lua` with the built-in WSL clipboard integration
+- `nvim/` owns the full Neovim config, including the LazyVim bootstrap and lockfile plus `lua/config/options.lua` with the built-in WSL clipboard integration
 - `nvim/` includes the vault plugin specs (`obsidian.lua`, `render-markdown.lua`); the vault is expected at `~/Projects/vault` (override with `OBSIDIAN_VAULT`)
 - Bash supports additive machine overlays through `~/.config/bash-overlays/*`; the directory is optional and reserved for untracked machine-local additions
 - Claude Code launches use the supported maximum effort, `--effort max`. `tdw` and `hdw` are byte-identical twins with EyrArcHy.
@@ -165,14 +165,20 @@ Stow can work from any clone location, but the related docs and cross-repo maint
 git clone https://github.com/peregrinus879/eyrwsl.git ~/Projects/eyrie/eyrwsl
 ```
 
-### 6. Neovim Base
+### 6. Neovim Ownership
 
-Clone the LazyVim starter first so the `nvim/` package has a target directory to extend:
+The `nvim/` package includes the LazyVim starter bootstrap and generated plugin lockfile. A separate starter clone is not required.
+
+An installation created under the previous setup may still have regular starter files at `~/.config/nvim`. Before `make clean`, migrate those files with the guarded backup-first target:
 
 ```bash
-git clone https://github.com/LazyVim/starter ~/.config/nvim
-rm -rf ~/.config/nvim/.git
+cd ~/Projects/eyrie/eyrwsl
+make migrate-nvim
 ```
+
+The migration accepts the six unmodified static files from the pinned official starter predecessor and any regular `lazy-lock.json`. It preflights the complete path set, creates a timestamped `~/.config/nvim.eyrwsl-backup-<timestamp>`, verifies each copy, removes only those backed-up files, and stows the owned replacements. Modified files, foreign links, symlinked foreign parents, and special files abort before any backup or removal. Starter `LICENSE`, `README.md`, and `.gitignore` files remain untouched.
+
+If a static file was modified, merge its needed content into the corresponding tracked file, move the live file aside, and rerun the migration. To roll back, inspect each file present in the reported backup, require its corresponding live endpoint to be a direct symlink resolving to the same path under this repo's `nvim/.config/nvim/`, remove only that link, then copy the backup contents into `~/.config/nvim/`. Stop if an endpoint is not that exact owned link; the backup remains available for manual recovery.
 
 ### 7. Private Git Identity
 
@@ -196,7 +202,7 @@ Checklist before stowing:
 
 - Required packages are installed
 - EyrWSL was cloned locally
-- LazyVim starter was cloned into `~/.config/nvim`
+- Any regular LazyVim starter files from an earlier installation were handled with `make migrate-nvim`
 - `~/.config/git/config.local` exists with your local Git identity
 - EyrAgents OpenCode config is already stowed if you use OpenCode on this WSL install
 - Any existing conflicting files were reviewed and moved or merged
@@ -263,7 +269,7 @@ If the old clone is no longer available, run the full cleanup in section 8 befor
 
 ### 10. First Launch
 
-Open Neovim once to trigger plugin installation:
+Open Neovim once to install the revisions recorded in the tracked lockfile:
 
 ```bash
 nvim
@@ -305,7 +311,7 @@ After stowing:
 - Confirm `type tdw` shows the tmux workspace function; from a project directory, `tdw cc` or `tdw oc` opens its session (`-c` continues that agent's last conversation; bare `tdw` re-attaches an existing session). Creating a session fails before changing tmux state when the selected agent is unavailable.
 - Confirm `type hdw`, `type hdl`, `type hdlm`, and `type hsl` show the Herdr workspace functions. `hds` is intentionally unavailable because it requires Hunk.
 - Confirm `pacman -Qo /usr/bin/codex /usr/bin/opencode` reports `openai-codex` and `opencode` ownership.
-- Run `nvim` once and confirm plugins install successfully and Miasma loads.
+- Run `nvim` once and confirm plugins install successfully and Gruvbox loads.
 - In Neovim, confirm yanks reach the Windows clipboard and pastes from the Windows clipboard reach Neovim.
 - If the vault is synced to this machine, open a vault note and confirm obsidian.nvim loads (`<leader>oo` opens the note switcher).
 - In OpenCode, run `/theme` and confirm `miasma` is available. Select it if OpenCode is still using the `system` theme.
@@ -314,6 +320,7 @@ After stowing:
 ## Troubleshooting
 
 - **Preparation reports a conflict**: Compare the reported path, move or merge any needed content, then rerun `make clean`. The script never deletes regular files, foreign links, broken links, or special files.
+- **Neovim starter migration reports a conflict**: Merge needed edits into the corresponding tracked file, move the reported live file aside, and rerun `make migrate-nvim`. The migration changes nothing until the complete path set passes preflight.
 - **Neovim clipboard not working**: Confirm `clip.exe` and `powershell.exe` are accessible from WSL (`which clip.exe`). If Windows interop is disabled, check `[interop]` in `/etc/wsl.conf`.
 - **OpenCode Miasma not listed**: Confirm `~/.config/opencode/themes/miasma.json` is a symlink to `opencode-wsl/.config/opencode/themes/miasma.json`. If `~/.config/opencode` or `~/.config/opencode/themes` is still a directory symlink to another dotfiles package, repeat the merge directory prep in section 8, then re-run the stow command.
 
@@ -323,13 +330,16 @@ A repo-root `Makefile` keeps the package list in one place and wraps the routine
 
 - `make stow` / `make unstow` / `make dry-run` / `make restow` - the stow command sets from Setup
 - `make stow-all` - stows EyrAgents' `opencode` package first, then all packages here
-- `make verify` - every Git-visible Stow source resolves to its deployed target, the local Git identity exists, Bash and Lua syntax pass, `yazi.toml` parses, every twin matches EyrArcHy, and guarded-preparation fixtures pass; required verifier tools fail closed
+- `make verify` - every Git-visible Stow source resolves to its deployed target, the local Git identity exists, Bash and Lua syntax pass, the Neovim bootstrap and lockfile are valid, `yazi.toml` parses, every twin matches EyrArcHy, and guarded deployment fixtures pass; required verifier tools fail closed
 - `make clean` - WSL-only, all-or-nothing ownership preflight followed by managed-link removal and mutable-directory preparation
-- `make test` - fake-home attack and ownership fixtures for guarded preparation
-- `make lint` - ShellCheck over the bash package and `scripts/`; `.shellcheckrc` disables the upstream-derived warnings so new issues stand out
+- `make migrate-nvim` - WSL-only, preflight and back up recognized regular LazyVim starter files before stowing the self-contained Neovim package
+- `make test` - fake-home attack, ownership, migration, and rollback-boundary fixtures
+- `make lint` - ShellCheck over the bash package, `scripts/`, and `tests/`; `.shellcheckrc` disables the upstream-derived warnings so new issues stand out
 - `make wt-diff` - diff the tracked Windows Terminal settings against the deployed Windows-side file (normalized with `jq`, since Windows Terminal rewrites key order)
 - `make wt-pull` - WSL-only, validate and atomically copy deployed Windows Terminal settings into the repo for review
 - `make wt-push` - WSL-only, validate, back up, and deploy tracked Windows Terminal settings
+
+`nvim/.config/nvim/lazy-lock.json` is generated but tracked. Update it only through an intentional Lazy sync, review the pinned revision changes, verify a clean headless bootstrap, and commit the lockfile with the plugin-spec change that required it.
 
 Periodically, review the local reference repos and official docs for upstream changes to owned packages, sync with `/synchronize` or a manual comparison, and confirm every intentional difference is still documented in `DEVIATIONS.md`.
 

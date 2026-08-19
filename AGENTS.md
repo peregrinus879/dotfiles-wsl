@@ -13,7 +13,8 @@ Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basec
 - Target machine: WSL; run stow and make targets only on the WSL host.
 - When editing sibling dotfiles repos, use identical wording for shared concepts; only repo-specific values (scope, package lists, invariants) differ.
 - The Makefile `TWIN_SPECS` files (nvim vault plugin specs, the `tdw` and `hdw` workspace functions, `yazi.toml`) are byte-identical twins with EyrArcHy; `make verify` fails on drift.
-- `nvim/` assumes the LazyVim starter was cloned into `~/.config/nvim` first.
+- `nvim/` owns the LazyVim bootstrap and generated plugin lockfile; setup must not require a separate starter clone.
+- `make migrate-nvim` recognizes only the pinned predecessor bytes for six static starter files, accepts the host-generated lockfile as variable content, verifies a complete timestamped backup before removal, and leaves starter `LICENSE`, `README.md`, and `.gitignore` files untouched.
 - The vault is expected at `~/Projects/vault` (override with `OBSIDIAN_VAULT`) for the obsidian.nvim workflow.
 - Git identity lives in the untracked per-host `~/.config/git/config.local`.
 - `~/.config/opencode/` and `~/.config/opencode/themes/` must be real merge directories so EyrAgents and `opencode-wsl` can both link files inside them; shared AI agent harness runtime config stays in EyrAgents.

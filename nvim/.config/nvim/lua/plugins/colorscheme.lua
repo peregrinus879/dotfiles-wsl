@@ -1,12 +1,12 @@
 return {
   {
-    "OldJobobo/miasma.nvim",
+    "ellisonleao/gruvbox.nvim",
     priority = 1000,
   },
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "miasma",
+      colorscheme = "gruvbox",
     },
   },
 }

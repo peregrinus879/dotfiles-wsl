@@ -15,7 +15,7 @@ TWIN_SPECS := nvim/.config/nvim/lua/plugins/obsidian.lua \
   bash/.config/bash/functions/hdw \
   yazi/.config/yazi/yazi.toml
 
-.PHONY: help require-wsl stow unstow dry-run restow stow-all verify test clean lint wt-diff wt-pull wt-push
+.PHONY: help require-wsl stow unstow dry-run restow stow-all verify test clean migrate-nvim lint wt-diff wt-pull wt-push
 
 help:
 	@echo "Targets:"
@@ -27,6 +27,7 @@ help:
 	@echo "  verify    Check deployment, syntax, twins, and guarded-preparation fixtures"
 	@echo "  test      Run guarded deployment fixture tests"
 	@echo "  clean     Preflight all endpoints, then remove managed links only"
+	@echo "  migrate-nvim  Back up known starter files and stow managed Neovim config"
 	@echo "  lint      ShellCheck over the bash package and scripts (.shellcheckrc holds the disable list)"
 	@echo "  wt-diff   Diff tracked Windows Terminal settings against the deployed file"
 	@echo "  wt-pull   Atomically copy deployed Windows Terminal settings into the repo"
@@ -62,7 +63,7 @@ stow-all: require-wsl
 # A missing sibling clone skips the twin checks; an existing clone missing a
 # twin file is drift and fails.
 verify:
-	@for tool in readlink cmp find luac git python3; do \
+	@for tool in readlink cmp find jq luac git python3; do \
 	  command -v "$$tool" > /dev/null || { echo "FAIL: required verifier '$$tool' is missing"; exit 1; }; \
 	done
 	@fail=0; \
@@ -87,6 +88,16 @@ verify:
 	else \
 	  echo "FAIL: yazi.toml is not valid TOML"; fail=1; \
 	fi; \
+	for f in nvim/.config/nvim/init.lua nvim/.config/nvim/lua/config/lazy.lua \
+	  nvim/.config/nvim/lua/config/autocmds.lua nvim/.config/nvim/lua/config/keymaps.lua \
+	  nvim/.config/nvim/.neoconf.json nvim/.config/nvim/stylua.toml nvim/.config/nvim/lazy-lock.json; do \
+	  if [[ -f $$f ]]; then echo "ok:   $$f is tracked bootstrap content"; \
+	  else echo "FAIL: missing Neovim bootstrap file: $$f"; fail=1; fi; \
+	done; \
+	if jq -e 'type == "object" and length > 0 and has("LazyVim") and has("gruvbox.nvim") and (has("miasma.nvim") | not)' \
+	  nvim/.config/nvim/lazy-lock.json > /dev/null; then \
+	  echo "ok:   lazy-lock.json pins LazyVim and Gruvbox without Miasma"; \
+	else echo "FAIL: lazy-lock.json is invalid"; fail=1; fi; \
 	if [[ ! -d "$(SIBLING)" ]]; then \
 	  echo "note: EyrArcHy clone not found, skipped twin checks"; \
 	else \
@@ -98,14 +109,17 @@ verify:
 	  done; \
 	fi; \
 	exit $$fail
-	@bash tests/prepare-stow.sh
+	@for test in tests/*.sh; do bash "$$test"; done
 
 test:
-	bash tests/prepare-stow.sh
+	@for test in tests/*.sh; do bash "$$test"; done
 
 clean: require-wsl
 	@bash scripts/prepare-stow.sh
 	@echo "note: run 'make stow-all' next so shared EyrAgents OpenCode entries stay linked"
+
+migrate-nvim: require-wsl
+	@bash scripts/migrate-nvim-starter.sh
 
 lint:
 	shellcheck -s bash bash/.bashrc bash/.config/bash/envs bash/.config/bash/shell \

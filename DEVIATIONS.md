@@ -16,7 +16,7 @@ Omarchy is an opinionated Arch Linux distribution targeting a full desktop envir
 2. **Adapt only what breaks or does not apply.** Desktop-bound behavior, GUI launchers, and hardware workflows are omitted because they do not fit WSL.
 3. **Keep Windows-specific behavior explicit.** Anything that depends on `clip.exe`, `powershell.exe`, or Windows Terminal should be documented as a Windows interop concern.
 4. **Use GNU Stow for dotfile management.** Omarchy uses direct file copies and packaged assets. This repo uses symlink-based package ownership for clearer separation and reuse.
-5. **Single theme, no switching.** Omarchy supports many themes and hot-reload infrastructure. This repo uses Miasma only, so theme switching infrastructure is intentionally omitted.
+5. **Fixed themes, no switching.** Neovim uses Gruvbox while the remaining owned theme surfaces use Miasma. Omarchy's theme switching and hot-reload infrastructure is intentionally omitted.
 6. **Pacman-first package ownership.** System packages, OpenCode, and Codex CLI come from official Arch repositories. Claude Code and Herdr use canonical standalone installers only while official packages are unavailable. The baseline depends on no AUR packages and installs no AUR helper.
 
 ## Reference Sources
@@ -26,6 +26,7 @@ Omarchy is an opinionated Arch Linux distribution targeting a full desktop envir
 - [OpenAI Codex](https://github.com/openai/codex) and the [Arch `openai-codex` package](https://archlinux.org/packages/extra/x86_64/openai-codex/) - official terminal CLI upstream and signed Arch package
 - [OpenCode](https://github.com/anomalyco/opencode) and the [Arch `opencode` package](https://archlinux.org/packages/extra/x86_64/opencode/) - terminal coding agent upstream and signed Arch package
 - [Herdr](https://herdr.dev/) - terminal workspace manager and canonical installer
+- [ellisonleao/gruvbox.nvim](https://github.com/ellisonleao/gruvbox.nvim) - Neovim colorscheme
 - [OldJobobo/miasma.nvim](https://github.com/OldJobobo/miasma.nvim) - Miasma Neovim plugin used by Omarchy (optimized fork of `xero/miasma.nvim`)
 - [microsoft/terminal](https://github.com/microsoft/terminal) - Windows Terminal settings structure and feature changes
 - [sxyazi/yazi](https://github.com/sxyazi/yazi) and the [Yazi docs](https://yazi-rs.github.io/docs/) - file manager upstream and configuration reference
@@ -46,7 +47,7 @@ Omarchy is an opinionated Arch Linux distribution targeting a full desktop envir
 - [btop](https://github.com/aristocratos/btop) - config options and themes
 - [fastfetch Wiki](https://github.com/fastfetch-cli/fastfetch/wiki) - modules and JSON config
 
-The Miasma palette has two intentional canons in this repo. Terminal-side files (btop theme, Yazi theme, Windows Terminal scheme) track `themes/miasma/colors.toml` in `basecamp/omarchy`, which uses the `#78824b` olive accent, `#c2c2b0` as the terminal main fg, and intentionally identical ANSI bright and dark pairs (`color1..color7` equal `color9..color15`). Plugin-side files (the Neovim colorscheme and the OpenCode theme) track `miasma.nvim` with the slightly brighter `accent_primary = #78834b`. The tmux status bar uses upstream's ANSI palette names, resolved through the Windows Terminal scheme. Keep each file aligned with its own canon.
+The Miasma palette has two intentional canons in this repo. Terminal-side files (btop theme, Yazi theme, Windows Terminal scheme) track `themes/miasma/colors.toml` in `basecamp/omarchy`, which uses the `#78824b` olive accent, `#c2c2b0` as the terminal main fg, and intentionally identical ANSI bright and dark pairs (`color1..color7` equal `color9..color15`). The OpenCode theme tracks `miasma.nvim` with the slightly brighter `accent_primary = #78834b`. The tmux status bar uses upstream's ANSI palette names, resolved through the Windows Terminal scheme. Keep each file aligned with its own canon.
 
 ## Intentional Deviations
 
@@ -64,7 +65,7 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 
 ### Theme
 
-- Only Miasma is configured. Omarchy's multi-theme plugin set and theme hot-reload infrastructure are omitted.
+- Neovim uses Gruvbox. The terminal, btop, Yazi, and OpenCode use Miasma. Omarchy's multi-theme plugin set and theme hot-reload infrastructure are omitted.
 
 ### Terminal
 
@@ -116,7 +117,9 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 ### Neovim
 
 - `lua/config/options.lua` keeps Omarchy's `vim.opt.relativenumber = false` and `vim.g.autoformat = false` baseline and adds WSL clipboard integration directly, guarded by `clip.exe` and `powershell.exe` availability so the block is a no-op outside WSL. Copy uses `clip.exe`; paste uses `powershell.exe Get-Clipboard`.
-- `all-themes.lua` and `omarchy-theme-hotreload.lua` are omitted because this repo uses Miasma only.
+- The `nvim/` package owns the LazyVim bootstrap, static starter configuration, and generated `lazy-lock.json`; setup requires no separate starter clone.
+- `make migrate-nvim` accepts only the pinned official predecessor bytes from signed LazyVim starter commit `803bc181d7c0d6d5eeba9274d9be49b287294d99` for the six static starter files and treats the generated predecessor lockfile as variable content. It preflights all paths, verifies a timestamped backup before removal, rejects foreign symlinks and symlinked parents, and leaves starter `LICENSE`, `README.md`, and `.gitignore` files untouched.
+- `all-themes.lua` and `omarchy-theme-hotreload.lua` are omitted because Neovim uses a fixed Gruvbox configuration.
 - Kept verbatim from `omarchy-nvim`: `disable-news-alert.lua`, `snacks-animated-scrolling-off.lua`, `vim.opt.relativenumber = false`, and `vim.g.autoformat = false`.
 - `transparency.lua` content is verbatim from `omarchy-nvim` but lives at `after/plugin/` instead of upstream's `plugin/after/` to use Neovim's actual after-load mechanism. Upstream `omarchy-nvim` uses the incorrect path.
 - Owned Lua files use 2-space indentation per the shared `.editorconfig` in this repo. Upstream `omarchy-nvim` uses tabs. Contents are otherwise unchanged.
@@ -172,7 +175,7 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 - Hunk-dependent `tds` and `hds` layouts
 - Omarchy's `open`, `a`, and `mup` shell helpers, which depend on desktop launchers, `omarchy-agent`, or mise
 - Hardware-focused tooling and desktop automation
-- Theme switching infrastructure not needed for a single-theme setup
+- Theme switching infrastructure not needed for fixed per-surface themes
 - Shell or app packages outside the chosen Bash plus terminal-tooling baseline
 
 ## Out Of Scope
