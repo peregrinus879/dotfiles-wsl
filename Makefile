@@ -47,10 +47,10 @@ verify:
 	@$(MAKE) --no-print-directory test
 
 test:
-	@set -e; for test in tests/*.sh; do bash "$$test"; done
+	@set -e; for test in tests/*.sh; do EYRWSL_PACKAGES='$(PACKAGES)' bash "$$test"; done
 
 clean: require-wsl
-	@bash scripts/prepare-stow.sh
+	@EYRWSL_PACKAGES='$(PACKAGES)' bash scripts/prepare-stow.sh
 	@echo "note: run 'make stow-all' next so shared EyrAgents OpenCode entries stay linked"
 
 lint:

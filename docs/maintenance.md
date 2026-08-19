@@ -6,7 +6,3 @@ Read this file before package changes, WSL or Windows Terminal updates, `/omasyn
 
 - `:Obsidian paste_img` expects `wl-clipboard` or `xclip`, unavailable under WSL.
 - Stow tree-folds immutable config directories that do not pre-exist at stow time into package symlinks. Guarded preparation keeps Git, Neovim, OpenCode, btop, and Yazi mutable or merge roots real; folding remains the convention for the other package directories (do not add `--no-folding`).
-
-## Deferred Items
-
-- watch the tree-folded `~/.config/yazi`: the first `ya pkg` install writes `plugins/` and `package.toml` into the repo working tree; decide then whether to track them (the EyrAgents opencode-deps pattern) or gitignore them (the git-identity pattern already guarded by this repo's `.gitignore`).

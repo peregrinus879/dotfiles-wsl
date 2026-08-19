@@ -4,7 +4,6 @@ set -euo pipefail
 
 repo=$(realpath -e -- "$(dirname -- "${BASH_SOURCE[0]}")/..")
 ai_repo=$(realpath -m -- "${EYRAGENTS_REPO:-$repo/../eyragents}")
-packages=(bash btop editorconfig fastfetch git nvim starship tmux yazi)
 
 declare -a remove_links=()
 declare -a create_dirs=()
@@ -14,6 +13,10 @@ abort() {
   printf 'prepare-stow: %s\n' "$1" >&2
   exit 1
 }
+
+[[ -n ${EYRWSL_PACKAGES:-} ]] || abort "EYRWSL_PACKAGES is required"
+read -r -a packages <<<"$EYRWSL_PACKAGES"
+(( ${#packages[@]} )) || abort "package list is empty"
 
 kernel=$(uname -r)
 [[ ${kernel,,} == *microsoft* ]] || abort "WSL is required for deployment preparation"

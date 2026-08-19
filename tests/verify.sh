@@ -4,7 +4,9 @@ set -euo pipefail
 ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 TMP=$(mktemp -d)
 trap 'rm -rf -- "$TMP"' EXIT
-PACKAGES="bash btop editorconfig fastfetch git nvim starship tmux yazi"
+[[ -n ${EYRWSL_PACKAGES:-} ]] || { printf 'FAIL: EYRWSL_PACKAGES is required\n' >&2; exit 1; }
+read -r -a PACKAGES <<<"$EYRWSL_PACKAGES"
+(( ${#PACKAGES[@]} )) || { printf 'FAIL: package list is empty\n' >&2; exit 1; }
 
 fail() {
   printf 'FAIL: %s\n' "$1" >&2
@@ -22,7 +24,7 @@ make_baseline() {
   git -C "$repo" init -q
   git -C "$repo" add .
   printf '[user]\n  name = Fixture User\n  email = fixture@example.invalid\n' >"$home/.config/git/config.local"
-  stow -t "$home" -d "$repo" bash btop editorconfig fastfetch git nvim starship tmux yazi
+  stow -t "$home" -d "$repo" "${PACKAGES[@]}"
 }
 
 clone_baseline() {
@@ -36,7 +38,7 @@ run_verify() {
     VERIFY_REPO="$base/repo" \
     VERIFY_HOME="$base/home" \
     VERIFY_KERNEL_RELEASE="6.6.0-microsoft-standard-WSL2" \
-    VERIFY_PACKAGES="$PACKAGES" \
+    VERIFY_PACKAGES="${PACKAGES[*]}" \
     VERIFY_EXTRA_REQUIRED_TOOL="$extra_tool" \
     bash "$ROOT/scripts/verify.sh"
 }
@@ -103,7 +105,7 @@ if HOME="$TMP/non-wsl/home" \
   VERIFY_REPO="$TMP/non-wsl/repo" \
   VERIFY_HOME="$TMP/non-wsl/home" \
   VERIFY_KERNEL_RELEASE=linux-fixture \
-  VERIFY_PACKAGES="$PACKAGES" \
+  VERIFY_PACKAGES="${PACKAGES[*]}" \
   bash "$ROOT/scripts/verify.sh" >/dev/null 2>&1; then
   fail "non-WSL fixture did not fail closed"
 fi

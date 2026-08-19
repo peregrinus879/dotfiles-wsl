@@ -39,6 +39,19 @@ fi
 invalid_backups=("$invalid".backup-*)
 (( ${#invalid_backups[@]} == 0 )) || fail "invalid deployed JSON created a backup"
 
+unstageable="$TMP/unstageable.json"
+cp -- "$original" "$unstageable"
+mkdir "$TMP/fail-bin"
+printf '#!/usr/bin/env bash\nexit 1\n' >"$TMP/fail-bin/chmod"
+chmod +x "$TMP/fail-bin/chmod"
+if PATH="$TMP/fail-bin:$PATH" WT_SETTINGS="$unstageable" \
+  "$ROOT/scripts/wt-diff.sh" --push >/dev/null 2>&1; then
+  fail "unstageable deployment did not fail"
+fi
+unstageable_backups=("$unstageable".backup-*)
+(( ${#unstageable_backups[@]} == 0 )) || fail "staging failure created a backup"
+cmp -s "$original" "$unstageable" || fail "staging failure changed deployed settings"
+
 set +e
 "$ROOT/scripts/wt-diff.sh" --pull >/dev/null 2>&1
 status=$?

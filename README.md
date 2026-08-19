@@ -337,7 +337,7 @@ If automatic discovery is unavailable, open Windows Terminal settings JSON with 
 %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
 ```
 
-After deployment, confirm the default profile resolves to `archlinux` and the font is JetBrainsMono Nerd Font at size 9. If Windows Terminal warns about a missing default profile, re-select it once in the settings UI.
+After deployment, confirm the default profile resolves to `archlinux` and the font is JetBrainsMono Nerd Font at size 9. If Windows Terminal warns about a missing default profile, re-select it once in the settings UI. Settings UI saves can serialize the generated `archlinux` profile into the deployed file; run `make wt-diff`, then `make wt-push` to restore the tracked canonical form when it reports drift.
 
 ## Verify
 

@@ -60,15 +60,13 @@ cleanup() {
 }
 trap cleanup EXIT
 
-atomic_copy_json() {
+stage_json() {
   local source=$1 destination=$2 destination_dir
   destination_dir=$(dirname -- "$destination")
   tmp=$(mktemp "$destination_dir/.settings.json.tmp.XXXXXX")
   strip_bom "$source" >"$tmp"
   validate_json "$tmp"
   chmod --reference="$destination" "$tmp"
-  mv -f -- "$tmp" "$destination"
-  tmp=""
 }
 
 validate_json "$deployed"
@@ -83,8 +81,10 @@ if [[ $mode == --push ]]; then
   timestamp=$(date +%Y%m%d-%H%M%S)
   backup="${deployed}.backup-${timestamp}"
   [[ ! -e $backup ]] || abort "backup already exists: $backup"
+  stage_json "$tracked" "$deployed"
   cp -p -- "$deployed" "$backup"
-  atomic_copy_json "$tracked" "$deployed"
+  mv -f -- "$tmp" "$deployed"
+  tmp=""
   printf 'backed up deployed settings: %s\n' "$backup"
   printf 'pushed tracked settings: %s\n' "$deployed"
   exit 0
