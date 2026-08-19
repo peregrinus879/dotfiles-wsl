@@ -24,6 +24,7 @@ Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basec
 - Nerd Font rendering comes from the Windows-installed font via Windows Terminal; WSL needs no Linux font package.
 - System packages, OpenCode, and Codex CLI come from official Arch repos; Claude Code and Herdr use canonical installers only while official packages are unavailable. No AUR packages or AUR helper.
 - The README prerequisite list includes `inetutils` for `hostname`, `lua` for the fail-closed EyrWSL verifier, `nodejs` for EyrAgents verification, `tree-sitter-cli` for LazyVim, and `rsync`/`inotify-tools` for the adopted watcher.
+- The fresh-host setup installs Arch directly with `wsl --install -d archlinux`, requires WSL2 and a root recovery password, and labels Yazi media helpers as optional rather than baseline.
 - `windows-terminal/settings.json` is a full paste-ready config, never stowed; deployment is either manual or explicit through backup-first `make wt-push`.
 - Bash may load additive machine-specific overlays from `~/.config/bash-overlays/` after the shared init; the directory is untracked and optional.
 - Keep every intentional difference documented in `DEVIATIONS.md`; update `README.md`, `AGENTS.md`, and `DEVIATIONS.md` together when ownership, setup, or sync assumptions change.

@@ -71,26 +71,48 @@ Key ownership rules:
 
 ### 1. Windows and WSL
 
-Open PowerShell as Administrator, then install the Nerd Font and WSL:
+EyrWSL targets current Windows 11 or a supported Windows 10 release with WSL2. Open PowerShell as Administrator, install Windows Terminal and the Nerd Font, and confirm Arch is listed online:
 
 ```powershell
-winget install DEVCOM.JetBrainsMonoNerdFont
-wsl --install
+winget install --id Microsoft.WindowsTerminal --exact --accept-package-agreements --accept-source-agreements
+winget install --id DEVCOM.JetBrainsMonoNerdFont --exact --accept-package-agreements --accept-source-agreements
+wsl --list --online
 ```
 
 Windows Terminal uses the Windows-installed Nerd Font directly. WSL does not need a separate Linux font package for `tmux`, `nvim`, `yazi`, `starship`, or `fastfetch` icons to render correctly.
 
-Restart Windows if prompted, then install Arch Linux with the distro-specific `-d` form documented by Microsoft:
+On a fresh Windows host, this command enables WSL and installs Arch instead of the default Ubuntu distribution:
 
 ```powershell
 wsl --install -d archlinux
 ```
 
+Restart Windows if prompted. If WSL is already enabled, update it before installing Arch with the same distro-specific command:
+
+```powershell
+wsl --update
+wsl --install -d archlinux
+```
+
+After installation, require WSL2, make Arch the default distribution, and inspect the result:
+
+```powershell
+wsl --update
+wsl --set-default-version 2
+wsl --set-version archlinux 2
+wsl --set-default archlinux
+wsl --status
+wsl --list --verbose
+```
+
+`wsl --list --verbose` must report `archlinux` at version `2` before continuing.
+
 ### 2. WSL Initial Setup
 
-On first launch, Arch runs as root. Update the system and create your user:
+Launch Arch. The first shell runs as root. Set a root recovery password before creating the daily user, then update the system and install the bootstrap tools:
 
 ```bash
+passwd
 pacman -Syu
 pacman -S --needed git neovim openssh sudo
 useradd -m -G wheel -s /bin/bash <username>
@@ -104,7 +126,7 @@ Uncomment this line in `visudo`:
 %wheel ALL=(ALL:ALL) ALL
 ```
 
-Set the default user and keep Windows interop enabled in `/etc/wsl.conf`:
+Open `nvim /etc/wsl.conf`, then set the default user and keep Windows interop enabled:
 
 ```ini
 [user]
@@ -114,19 +136,29 @@ default = <username>
 enabled = true
 ```
 
-Restart WSL from PowerShell so `/etc/wsl.conf` changes are applied:
+Exit the root shell, then terminate only Arch from PowerShell so `/etc/wsl.conf` is applied without stopping unrelated distributions:
 
 ```powershell
-wsl --shutdown
+wsl --terminate archlinux
+wsl -d archlinux
 ```
+
+Confirm the new shell opens as `<username>`, and run `sudo -v` before continuing.
 
 ### 3. Locale
 
-Generate the `en_US.UTF-8` locale to avoid perl and stow warnings:
+Edit `/etc/locale.gen`, uncomment `en_US.UTF-8 UTF-8`, then generate the locale:
 
 ```bash
-sudo sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+sudo nvim /etc/locale.gen
 sudo locale-gen
+sudo nvim /etc/locale.conf
+```
+
+Set the following value in `/etc/locale.conf`, then start a fresh WSL shell:
+
+```ini
+LANG=en_US.UTF-8
 ```
 
 ### 4. Prerequisites
@@ -140,30 +172,54 @@ sudo pacman -S --needed 7zip bash-completion bat btop curl diffutils eza fastfet
   stow sudo tmux tree-sitter-cli unzip util-linux which yazi zoxide
 ```
 
-All baseline packages come from official Arch repositories. `openai-codex` installs the official OpenAI terminal CLI as `codex`; `opencode` installs the OpenCode terminal CLI. The local documentation baseline uses `man-db` and `man-pages`, and 7-Zip enables Yazi archive previews and extraction. This repo intentionally depends on no AUR packages and installs no AUR helper.
+All baseline packages come from official Arch repositories. `openai-codex` installs the official OpenAI terminal CLI as `codex`; `opencode` installs the OpenCode terminal CLI. The local documentation baseline uses `man-db` and `man-pages`, and 7-Zip enables Yazi archive previews and extraction. `nodejs` provides the runtime needed by EyrAgents verification; its workflow does not require `npm`. Windows interoperability handles host integration, so this terminal baseline does not add the desktop-oriented `xdg-utils`. This repo intentionally depends on no AUR packages and installs no AUR helper.
 
-Claude Code and Herdr are not currently packaged in the official Arch repositories. Install them from their canonical user-level installers:
+Verify the exact baseline; successful closure prints no output. Resolve every reported package before continuing:
+
+```bash
+pacman -T 7zip bash-completion bat btop curl diffutils eza fastfetch fd file findutils \
+  fzf gcc git github-cli gum inetutils inotify-tools jq lazygit less lua make man-db man-pages \
+  neovim nodejs openai-codex openssh opencode procps-ng python ripgrep rsync shellcheck starship \
+  stow sudo tmux tree-sitter-cli unzip util-linux which yazi zoxide
+```
+
+For Yazi image, video, PDF, SVG, and extended archive previews, optionally install the official media helpers:
+
+```bash
+sudo pacman -S --needed ffmpeg imagemagick poppler resvg
+```
+
+These helpers are optional and are not required by `make verify`.
+
+Claude Code and Herdr are not currently packaged in the official Arch repositories. Recheck each exact package name first:
+
+```bash
+pacman -Si claude-code
+pacman -Si herdr
+```
+
+Proceed with the corresponding canonical user-level installer only while its probe reports `package not found`:
 
 ```bash
 curl -fsSL https://claude.ai/install.sh | bash
 curl -fsSL https://herdr.dev/install.sh | sh
 ```
 
+Package ownership is Pacman-first. Before future reinstalls, recheck the official repositories; if `claude-code` or `herdr` becomes packaged, replace its standalone installation with the official package. Authentication and subscriptions are separate from installation; complete interactive sign-in only after the shell configuration is stowed.
+
 If an existing shell resolves `opencode` to `~/.opencode/bin/opencode`, do not remove that binary while an OpenCode session is running. After the session ends, remove only `~/.opencode/bin/opencode`, start a fresh shell, run `hash -r`, and confirm `command -v opencode` prints `/usr/bin/opencode`. Leave the remaining `~/.opencode` content in place unless it is separately audited.
 
 ### 5. Clone
 
-Recommended local layout for this repo family:
-
-```text
-~/Projects/eyrie/eyrwsl
-```
-
-Stow can work from any clone location, but the related docs and cross-repo maintenance workflows assume this layout.
+Create the shared parent directory. EyrWSL is required; the sibling EyrAgents clone is recommended when this host will run Claude Code, Codex, or OpenCode with the shared agent harness:
 
 ```bash
+mkdir -p ~/Projects/eyrie
 git clone https://github.com/peregrinus879/eyrwsl.git ~/Projects/eyrie/eyrwsl
+git clone https://github.com/peregrinus879/eyragents.git ~/Projects/eyrie/eyragents
 ```
+
+Skip the EyrAgents clone only for an EyrWSL-only installation. Stow can work from another clone location, but sibling verification and maintenance workflows assume this layout.
 
 ### 6. Neovim Ownership
 
@@ -202,9 +258,9 @@ Checklist before stowing:
 
 - Required packages are installed
 - EyrWSL was cloned locally
+- EyrAgents was cloned beside EyrWSL if the shared AI agent harness is used
 - Any regular LazyVim starter files from an earlier installation were handled with `make migrate-nvim`
 - `~/.config/git/config.local` exists with your local Git identity
-- EyrAgents OpenCode config is already stowed if you use OpenCode on this WSL install
 - Any existing conflicting files were reviewed and moved or merged
 
 Run the guarded preparation from the repository root:
@@ -215,6 +271,8 @@ make clean
 ```
 
 Preparation checks every endpoint before changing anything. It removes only symlinks that resolve into EyrWSL or the sibling EyrAgents OpenCode package. A regular file, foreign or broken symlink, special file, or path reached through an unrecognized repo-resolving parent aborts the entire run without partial removal. Compare and move or merge the reported conflict, then rerun `make clean`.
+
+A fresh Arch user normally has a regular `~/.bashrc` from `/etc/skel`, so expect the first preparation run to report it. Compare any needed local content, move or merge it deliberately, and rerun `make clean`; the script never replaces it automatically.
 
 The script keeps Git, Neovim, OpenCode, btop, and Yazi mutable or merge directories real. Other immutable config directories may use GNU Stow's normal tree-folding behavior. After preparation, use `make stow-all` when EyrAgents is present so its OpenCode config is linked before EyrWSL adds the theme.
 
@@ -275,6 +333,18 @@ Open Neovim once to install the revisions recorded in the tracked lockfile:
 nvim
 ```
 
+Run `:LazyHealth`, confirm Gruvbox loads, then exit and open Neovim again to verify the lock is stable. If the vault is synced to a different path, export `OBSIDIAN_VAULT` before launching Neovim; otherwise the vault workflow expects `~/Projects/vault`. Vault synchronization and the vault's `normalize.py` are user-owned data, not installed by this repo.
+
+Start each installed AI terminal tool once and complete its own authentication flow:
+
+```bash
+claude
+codex
+opencode
+```
+
+Authentication failures do not indicate a dotfile deployment failure; resolve account access with the tool provider before testing `tdw` or `hdw`.
+
 ### 11. Windows Terminal
 
 Open Windows Terminal settings JSON with `Ctrl+Shift+,` and replace the contents with `windows-terminal/settings.json`.
@@ -328,9 +398,11 @@ Complete these manual fresh-session checks:
 
 ## Troubleshooting
 
+- **WSL or Arch does not start**: Confirm hardware virtualization is enabled in UEFI, run `wsl --update` from elevated PowerShell, and repeat `wsl --status` and `wsl --list --verbose`. Do not continue until `archlinux` launches under WSL2.
 - **Preparation reports a conflict**: Compare the reported path, move or merge any needed content, then rerun `make clean`. The script never deletes regular files, foreign links, broken links, or special files.
 - **Neovim starter migration reports a conflict**: Merge needed edits into the corresponding tracked file, move the reported live file aside, and rerun `make migrate-nvim`. The migration changes nothing until the complete path set passes preflight.
 - **Neovim clipboard not working**: Confirm `clip.exe` and `powershell.exe` are accessible from WSL (`which clip.exe`). If Windows interop is disabled, check `[interop]` in `/etc/wsl.conf`.
+- **Obsidian image paste unavailable**: `:Obsidian paste_img` expects `wl-clipboard` or `xclip`, which this WSL baseline does not install. Save the image through Windows or the vault's own workflow, then link or embed it from the note.
 - **OpenCode Gruvbox not listed**: Confirm `~/.config/opencode/themes/gruvbox.json` is a symlink to `opencode-wsl/.config/opencode/themes/gruvbox.json`. If `~/.config/opencode` or `~/.config/opencode/themes` is still a directory symlink to another dotfiles package, repeat the merge directory prep in section 8, then re-run the stow command.
 
 ## Maintenance

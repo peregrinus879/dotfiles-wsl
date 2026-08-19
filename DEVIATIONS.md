@@ -162,8 +162,9 @@ Gruvbox has two intentional canons in this repo. Terminal-side files (btop, Yazi
 ### WSL Bootstrap
 
 - `/etc/wsl.conf` carries the default user and keeps Windows interop enabled, which the clipboard integration requires.
-- Windows-side installation of WSL, the Nerd Font, and Windows Terminal is documented in this repo's README.
+- Windows-side installation of Windows Terminal, the Nerd Font, and Arch directly through `wsl --install -d archlinux` is documented in this repo's README; WSL2 and a root recovery password are setup gates.
 - The WSL baseline includes `inetutils` for the `hostname` host gate, `lua` for EyrWSL's fail-closed syntax verification, `nodejs` for EyrAgents verification, `tree-sitter-cli` for LazyVim, and `man-db`/`man-pages` for local documentation. The official `openai-codex` and `opencode` packages own the AI terminal binaries.
+- Yazi media helpers are optional official packages, not hidden baseline dependencies.
 
 ## Skipped From Omarchy
 
