@@ -1,6 +1,6 @@
 # AGENTS.md - EyrWSL
 
-Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basecamp/omarchy), managed with [GNU Stow](https://www.gnu.org/software/stow/): the full terminal baseline for Arch Linux inside WSL (Bash, Git, Neovim, tmux, Herdr, starship, fastfetch, btop, editorconfig, Yazi), plus WSL and Windows-specific behavior (the OpenCode Miasma theme in `opencode-wsl/`, Windows Terminal configuration in `windows-terminal/`). Omarchy tag `v4.0.0`, official docs, official package docs, and `DEVIATIONS.md` are the source of truth for default behavior and intentional differences; ownership boundaries live in `DEVIATIONS.md` (Deviation Policy and Out Of Scope).
+Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basecamp/omarchy), managed with [GNU Stow](https://www.gnu.org/software/stow/): the full terminal baseline for Arch Linux inside WSL (Bash, Git, Neovim, tmux, Herdr, starship, fastfetch, btop, editorconfig, Yazi), plus WSL and Windows-specific behavior (the OpenCode Gruvbox theme in `opencode-wsl/`, Windows Terminal configuration in `windows-terminal/`). Omarchy tag `v4.0.0`, official docs, official package docs, and `DEVIATIONS.md` are the source of truth for default behavior and intentional differences; ownership boundaries live in `DEVIATIONS.md` (Deviation Policy and Out Of Scope).
 
 ## Load Map
 
@@ -13,6 +13,7 @@ Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basec
 - Target machine: WSL; run stow and make targets only on the WSL host.
 - When editing sibling dotfiles repos, use identical wording for shared concepts; only repo-specific values (scope, package lists, invariants) differ.
 - The Makefile `TWIN_SPECS` files (nvim vault plugin specs, the `tdw` and `hdw` workspace functions, `yazi.toml`) are byte-identical twins with EyrArcHy; `make verify` fails on drift.
+- Gruvbox is the only configured theme; terminal-side files track Omarchy's semantic palette, while Neovim and OpenCode track `ellisonleao/gruvbox.nvim`'s dark palette and highlights.
 - `nvim/` owns the LazyVim bootstrap and generated plugin lockfile; setup must not require a separate starter clone.
 - `make migrate-nvim` recognizes only the pinned predecessor bytes for six static starter files, accepts the host-generated lockfile as variable content, verifies a complete timestamped backup before removal, and leaves starter `LICENSE`, `README.md`, and `.gitignore` files untouched.
 - The vault is expected at `~/Projects/vault` (override with `OBSIDIAN_VAULT`) for the obsidian.nvim workflow.
@@ -44,7 +45,7 @@ Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basec
 - watch the tree-folded `~/.config/yazi`: the first `ya pkg` install writes `plugins/` and `package.toml` into the repo working tree; decide then whether to track them (the EyrAgents opencode-deps pattern) or gitignore them (the git-identity pattern already guarded by this repo's `.gitignore`).
 - mirror the sibling skill: EyrArcHy's skill is named `omasync` and includes reference-clone maintenance (re-resolve the upstream default branch with `git remote set-head origin -a`) and a cross-repo ledger coordination step; rename and adapt this repo's skill to match, keeping repo-specific content.
 - finish the EyrAgents WSL host pass in fresh Claude Code, Codex, and OpenCode processes: verify `/commit` and `/spar`, and review app-managed trust rewrites before reconciliation.
-- after this OpenCode session ends, remove only `~/.opencode/bin/opencode`, start a fresh shell, run `hash -r`, and verify `command -v opencode` resolves to Pacman's `/usr/bin/opencode`; keep the remaining `~/.opencode` content until separately audited.
+- after this OpenCode session ends, remove only `~/.opencode/bin/opencode`, start a fresh shell, run `hash -r`, and verify `command -v opencode` resolves to Pacman's `/usr/bin/opencode`; launch fresh OpenCode, confirm the custom `gruvbox` theme is discovered and selectable, and keep the remaining `~/.opencode` content until separately audited.
 - consider dropping the repo-root per-tool project allowlists (`.claude/settings.json`, `opencode.json`) as EyrArcHy did on 2026-08-15 (its commit cead290); verification approvals are handled session-side.
 
 ## Skills

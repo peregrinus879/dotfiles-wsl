@@ -13,7 +13,7 @@ Local reference clones live under `~/Projects/quarry/`:
 
 - `omarchy/` - main repo for bash, tmux, starship, git, fastfetch, btop, and editorconfig references
 - `omarchy-pkgs/` - package builds, including the Omarchy Neovim package
-- `miasma.nvim/` - Miasma Neovim plugin source (the `OldJobobo/miasma.nvim` optimized fork used by Omarchy)
+- `gruvbox.nvim/` - Gruvbox Neovim plugin source selected by Omarchy
 - `yazi/` - Yazi reference repo for configuration, theme, and feature changes
 - `obsidian.nvim/` - obsidian.nvim upstream for the vault plugin spec
 - `terminal/` - Windows Terminal reference repo for settings structure and feature changes
@@ -30,7 +30,7 @@ Upstream URLs, official docs, and descriptions live in `DEVIATIONS.md` (Referenc
 ## Workflow
 
 1. Compare reference repos against the packages owned by EyrWSL
-2. For Omarchy-derived packages, compare against `omarchy/`, `omarchy-pkgs/`, and `miasma.nvim/`
+2. For Omarchy-derived packages, compare against `omarchy/`, `omarchy-pkgs/`, and `gruvbox.nvim/`
 3. For non-Omarchy tools, compare Yazi against `yazi/` and official docs, and the vault plugin specs against `obsidian.nvim/` and the render-markdown.nvim README
 4. For Windows Terminal, compare `windows-terminal/settings.json` against `terminal/` and official docs
 5. For each difference, classify it:
@@ -55,7 +55,7 @@ Upstream URLs, official docs, and descriptions live in `DEVIATIONS.md` (Referenc
 - Omarchy, official docs, official package docs, and `DEVIATIONS.md` are the source of truth for default behavior and intentional differences
 - Always check all relevant sources, not just one
 - Never assume a difference is intentional without verifying it is documented in `DEVIATIONS.md`
-- Keep the dual Miasma palette canons: terminal-side files track `themes/miasma/colors.toml` (`#78824b`), plugin-side files track `miasma.nvim` (`#78834b`)
+- Keep the dual Gruvbox palette canons: terminal-side files track `themes/gruvbox/colors.toml` (`#7daea3` accent), while Neovim and the OpenCode theme track `gruvbox.nvim` (`#83a598` blue)
 - Keep shared AI agent harness runtime config in EyrAgents; this repo owns only WSL-specific OpenCode theme availability
 - Do not add AUR packages or an AUR helper; the baseline depends on official Arch repos only
 - Keep Windows-specific behavior explicit and documented

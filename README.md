@@ -35,7 +35,7 @@ Local clones live side by side under `~/Projects/eyrie/`.
 - **System Info**: [fastfetch](https://github.com/fastfetch-cli/fastfetch)
 - **Dotfile Management**: [GNU Stow](https://www.gnu.org/software/stow/)
 - **Terminal**: [Windows Terminal](https://github.com/microsoft/terminal)
-- **Theme**: [Gruvbox](https://github.com/ellisonleao/gruvbox.nvim) in Neovim; Miasma on the remaining owned theme surfaces
+- **Theme**: [Gruvbox](https://github.com/ellisonleao/gruvbox.nvim)
 
 ## Package Layout
 
@@ -43,12 +43,12 @@ Each top-level directory is a GNU Stow package that symlinks into `$HOME`, excep
 
 ```text
 bash/              Shell config (.bashrc, .inputrc, .config/bash/)
-btop/              System monitor config (btop.conf, themes/miasma.theme)
+btop/              System monitor config (btop.conf, themes/gruvbox.theme)
 editorconfig/      Editor formatting rules (.editorconfig)
 fastfetch/         System info config (config.jsonc)
 git/               Git config (config, ignore)
 nvim/              Self-contained Neovim config (bootstrap, lock, LazyVim config and plugins)
-opencode-wsl/      OpenCode Miasma theme (themes/miasma.json)
+opencode-wsl/      OpenCode Gruvbox theme (themes/gruvbox.json)
 starship/          Prompt config (starship.toml)
 tmux/              Tmux config (tmux.conf)
 yazi/              File manager config (yazi.toml, theme.toml)
@@ -62,7 +62,7 @@ Key ownership rules:
 - Bash supports additive machine overlays through `~/.config/bash-overlays/*`; the directory is optional and reserved for untracked machine-local additions
 - Claude Code launches use the supported maximum effort, `--effort max`. `tdw` and `hdw` are byte-identical twins with EyrArcHy.
 - Interactive Bash exports `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` and `OPENCODE_ENABLE_EXA=1`; EyrAgents owns OpenCode runtime configuration
-- EyrAgents keeps ownership of shared OpenCode runtime config; `opencode-wsl/` only adds Miasma theme availability without forcing the selected theme
+- EyrAgents keeps ownership of shared OpenCode runtime config; `opencode-wsl/` only adds Gruvbox theme availability without forcing the selected theme
 - `~/.config/opencode/` and `~/.config/opencode/themes/` must be real merge directories so EyrAgents and `opencode-wsl` can both link files inside them
 - `windows-terminal/` stays Windows-side and intentionally tracks the full paste-ready `settings.json`; deployment is manual or backup-first through `make wt-push`
 - repo-root `.claude/settings.json` and `opencode.json` are per-tool project allowlists for this repo's verification make targets (`verify`, `lint`); they are not stowed
@@ -305,7 +305,7 @@ If rollback is needed, copy the reported `settings.json.backup-<timestamp>` over
 After stowing:
 
 - Confirm the core symlinks and local Git identity exist: `test -L ~/.bashrc && test -L ~/.config/starship.toml && test -L ~/.config/nvim/lua/config/options.lua && test -f ~/.config/git/config.local`
-- Confirm the OpenCode theme symlink exists: `test -L ~/.config/opencode/themes/miasma.json`
+- Confirm the OpenCode theme symlink exists: `test -L ~/.config/opencode/themes/gruvbox.json`
 - Start a fresh shell and confirm Bash, Starship, and Tmux load without errors.
 - Confirm `printenv OPENCODE_DISABLE_EXTERNAL_SKILLS` and `printenv OPENCODE_ENABLE_EXA` each print `1`.
 - Confirm `type tdw` shows the tmux workspace function; from a project directory, `tdw cc` or `tdw oc` opens its session (`-c` continues that agent's last conversation; bare `tdw` re-attaches an existing session). Creating a session fails before changing tmux state when the selected agent is unavailable.
@@ -314,15 +314,15 @@ After stowing:
 - Run `nvim` once and confirm plugins install successfully and Gruvbox loads.
 - In Neovim, confirm yanks reach the Windows clipboard and pastes from the Windows clipboard reach Neovim.
 - If the vault is synced to this machine, open a vault note and confirm obsidian.nvim loads (`<leader>oo` opens the note switcher).
-- In OpenCode, run `/theme` and confirm `miasma` is available. Select it if OpenCode is still using the `system` theme.
-- Confirm Windows Terminal uses JetBrainsMono Nerd Font and the Miasma color scheme after applying `windows-terminal/settings.json`.
+- In OpenCode, run `/theme` and confirm `gruvbox` is available. Select it if OpenCode is still using another theme.
+- Confirm Windows Terminal uses JetBrainsMono Nerd Font and the Gruvbox color scheme after applying `windows-terminal/settings.json`.
 
 ## Troubleshooting
 
 - **Preparation reports a conflict**: Compare the reported path, move or merge any needed content, then rerun `make clean`. The script never deletes regular files, foreign links, broken links, or special files.
 - **Neovim starter migration reports a conflict**: Merge needed edits into the corresponding tracked file, move the reported live file aside, and rerun `make migrate-nvim`. The migration changes nothing until the complete path set passes preflight.
 - **Neovim clipboard not working**: Confirm `clip.exe` and `powershell.exe` are accessible from WSL (`which clip.exe`). If Windows interop is disabled, check `[interop]` in `/etc/wsl.conf`.
-- **OpenCode Miasma not listed**: Confirm `~/.config/opencode/themes/miasma.json` is a symlink to `opencode-wsl/.config/opencode/themes/miasma.json`. If `~/.config/opencode` or `~/.config/opencode/themes` is still a directory symlink to another dotfiles package, repeat the merge directory prep in section 8, then re-run the stow command.
+- **OpenCode Gruvbox not listed**: Confirm `~/.config/opencode/themes/gruvbox.json` is a symlink to `opencode-wsl/.config/opencode/themes/gruvbox.json`. If `~/.config/opencode` or `~/.config/opencode/themes` is still a directory symlink to another dotfiles package, repeat the merge directory prep in section 8, then re-run the stow command.
 
 ## Maintenance
 

@@ -94,9 +94,9 @@ verify:
 	  if [[ -f $$f ]]; then echo "ok:   $$f is tracked bootstrap content"; \
 	  else echo "FAIL: missing Neovim bootstrap file: $$f"; fail=1; fi; \
 	done; \
-	if jq -e 'type == "object" and length > 0 and has("LazyVim") and has("gruvbox.nvim") and (has("miasma.nvim") | not)' \
+	if jq -e 'type == "object" and length > 0 and has("LazyVim") and has("gruvbox.nvim")' \
 	  nvim/.config/nvim/lazy-lock.json > /dev/null; then \
-	  echo "ok:   lazy-lock.json pins LazyVim and Gruvbox without Miasma"; \
+	  echo "ok:   lazy-lock.json pins LazyVim and Gruvbox"; \
 	else echo "FAIL: lazy-lock.json is invalid"; fail=1; fi; \
 	if [[ ! -d "$(SIBLING)" ]]; then \
 	  echo "note: EyrArcHy clone not found, skipped twin checks"; \

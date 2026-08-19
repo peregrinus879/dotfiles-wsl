@@ -16,7 +16,7 @@ Omarchy is an opinionated Arch Linux distribution targeting a full desktop envir
 2. **Adapt only what breaks or does not apply.** Desktop-bound behavior, GUI launchers, and hardware workflows are omitted because they do not fit WSL.
 3. **Keep Windows-specific behavior explicit.** Anything that depends on `clip.exe`, `powershell.exe`, or Windows Terminal should be documented as a Windows interop concern.
 4. **Use GNU Stow for dotfile management.** Omarchy uses direct file copies and packaged assets. This repo uses symlink-based package ownership for clearer separation and reuse.
-5. **Fixed themes, no switching.** Neovim uses Gruvbox while the remaining owned theme surfaces use Miasma. Omarchy's theme switching and hot-reload infrastructure is intentionally omitted.
+5. **Single theme, no switching.** This repo uses Gruvbox only, so Omarchy's theme switching and hot-reload infrastructure is intentionally omitted.
 6. **Pacman-first package ownership.** System packages, OpenCode, and Codex CLI come from official Arch repositories. Claude Code and Herdr use canonical standalone installers only while official packages are unavailable. The baseline depends on no AUR packages and installs no AUR helper.
 
 ## Reference Sources
@@ -27,7 +27,6 @@ Omarchy is an opinionated Arch Linux distribution targeting a full desktop envir
 - [OpenCode](https://github.com/anomalyco/opencode) and the [Arch `opencode` package](https://archlinux.org/packages/extra/x86_64/opencode/) - terminal coding agent upstream and signed Arch package
 - [Herdr](https://herdr.dev/) - terminal workspace manager and canonical installer
 - [ellisonleao/gruvbox.nvim](https://github.com/ellisonleao/gruvbox.nvim) - Neovim colorscheme
-- [OldJobobo/miasma.nvim](https://github.com/OldJobobo/miasma.nvim) - Miasma Neovim plugin used by Omarchy (optimized fork of `xero/miasma.nvim`)
 - [microsoft/terminal](https://github.com/microsoft/terminal) - Windows Terminal settings structure and feature changes
 - [sxyazi/yazi](https://github.com/sxyazi/yazi) and the [Yazi docs](https://yazi-rs.github.io/docs/) - file manager upstream and configuration reference
 - [obsidian-nvim/obsidian.nvim](https://github.com/obsidian-nvim/obsidian.nvim) - upstream for the vault plugin spec
@@ -47,7 +46,7 @@ Omarchy is an opinionated Arch Linux distribution targeting a full desktop envir
 - [btop](https://github.com/aristocratos/btop) - config options and themes
 - [fastfetch Wiki](https://github.com/fastfetch-cli/fastfetch/wiki) - modules and JSON config
 
-The Miasma palette has two intentional canons in this repo. Terminal-side files (btop theme, Yazi theme, Windows Terminal scheme) track `themes/miasma/colors.toml` in `basecamp/omarchy`, which uses the `#78824b` olive accent, `#c2c2b0` as the terminal main fg, and intentionally identical ANSI bright and dark pairs (`color1..color7` equal `color9..color15`). The OpenCode theme tracks `miasma.nvim` with the slightly brighter `accent_primary = #78834b`. The tmux status bar uses upstream's ANSI palette names, resolved through the Windows Terminal scheme. Keep each file aligned with its own canon.
+Gruvbox has two intentional canons in this repo. Terminal-side files (btop, Yazi, and Windows Terminal) track `themes/gruvbox/colors.toml` in `basecamp/omarchy`, including foreground `#d4be98` and accent/blue `#7daea3`. Neovim and the OpenCode theme track `ellisonleao/gruvbox.nvim`'s classic dark palette, including foreground `#ebdbb2` and blue `#83a598`. The tmux status bar uses upstream's ANSI palette names, resolved through the Windows Terminal scheme. Keep each file aligned with its own canon.
 
 ## Intentional Deviations
 
@@ -65,13 +64,14 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 
 ### Theme
 
-- Neovim uses Gruvbox. The terminal, btop, Yazi, and OpenCode use Miasma. Omarchy's multi-theme plugin set and theme hot-reload infrastructure are omitted.
+- Gruvbox is configured across every owned theme surface. Omarchy's multi-theme plugin set and theme hot-reload infrastructure are omitted.
 
 ### Terminal
 
 - Windows Terminal replaces Ghostty from the Omarchy desktop.
-- Miasma colors, JetBrainsMono Nerd Font, and padding are adapted into `windows-terminal/settings.json`.
-- The Miasma color scheme keeps the terminal-side canonical palette choices (Reference Sources) to stay consistent with Omarchy's terminal experience.
+- Gruvbox colors, JetBrainsMono Nerd Font, and padding are adapted into `windows-terminal/settings.json`.
+- The Gruvbox color scheme maps Omarchy's semantic terminal palette to all 16 ANSI colors, cursor, selection, foreground, and background.
+- `defaultProfile` uses the dynamic profile name `archlinux`; host-specific profile entries are omitted, and the legacy `Windows.Terminal.Wsl` generator is disabled so the current `Microsoft.WSL` profile is unambiguous.
 - Windows Terminal settings are never stowed. `make wt-push` resolves the active Windows account through PowerShell, validates JSON, creates a timestamped adjacent backup, and replaces the deployment in the same directory; `make wt-pull` validates and atomically stages deployed content for Git review.
 
 ### Bash
@@ -128,12 +128,12 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 
 ### OpenCode
 
-- `opencode-wsl/` stows `~/.config/opencode/themes/miasma.json` so OpenCode can select Miasma in WSL.
+- `opencode-wsl/` stows `~/.config/opencode/themes/gruvbox.json` so OpenCode can select the EyrWSL Gruvbox mapping.
 - The theme file is WSL-specific theme availability, not shared OpenCode runtime config. Runtime config remains owned by EyrAgents.
 - `~/.config/opencode/` and `~/.config/opencode/themes/` stay real merge directories so EyrAgents and `opencode-wsl` can both link files inside them.
-- The repo does not force OpenCode's selected theme. Select `miasma` with `/theme` so the choice remains a user-level OpenCode preference.
-- `miasma.json` uses flat string values rather than the `{dark, light}` object pairs used by upstream OpenCode themes in `packages/ui/src/theme/themes/`. The flat form is valid against `https://opencode.ai/tui.json`. Miasma is dark-only upstream in `miasma.nvim`, so inventing a light variant would not be faithful to the canonical palette.
-- Palette defs and role mappings track `miasma.nvim/lua/miasma/palette.lua` and the highlight definitions in `colors/miasma.vim`. Def names mirror the canonical palette (`base`, `surface`, `surfaceHighlight`, `text`, `textMuted`, `amber`, `orange`, `accentPrimary`, `accentSecondary`, `warning`, `error`). `primary` maps to `accentPrimary` (`#78834b`) so opencode's dominant accent matches miasma.nvim's Type, Function, and selection accent rather than the amber/string color. `syntaxString` maps to `warning` (`#685742`) per `M.string = M.warning` in palette.lua.
+- The repo does not force OpenCode's selected theme. Select `gruvbox` with `/theme` so the choice remains a user-level OpenCode preference.
+- The custom file intentionally overrides OpenCode's built-in theme of the same name. It declares the official `https://opencode.ai/theme.json` identifier and includes the complete current role set; verification treats the documented runtime format as authoritative because the public schema URL is not retrievable.
+- Flat color references preserve the dark-only plugin canon without inventing a light palette. Definitions and syntax roles track `gruvbox.nvim/lua/gruvbox.lua`: functions and strings use green, identifiers use blue, numbers use purple, types use yellow, keywords use red, and operators use orange. Diff backgrounds use the plugin's dark red and dark green values.
 
 ### Fastfetch
 
@@ -150,14 +150,13 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 ### Btop
 
 - `btop.conf` is based on the generated config format produced by `btop`, including lowercase booleans and additional default settings.
-- The intentional baseline change is `color_theme = "miasma"` instead of Omarchy's `"current"`.
+- The intentional baseline change is `color_theme = "gruvbox"` instead of Omarchy's `"current"`; `gruvbox.theme` is the stable Omarchy template rendered with the stable semantic palette.
 
 ### Yazi
 
 - Added entirely. Yazi is not part of Omarchy.
 - `yazi.toml` keeps the local layout and behavior choices: ratio `[2, 4, 4]`, hidden files shown, directories sorted first, `sort_by = "natural"`, and `linemode = "size"`. Tracked as a byte-identical twin with EyrArcHy.
-- `theme.toml` carries the Miasma palette.
-- One off-palette color, `#333333`, is kept for alternate and inactive backgrounds to create subtle separation from the base terminal background `#222222`.
+- `theme.toml` maps mode, status, tab, and manager readability roles to the Omarchy Gruvbox semantic palette.
 
 ### WSL Bootstrap
 

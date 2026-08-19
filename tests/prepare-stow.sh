@@ -65,14 +65,14 @@ case_opencode_merge() {
   printf 'preserve\n' >"$home/.config/opencode/local-note"
   ln -s "$AI_ROOT/opencode/.config/opencode/agents" "$home/.config/opencode/agents"
   ln -s "$AI_ROOT/opencode/.config/opencode/opencode.json" "$home/.config/opencode/opencode.json"
-  ln -s "$ROOT/opencode-wsl/.config/opencode/themes/miasma.json" "$home/.config/opencode/themes/miasma.json"
+  ln -s "$ROOT/opencode-wsl/.config/opencode/themes/gruvbox.json" "$home/.config/opencode/themes/gruvbox.json"
   run_prepare "$home" >/dev/null
   [[ $(<"$home/.config/opencode/local-note") == preserve ]] || fail "OpenCode user content changed"
   [[ -d $home/.config/opencode && ! -L $home/.config/opencode ]] || fail "OpenCode root is not real"
   [[ -d $home/.config/opencode/themes && ! -L $home/.config/opencode/themes ]] || fail "OpenCode themes root is not real"
   [[ ! -e $home/.config/opencode/agents ]] || fail "managed OpenCode directory link remains"
   [[ ! -e $home/.config/opencode/opencode.json ]] || fail "managed OpenCode file link remains"
-  [[ ! -e $home/.config/opencode/themes/miasma.json ]] || fail "managed EyrWSL theme link remains"
+  [[ ! -e $home/.config/opencode/themes/gruvbox.json ]] || fail "managed EyrWSL theme link remains"
 }
 
 case_folded_parent_safety() {
