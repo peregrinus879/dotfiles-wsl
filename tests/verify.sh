@@ -16,6 +16,7 @@ make_baseline() {
   local base=$1 repo="$1/repo" home="$1/home" sibling="$1/sibling" source relative
   mkdir -p "$repo" "$home/.config/git" "$sibling"
   while IFS= read -r source; do
+    [[ -e $ROOT/$source || -L $ROOT/$source ]] || continue
     mkdir -p "$repo/$(dirname -- "$source")"
     cp -a -- "$ROOT/$source" "$repo/$source"
   done < <(git -C "$ROOT" ls-files)

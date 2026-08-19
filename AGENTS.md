@@ -6,7 +6,7 @@ Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basec
 
 - Claude Code loads this file through the root `CLAUDE.md` `@AGENTS.md` import; skills load on invocation only.
 - The `Makefile` is the single source of the package and twin lists; `scripts/verify.sh` consumes both through environment arguments, and `README.md` carries the human-facing setup, verification, and maintenance detail.
-- Repo-root `.claude/settings.json` and `opencode.json` are per-tool project allowlists for this repo's verification make targets (`verify`, `lint`).
+- `docs/maintenance.md` is the on-demand ledger for known limitations, deferred items, and dated findings; read it before package changes, WSL or Windows Terminal updates, `/omasync`, or work on a deferred item.
 
 ## Invariants
 
@@ -28,7 +28,6 @@ Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basec
 - `windows-terminal/settings.json` is a full paste-ready config, never stowed; deployment is either manual or explicit through backup-first `make wt-push`.
 - Bash may load additive machine-specific overlays from `~/.config/bash-overlays/` after the shared init; the directory is untracked and optional.
 - Keep every intentional difference documented in `DEVIATIONS.md`; update `README.md`, `AGENTS.md`, and `DEVIATIONS.md` together when ownership, setup, or sync assumptions change.
-- Known Limitations records repo decisions and behavior official docs do not state; doc-derivable facts (defaults, version gates, upstream status) are fetched at change time, not cached here.
 
 ## Post-Change Verification
 
@@ -37,19 +36,6 @@ Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basec
 - Start fresh WSL and Windows Terminal sessions after structural changes and verify the shell, Neovim, clipboard round-trip, and OpenCode theme still load cleanly.
 - The full human checklist lives in `README.md` (Verify and Maintenance).
 
-## Known Limitations
-
-- `:Obsidian paste_img` expects `wl-clipboard` or `xclip`, unavailable under WSL.
-- Stow tree-folds immutable config directories that do not pre-exist at stow time into package symlinks. Guarded preparation keeps Git, Neovim, OpenCode, btop, and Yazi mutable or merge roots real; folding remains the convention for the other package directories (do not add `--no-folding`).
-
-## Deferred Items
-
-- watch the tree-folded `~/.config/yazi`: the first `ya pkg` install writes `plugins/` and `package.toml` into the repo working tree; decide then whether to track them (the EyrAgents opencode-deps pattern) or gitignore them (the git-identity pattern already guarded by this repo's `.gitignore`).
-- mirror the sibling skill: EyrArcHy's skill is named `omasync` and includes reference-clone maintenance (re-resolve the upstream default branch with `git remote set-head origin -a`) and a cross-repo ledger coordination step; rename and adapt this repo's skill to match, keeping repo-specific content.
-- finish the EyrAgents WSL host pass in fresh Claude Code, Codex, and OpenCode processes: verify `/commit` and `/spar`, and review app-managed trust rewrites before reconciliation.
-- after this OpenCode session ends, remove only `~/.opencode/bin/opencode`, start a fresh shell, run `hash -r`, and verify `command -v opencode` resolves to Pacman's `/usr/bin/opencode`; launch fresh OpenCode, confirm the custom `gruvbox` theme is discovered and selectable, and keep the remaining `~/.opencode` content until separately audited.
-- consider dropping the repo-root per-tool project allowlists (`.claude/settings.json`, `opencode.json`) as EyrArcHy did on 2026-08-15 (its commit cead290); verification approvals are handled session-side.
-
 ## Skills
 
-- `/synchronize` - sync this repo against Omarchy references and official WSL and Windows Terminal docs
+- `/omasync` - sync this repo against Omarchy references and official WSL and Windows Terminal docs

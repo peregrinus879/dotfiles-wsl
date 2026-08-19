@@ -65,7 +65,6 @@ Key ownership rules:
 - EyrAgents keeps ownership of shared OpenCode runtime config; `opencode-wsl/` only adds Gruvbox theme availability without forcing the selected theme
 - `~/.config/opencode/` and `~/.config/opencode/themes/` must be real merge directories so EyrAgents and `opencode-wsl` can both link files inside them
 - `windows-terminal/` stays Windows-side and intentionally tracks the full paste-ready `settings.json`; deployment is manual or backup-first through `make wt-push`
-- repo-root `.claude/settings.json` and `opencode.json` are per-tool project allowlists for this repo's verification make targets (`verify`, `lint`); they are not stowed
 
 ## Setup
 
@@ -422,11 +421,11 @@ A repo-root `Makefile` keeps the package list in one place and wraps the routine
 
 `nvim/.config/nvim/lazy-lock.json` is generated but tracked. Update it only through an intentional Lazy sync, review the pinned revision changes, verify a clean headless bootstrap, and commit the lockfile with the plugin-spec change that required it.
 
-Periodically, review the local reference repos and official docs for upstream changes to owned packages, sync with `/synchronize` or a manual comparison, and confirm every intentional difference is still documented in `DEVIATIONS.md`.
+Periodically, review the local reference repos and official docs for upstream changes to owned packages, sync with `/omasync` or a manual comparison, and confirm every intentional difference is still documented in `DEVIATIONS.md`. Durable findings, known limitations, and deferred items live in [docs/maintenance.md](docs/maintenance.md).
 
 ## Related Repos
 
-Upstream comparison runs through the `/synchronize` skill, which carries the local reference clone paths. Upstream URLs and official docs live in [DEVIATIONS.md](DEVIATIONS.md) (Reference Sources).
+Upstream comparison runs through the `/omasync` skill, which carries the local reference clone paths. Upstream URLs and official docs live in [DEVIATIONS.md](DEVIATIONS.md) (Reference Sources).
 
 ## Credits
 
