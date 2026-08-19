@@ -59,6 +59,8 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 ### Dotfile Management
 
 - GNU Stow with symlinked package ownership replaces Omarchy's file-copy and package-install model.
+- `make clean` performs an all-or-nothing ownership preflight and removes only links into EyrWSL or the sibling EyrAgents OpenCode package. Regular files, foreign or broken links, special files, and unrecognized repo-resolving parents abort untouched.
+- Git, Neovim, OpenCode, btop, and Yazi mutable or merge roots stay real; immutable package directories retain GNU Stow's normal tree-folding behavior.
 
 ### Theme
 
@@ -69,6 +71,7 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 - Windows Terminal replaces Ghostty from the Omarchy desktop.
 - Miasma colors, JetBrainsMono Nerd Font, and padding are adapted into `windows-terminal/settings.json`.
 - The Miasma color scheme keeps the terminal-side canonical palette choices (Reference Sources) to stay consistent with Omarchy's terminal experience.
+- Windows Terminal settings are never stowed. `make wt-push` resolves the active Windows account through PowerShell, validates JSON, creates a timestamped adjacent backup, and replaces the deployment in the same directory; `make wt-pull` validates and atomically stages deployed content for Git review.
 
 ### Bash
 

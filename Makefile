@@ -15,7 +15,7 @@ TWIN_SPECS := nvim/.config/nvim/lua/plugins/obsidian.lua \
   bash/.config/bash/functions/hdw \
   yazi/.config/yazi/yazi.toml
 
-.PHONY: help stow unstow dry-run restow stow-all verify clean lint wt-diff wt-pull
+.PHONY: help require-wsl stow unstow dry-run restow stow-all verify test clean lint wt-diff wt-pull wt-push
 
 help:
 	@echo "Targets:"
@@ -24,25 +24,30 @@ help:
 	@echo "  dry-run   Preview stow actions without making changes"
 	@echo "  restow    Re-stow after repo content changes"
 	@echo "  stow-all  Stow EyrAgents' opencode package first, then all packages here"
-	@echo "  verify    Check symlinks, git identity, shell/Lua syntax, TOML validity, and twin-file sync"
-	@echo "  clean     Remove files that would conflict with stow (README Prepare steps)"
+	@echo "  verify    Check deployment, syntax, twins, and guarded-preparation fixtures"
+	@echo "  test      Run guarded deployment fixture tests"
+	@echo "  clean     Preflight all endpoints, then remove managed links only"
 	@echo "  lint      ShellCheck over the bash package and scripts (.shellcheckrc holds the disable list)"
 	@echo "  wt-diff   Diff tracked Windows Terminal settings against the deployed file"
-	@echo "  wt-pull   Copy the deployed Windows Terminal settings into the repo for review"
+	@echo "  wt-pull   Atomically copy deployed Windows Terminal settings into the repo"
+	@echo "  wt-push   Back up and deploy tracked Windows Terminal settings"
 
-stow:
+require-wsl:
+	@kernel="$$(uname -r)"; [[ "$${kernel,,}" == *microsoft* ]] || { echo "FAIL: WSL is required for this target"; exit 1; }
+
+stow: require-wsl
 	stow -v -t ~ $(PACKAGES)
 
-unstow:
+unstow: require-wsl
 	stow -D -v -t ~ $(PACKAGES)
 
 dry-run:
 	stow -v -n -t ~ $(PACKAGES)
 
-restow:
+restow: require-wsl
 	stow -R -v -t ~ $(PACKAGES)
 
-stow-all:
+stow-all: require-wsl
 	@[[ -d $(AI_REPO) ]] || { echo "error: $(AI_REPO) not found; clone EyrAgents next to this repo"; exit 1; }
 	cd $(AI_REPO) && stow -v -t ~ opencode
 	stow -v -t ~ $(PACKAGES)
@@ -93,41 +98,26 @@ verify:
 	  done; \
 	fi; \
 	exit $$fail
+	@bash tests/prepare-stow.sh
 
-clean:
-	-rm -f ~/.config/bash ~/.config/btop ~/.config/fastfetch ~/.config/git \
-	  ~/.config/nvim/after ~/.config/tmux ~/.config/yazi
-	@if [[ -L ~/.config/opencode ]]; then rm -f ~/.config/opencode; fi
-	mkdir -p ~/.config/opencode
-	@if [[ -L ~/.config/opencode/themes ]]; then rm -f ~/.config/opencode/themes; fi
-	mkdir -p ~/.config/opencode/themes
-	-rm -f ~/.bashrc ~/.inputrc ~/.editorconfig
-	-rm -f ~/.config/git/config ~/.config/git/ignore
-	-rm -f ~/.config/starship.toml
-	-rm -f ~/.config/tmux/tmux.conf
-	-rm -f ~/.config/fastfetch/config.jsonc
-	-rm -f ~/.config/btop/btop.conf ~/.config/btop/themes/miasma.theme
-	-rm -f ~/.config/yazi/yazi.toml ~/.config/yazi/theme.toml
-	-rm -f ~/.config/nvim/lazyvim.json
-	-rm -f ~/.config/nvim/lua/config/options.lua
-	-rm -f ~/.config/nvim/lua/plugins/example.lua
-	-rm -f ~/.config/nvim/lua/plugins/colorscheme.lua
-	-rm -f ~/.config/nvim/lua/plugins/disable-news-alert.lua
-	-rm -f ~/.config/nvim/lua/plugins/snacks-animated-scrolling-off.lua
-	-rm -f ~/.config/nvim/lua/plugins/obsidian.lua
-	-rm -f ~/.config/nvim/lua/plugins/render-markdown.lua
-	-rm -f ~/.config/nvim/after/plugin/transparency.lua
-	-rm -f ~/.config/opencode/themes/miasma.json
-	@echo "note: run 'make stow-all' next so shared EyrAgents opencode entries stay linked"
+test:
+	bash tests/prepare-stow.sh
+
+clean: require-wsl
+	@bash scripts/prepare-stow.sh
+	@echo "note: run 'make stow-all' next so shared EyrAgents OpenCode entries stay linked"
 
 lint:
 	shellcheck -s bash bash/.bashrc bash/.config/bash/envs bash/.config/bash/shell \
 	  bash/.config/bash/aliases bash/.config/bash/init bash/.config/bash/functions/* \
-	  scripts/wt-diff.sh
+	  scripts/*.sh tests/*.sh
 	@echo "ok:   shellcheck clean"
 
 wt-diff:
 	scripts/wt-diff.sh
 
-wt-pull:
+wt-pull: require-wsl
 	scripts/wt-diff.sh --pull
+
+wt-push: require-wsl
+	scripts/wt-diff.sh --push

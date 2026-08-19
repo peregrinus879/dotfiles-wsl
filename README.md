@@ -39,7 +39,7 @@ Local clones live side by side under `~/Projects/eyrie/`.
 
 ## Package Layout
 
-Each top-level directory is a GNU Stow package that symlinks into `$HOME`, except `windows-terminal/`, which is applied manually on Windows:
+Each top-level directory is a GNU Stow package that symlinks into `$HOME`, except `windows-terminal/`, which is deployed separately:
 
 ```text
 bash/              Shell config (.bashrc, .inputrc, .config/bash/)
@@ -52,7 +52,7 @@ opencode-wsl/      OpenCode Miasma theme (themes/miasma.json)
 starship/          Prompt config (starship.toml)
 tmux/              Tmux config (tmux.conf)
 yazi/              File manager config (yazi.toml, theme.toml)
-windows-terminal/  Windows Terminal settings.json, applied manually, not stowed
+windows-terminal/  Windows Terminal settings.json, deployed explicitly, not stowed
 ```
 
 Key ownership rules:
@@ -64,7 +64,7 @@ Key ownership rules:
 - Interactive Bash exports `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` and `OPENCODE_ENABLE_EXA=1`; EyrAgents owns OpenCode runtime configuration
 - EyrAgents keeps ownership of shared OpenCode runtime config; `opencode-wsl/` only adds Miasma theme availability without forcing the selected theme
 - `~/.config/opencode/` and `~/.config/opencode/themes/` must be real merge directories so EyrAgents and `opencode-wsl` can both link files inside them
-- `windows-terminal/` stays Windows-side, is applied manually, and intentionally tracks the full paste-ready `settings.json`
+- `windows-terminal/` stays Windows-side and intentionally tracks the full paste-ready `settings.json`; deployment is manual or backup-first through `make wt-push`
 - repo-root `.claude/settings.json` and `opencode.json` are per-tool project allowlists for this repo's verification make targets (`verify`, `lint`); they are not stowed
 
 ## Setup
@@ -199,58 +199,29 @@ Checklist before stowing:
 - LazyVim starter was cloned into `~/.config/nvim`
 - `~/.config/git/config.local` exists with your local Git identity
 - EyrAgents OpenCode config is already stowed if you use OpenCode on this WSL install
-- Any existing conflicting files were removed
+- Any existing conflicting files were reviewed and moved or merged
 
-Remove existing files that would conflict with stow. The first block removes tree-folded directory symlinks left by a previous stow; entries that are already real directories (such as `~/.config/git` after step 7) error harmlessly and are left in place. The second block prepares shared OpenCode merge directories, then re-stows EyrAgents when present so any shared OpenCode entries remain linked there. The final block removes individual config files:
-
-```bash
-# Tree-folded directory symlinks (from a previous stow)
-rm -f ~/.config/bash ~/.config/btop ~/.config/fastfetch ~/.config/git \
-  ~/.config/nvim/after ~/.config/tmux ~/.config/yazi
-
-# Shared merge directories
-if [[ -L ~/.config/opencode ]]; then
-  rm -f ~/.config/opencode
-fi
-mkdir -p ~/.config/opencode
-if [[ -L ~/.config/opencode/themes ]]; then
-  rm -f ~/.config/opencode/themes
-fi
-mkdir -p ~/.config/opencode/themes
-
-if [[ -d ~/Projects/eyrie/eyragents ]]; then
-  (cd ~/Projects/eyrie/eyragents && stow -v -t ~ opencode)
-fi
-
-# Individual config files
-rm -f ~/.bashrc ~/.inputrc
-rm -f ~/.editorconfig
-rm -f ~/.config/git/config ~/.config/git/ignore
-rm -f ~/.config/starship.toml
-rm -f ~/.config/tmux/tmux.conf
-rm -f ~/.config/fastfetch/config.jsonc
-rm -f ~/.config/btop/btop.conf ~/.config/btop/themes/miasma.theme
-rm -f ~/.config/yazi/yazi.toml ~/.config/yazi/theme.toml
-rm -f ~/.config/nvim/lazyvim.json
-rm -f ~/.config/nvim/lua/config/options.lua
-rm -f ~/.config/nvim/lua/plugins/example.lua
-rm -f ~/.config/nvim/lua/plugins/colorscheme.lua
-rm -f ~/.config/nvim/lua/plugins/disable-news-alert.lua
-rm -f ~/.config/nvim/lua/plugins/snacks-animated-scrolling-off.lua
-rm -f ~/.config/nvim/lua/plugins/obsidian.lua
-rm -f ~/.config/nvim/lua/plugins/render-markdown.lua
-rm -f ~/.config/nvim/after/plugin/transparency.lua
-rm -f ~/.config/opencode/themes/miasma.json
-```
-
-### 9. Stow
-
-Create symlinks for all packages:
+Run the guarded preparation from the repository root:
 
 ```bash
 cd ~/Projects/eyrie/eyrwsl
-stow -v -t ~ bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
+make clean
 ```
+
+Preparation checks every endpoint before changing anything. It removes only symlinks that resolve into EyrWSL or the sibling EyrAgents OpenCode package. A regular file, foreign or broken symlink, special file, or path reached through an unrecognized repo-resolving parent aborts the entire run without partial removal. Compare and move or merge the reported conflict, then rerun `make clean`.
+
+The script keeps Git, Neovim, OpenCode, btop, and Yazi mutable or merge directories real. Other immutable config directories may use GNU Stow's normal tree-folding behavior. After preparation, use `make stow-all` when EyrAgents is present so its OpenCode config is linked before EyrWSL adds the theme.
+
+### 9. Stow
+
+With the recommended sibling EyrAgents clone, restore its OpenCode package first and then all EyrWSL packages:
+
+```bash
+cd ~/Projects/eyrie/eyrwsl
+make stow-all
+```
+
+For an EyrWSL-only installation without EyrAgents, run `make stow` instead.
 
 Start a new terminal session, or run `source ~/.bashrc`, for the shell config to take effect.
 
@@ -312,6 +283,17 @@ Alternatively, edit the file directly at:
 %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
 ```
 
+From WSL, the explicit deployment workflow resolves the active Windows account through PowerShell, validates both JSON files, creates a timestamped backup beside the deployed file, and replaces it in the same directory:
+
+```bash
+cd ~/Projects/eyrie/eyrwsl
+make wt-diff
+make wt-push
+make wt-diff
+```
+
+If rollback is needed, copy the reported `settings.json.backup-<timestamp>` over the deployed `settings.json`. Backups remain until you delete them manually. `make wt-pull` atomically copies valid deployed JSON into the repository for review; it never commits the result. Set `WT_SETTINGS` only when Windows Terminal uses a nonstandard settings path. If deployed settings are missing or invalid, launch Windows Terminal once or restore/copy a valid file manually before using the automated workflow.
+
 ## Verify
 
 After stowing:
@@ -331,7 +313,7 @@ After stowing:
 
 ## Troubleshooting
 
-- **`stow` reports "existing target is not a symlink"**: Remove the conflicting file listed in the error, then re-run the stow command. Section 8 lists the expected cleanup targets.
+- **Preparation reports a conflict**: Compare the reported path, move or merge any needed content, then rerun `make clean`. The script never deletes regular files, foreign links, broken links, or special files.
 - **Neovim clipboard not working**: Confirm `clip.exe` and `powershell.exe` are accessible from WSL (`which clip.exe`). If Windows interop is disabled, check `[interop]` in `/etc/wsl.conf`.
 - **OpenCode Miasma not listed**: Confirm `~/.config/opencode/themes/miasma.json` is a symlink to `opencode-wsl/.config/opencode/themes/miasma.json`. If `~/.config/opencode` or `~/.config/opencode/themes` is still a directory symlink to another dotfiles package, repeat the merge directory prep in section 8, then re-run the stow command.
 
@@ -341,11 +323,13 @@ A repo-root `Makefile` keeps the package list in one place and wraps the routine
 
 - `make stow` / `make unstow` / `make dry-run` / `make restow` - the stow command sets from Setup
 - `make stow-all` - stows EyrAgents' `opencode` package first, then all packages here
-- `make verify` - every Git-visible Stow source resolves to its deployed target, the local Git identity exists, Bash and Lua syntax pass, `yazi.toml` parses, and every twin matches EyrArcHy; required verifier tools fail closed
-- `make clean` - the Prepare cleanup steps
+- `make verify` - every Git-visible Stow source resolves to its deployed target, the local Git identity exists, Bash and Lua syntax pass, `yazi.toml` parses, every twin matches EyrArcHy, and guarded-preparation fixtures pass; required verifier tools fail closed
+- `make clean` - WSL-only, all-or-nothing ownership preflight followed by managed-link removal and mutable-directory preparation
+- `make test` - fake-home attack and ownership fixtures for guarded preparation
 - `make lint` - ShellCheck over the bash package and `scripts/`; `.shellcheckrc` disables the upstream-derived warnings so new issues stand out
 - `make wt-diff` - diff the tracked Windows Terminal settings against the deployed Windows-side file (normalized with `jq`, since Windows Terminal rewrites key order)
-- `make wt-pull` - copy the deployed Windows Terminal settings into the repo for review with `git diff`
+- `make wt-pull` - WSL-only, validate and atomically copy deployed Windows Terminal settings into the repo for review
+- `make wt-push` - WSL-only, validate, back up, and deploy tracked Windows Terminal settings
 
 Periodically, review the local reference repos and official docs for upstream changes to owned packages, sync with `/synchronize` or a manual comparison, and confirm every intentional difference is still documented in `DEVIATIONS.md`.
 

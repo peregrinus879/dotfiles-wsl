@@ -21,7 +21,7 @@ Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basec
 - Nerd Font rendering comes from the Windows-installed font via Windows Terminal; WSL needs no Linux font package.
 - System packages, OpenCode, and Codex CLI come from official Arch repos; Claude Code and Herdr use canonical installers only while official packages are unavailable. No AUR packages or AUR helper.
 - The README prerequisite list includes `inetutils` for `hostname`, `lua` for the fail-closed EyrWSL verifier, `nodejs` for EyrAgents verification, `tree-sitter-cli` for LazyVim, and `rsync`/`inotify-tools` for the adopted watcher.
-- `windows-terminal/settings.json` is a full paste-ready config applied manually from Windows, not stowed.
+- `windows-terminal/settings.json` is a full paste-ready config, never stowed; deployment is either manual or explicit through backup-first `make wt-push`.
 - Bash may load additive machine-specific overlays from `~/.config/bash-overlays/` after the shared init; the directory is untracked and optional.
 - Keep every intentional difference documented in `DEVIATIONS.md`; update `README.md`, `AGENTS.md`, and `DEVIATIONS.md` together when ownership, setup, or sync assumptions change.
 - Known Limitations records repo decisions and behavior official docs do not state; doc-derivable facts (defaults, version gates, upstream status) are fetched at change time, not cached here.
@@ -29,14 +29,14 @@ Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basec
 ## Post-Change Verification
 
 - Run `make verify` and `make lint` from the repo root after changing owned packages.
-- Run `make wt-diff` before and after editing `windows-terminal/settings.json` so tracked and deployed stay in sync.
+- Run `make wt-diff` before and after editing `windows-terminal/settings.json`; `make wt-push` validates both files and backs up the deployment before replacement.
 - Start fresh WSL and Windows Terminal sessions after structural changes and verify the shell, Neovim, clipboard round-trip, and OpenCode theme still load cleanly.
 - The full human checklist lives in `README.md` (Verify and Maintenance).
 
 ## Known Limitations
 
 - `:Obsidian paste_img` expects `wl-clipboard` or `xclip`, unavailable under WSL.
-- Stow tree-folds directories that do not pre-exist at stow time (the README Prepare list) into directory symlinks pointing at the repo, so anything written there lands in the repo working tree; folding is the accepted repo-family stow convention (do not add `--no-folding`).
+- Stow tree-folds immutable config directories that do not pre-exist at stow time into package symlinks. Guarded preparation keeps Git, Neovim, OpenCode, btop, and Yazi mutable or merge roots real; folding remains the convention for the other package directories (do not add `--no-folding`).
 
 ## Deferred Items
 

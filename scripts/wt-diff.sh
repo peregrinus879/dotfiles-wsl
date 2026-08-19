@@ -2,8 +2,9 @@
 # Diff the tracked Windows Terminal settings.json against the deployed
 # Windows-side file. Run from the repo root on the WSL machine.
 #
-# Usage: scripts/wt-diff.sh [--pull]
-#   --pull  copy the deployed file into the repo for review instead of diffing
+# Usage: scripts/wt-diff.sh [--pull|--push]
+#   --pull  atomically copy deployed settings into the repo for review
+#   --push  back up deployed settings, then replace them from the repo
 #
 # Set WT_SETTINGS to the deployed file path to skip auto-detection.
 set -euo pipefail
@@ -11,35 +12,83 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 tracked="${repo_root}/windows-terminal/settings.json"
 
+abort() {
+  printf 'wt-diff: %s\n' "$1" >&2
+  exit 2
+}
+
+mode=${1:-diff}
+(( $# <= 1 )) || abort "usage: scripts/wt-diff.sh [--pull|--push]"
+[[ $mode == diff || $mode == --pull || $mode == --push ]] ||
+  abort "usage: scripts/wt-diff.sh [--pull|--push]"
+
 deployed="${WT_SETTINGS:-}"
 if [[ -z "${deployed}" ]]; then
-  for candidate in /mnt/c/Users/*/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json; do
-    if [[ -f "${candidate}" ]]; then
-      deployed="${candidate}"
-      break
-    fi
-  done
+  command -v powershell.exe >/dev/null 2>&1 || abort "powershell.exe is required to locate Windows Terminal settings"
+  command -v wslpath >/dev/null 2>&1 || abort "wslpath is required to locate Windows Terminal settings"
+  windows_local_app_data=$(powershell.exe -NoProfile -NonInteractive -Command \
+    '[Environment]::GetFolderPath("LocalApplicationData")') ||
+    abort "PowerShell could not resolve the active Windows account"
+  windows_local_app_data=${windows_local_app_data//$'\r'/}
+  [[ -n $windows_local_app_data ]] || abort "PowerShell returned an empty LocalApplicationData path"
+  deployed="$(wslpath -u -- "$windows_local_app_data")/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json"
 fi
 
-if [[ -z "${deployed}" || ! -f "${deployed}" ]]; then
-  echo "error: deployed settings.json not found; set WT_SETTINGS to its path" >&2
-  exit 2
-fi
+[[ -f $tracked ]] || abort "tracked settings.json not found: $tracked"
+[[ -n $deployed && -f $deployed ]] || abort "deployed settings.json not found; set WT_SETTINGS to its path"
 
-if [[ "${1:-}" == "--pull" ]]; then
-  # Strip a possible UTF-8 BOM so it never lands in the tracked file, where
-  # the normalized diff below could not see it.
-  sed '1s/^\xEF\xBB\xBF//' "${deployed}" > "${tracked}"
-  echo "pulled deployed settings into the repo; review with: git diff -- windows-terminal/settings.json"
-  exit 0
-fi
+strip_bom() {
+  sed '1s/^\xEF\xBB\xBF//' "$1"
+}
+
+validate_json() {
+  strip_bom "$1" | jq -e . >/dev/null || abort "invalid JSON: $1"
+}
 
 # Normalize before diffing: Windows Terminal rewrites the deployed file with
 # its own key order and may prepend a UTF-8 BOM, so a plain checksum would
 # always report drift.
 normalize() {
-  sed '1s/^\xEF\xBB\xBF//' "$1" | jq -S .
+  strip_bom "$1" | jq -S .
 }
+
+tmp=""
+cleanup() {
+  [[ -z $tmp || ! -e $tmp ]] || rm -f -- "$tmp"
+}
+trap cleanup EXIT
+
+atomic_copy_json() {
+  local source=$1 destination=$2 destination_dir
+  destination_dir=$(dirname -- "$destination")
+  tmp=$(mktemp "$destination_dir/.settings.json.tmp.XXXXXX")
+  strip_bom "$source" >"$tmp"
+  validate_json "$tmp"
+  chmod --reference="$destination" "$tmp"
+  mv -f -- "$tmp" "$destination"
+  tmp=""
+}
+
+validate_json "$deployed"
+
+if [[ $mode == --pull ]]; then
+  atomic_copy_json "$deployed" "$tracked"
+  echo "pulled deployed settings into the repo; review with: git diff -- windows-terminal/settings.json"
+  exit 0
+fi
+
+validate_json "$tracked"
+
+if [[ $mode == --push ]]; then
+  timestamp=$(date +%Y%m%d-%H%M%S)
+  backup="${deployed}.backup-${timestamp}"
+  [[ ! -e $backup ]] || abort "backup already exists: $backup"
+  cp -- "$deployed" "$backup"
+  atomic_copy_json "$tracked" "$deployed"
+  printf 'backed up deployed settings: %s\n' "$backup"
+  printf 'pushed tracked settings: %s\n' "$deployed"
+  exit 0
+fi
 
 echo "tracked:  ${tracked}"
 echo "deployed: ${deployed}"
