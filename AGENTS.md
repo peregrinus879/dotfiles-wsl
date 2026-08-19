@@ -23,14 +23,14 @@ Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basec
 - System packages, OpenCode, and Codex CLI come from official Arch repos; Claude Code and Herdr use canonical installers only while official packages are unavailable. No AUR packages or AUR helper.
 - The README prerequisite list includes `inetutils` for `hostname`, `lua` for the fail-closed EyrWSL verifier, `nodejs` for EyrAgents verification, `tree-sitter-cli` for LazyVim, and `rsync`/`inotify-tools` for the adopted watcher.
 - The fresh-host setup installs Arch directly with `wsl --install -d archlinux`, requires WSL2 and a root recovery password, and labels Yazi media helpers as optional rather than baseline.
-- `windows-terminal/settings.json` is a full paste-ready config, never stowed; deployment is either manual or explicit through backup-first `make wt-push`.
+- `windows-terminal/settings.json` is a full paste-ready config, never stowed; deployment is manual.
 - Bash may load additive machine-specific overlays from `~/.config/bash-overlays/` after the shared init; the directory is untracked and optional.
 - Keep every intentional difference documented in `DEVIATIONS.md`; update `README.md`, `AGENTS.md`, and `DEVIATIONS.md` together when ownership, setup, or sync assumptions change.
 
 ## Post-Change Verification
 
 - Run `make verify` and `make lint` from the repo root after changing owned packages.
-- Run `make wt-diff` before and after editing `windows-terminal/settings.json`; `make wt-push` validates both files and backs up the deployment before replacement.
+- Run `make wt-diff` before and after editing or manually deploying `windows-terminal/settings.json`.
 - Start fresh WSL and Windows Terminal sessions after structural changes and verify the shell, Neovim, clipboard round-trip, and terminal-aware OpenCode theme still load cleanly.
 - The full human checklist lives in `README.md` (Verify and Maintenance).
 

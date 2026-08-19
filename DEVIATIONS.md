@@ -75,7 +75,7 @@ Gruvbox follows Omarchy's behavior on each owned surface. Windows Terminal and b
 - Gruvbox colors, JetBrainsMono Nerd Font, and padding are adapted into `windows-terminal/settings.json`.
 - The Gruvbox color scheme maps Omarchy's semantic terminal palette to all 16 ANSI colors, cursor, selection, foreground, and background.
 - `defaultProfile` uses the dynamic profile name `archlinux`; host-specific profile entries are omitted, and the legacy `Windows.Terminal.Wsl` generator is disabled so the current `Microsoft.WSL` profile is unambiguous.
-- Windows Terminal settings are never stowed. `make wt-push` resolves the active Windows account through PowerShell, validates JSON, creates a timestamped adjacent backup, and replaces the deployment in the same directory; `make wt-pull` validates and atomically stages deployed content for Git review.
+- Windows Terminal settings are never stowed. Deploy the full tracked file manually; `make wt-diff` resolves the active Windows account through PowerShell, validates both files, and reports normalized drift without changing either side.
 
 ### Bash
 

@@ -5,7 +5,7 @@ SHELL := /bin/bash
 PACKAGES := bash btop editorconfig fastfetch git nvim starship tmux yazi
 AI_REPO := ../eyragents
 
-.PHONY: help require-wsl stow unstow dry-run restow stow-all verify test clean lint wt-diff wt-pull wt-push
+.PHONY: help require-wsl stow unstow dry-run restow stow-all verify test clean lint wt-diff
 
 help:
 	@echo "Targets:"
@@ -19,8 +19,6 @@ help:
 	@echo "  clean     Preflight all endpoints, then remove managed links only"
 	@echo "  lint      ShellCheck over Bash config, scripts, and tests"
 	@echo "  wt-diff   Diff tracked Windows Terminal settings against the deployed file"
-	@echo "  wt-pull   Atomically copy deployed Windows Terminal settings into the repo"
-	@echo "  wt-push   Back up and deploy tracked Windows Terminal settings"
 
 require-wsl:
 	@kernel="$$(uname -r)"; [[ "$${kernel,,}" == *microsoft* ]] || { echo "FAIL: WSL is required for this target"; exit 1; }
@@ -62,9 +60,3 @@ lint:
 
 wt-diff:
 	scripts/wt-diff.sh
-
-wt-pull: require-wsl
-	scripts/wt-diff.sh --pull
-
-wt-push: require-wsl
-	scripts/wt-diff.sh --push

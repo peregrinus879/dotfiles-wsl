@@ -62,7 +62,7 @@ Key ownership rules:
 - Claude Code launches use the supported maximum effort, `--effort max`.
 - Interactive Bash exports `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` and `OPENCODE_ENABLE_EXA=1`; EyrAgents owns OpenCode runtime configuration
 - EyrAgents owns shared OpenCode runtime and TUI configuration; its `system` theme selection inherits the Windows Terminal ANSI palette
-- `windows-terminal/` stays Windows-side and intentionally tracks the full paste-ready `settings.json`; deployment is manual or backup-first through `make wt-push`
+- `windows-terminal/` stays Windows-side and intentionally tracks the full paste-ready `settings.json`; deployment is manual
 
 ## Setup
 
@@ -344,16 +344,14 @@ Alternatively, edit the file directly at:
 %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
 ```
 
-From WSL, the explicit deployment workflow resolves the active Windows account through PowerShell, validates both JSON files, creates a timestamped backup beside the deployed file, and replaces it in the same directory:
+From WSL, compare the tracked and deployed files without changing either one:
 
 ```bash
 cd ~/Projects/eyrie/eyrwsl
 make wt-diff
-make wt-push
-make wt-diff
 ```
 
-If rollback is needed, copy the reported `settings.json.backup-<timestamp>` over the deployed `settings.json`. Backups remain until you delete them manually. `make wt-pull` atomically copies valid deployed JSON into the repository for review; it never commits the result. Set `WT_SETTINGS` only when Windows Terminal uses a nonstandard settings path. If deployed settings are missing or invalid, launch Windows Terminal once or restore/copy a valid file manually before using the automated workflow.
+The comparison resolves the active Windows account through PowerShell, validates both JSON files, normalizes Windows Terminal's key ordering, and reports any drift. Set `WT_SETTINGS` only when Windows Terminal uses a nonstandard settings path.
 
 ## Verify
 
@@ -399,8 +397,6 @@ A repo-root `Makefile` keeps the package list in one place and wraps the routine
 - `make test` - fake-home deployment, ownership, and verifier attack fixtures; the loop stops on the first failing suite
 - `make lint` - ShellCheck over the bash package, `scripts/`, and `tests/`; `.shellcheckrc` disables the upstream-derived warnings so new issues stand out
 - `make wt-diff` - diff the tracked Windows Terminal settings against the deployed Windows-side file (normalized with `jq`, since Windows Terminal rewrites key order)
-- `make wt-pull` - WSL-only, validate and atomically copy deployed Windows Terminal settings into the repo for review
-- `make wt-push` - WSL-only, validate, back up, and deploy tracked Windows Terminal settings
 
 `nvim/.config/nvim/lazy-lock.json` is generated but tracked. Update it only through an intentional Lazy sync, review the pinned revision changes, verify a clean headless bootstrap, and commit the lockfile with the plugin-spec change that required it.
 
