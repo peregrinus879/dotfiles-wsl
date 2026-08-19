@@ -210,15 +210,16 @@ If an existing shell resolves `opencode` to `~/.opencode/bin/opencode`, do not r
 
 ### 5. Clone
 
-Create the shared parent directory. EyrWSL is required; the sibling EyrAgents clone is recommended when this host will run Claude Code, Codex, or OpenCode with the shared agent harness:
+Create the shared parent directory. EyrWSL is required, EyrArcHy supplies the read-only twin baseline required by `make verify`, and EyrAgents is recommended when this host will run Claude Code, Codex, or OpenCode with the shared agent harness:
 
 ```bash
 mkdir -p ~/Projects/eyrie
 git clone https://github.com/peregrinus879/eyrwsl.git ~/Projects/eyrie/eyrwsl
+git clone https://github.com/peregrinus879/eyrarchy.git ~/Projects/eyrie/eyrarchy
 git clone https://github.com/peregrinus879/eyragents.git ~/Projects/eyrie/eyragents
 ```
 
-Skip the EyrAgents clone only for an EyrWSL-only installation. Stow can work from another clone location, but sibling verification and maintenance workflows assume this layout.
+The EyrArcHy clone is comparison data on WSL; do not stow it or run its host-bound Make targets here. Skip the EyrAgents clone only for an EyrWSL-only installation. Stow can work from another clone location, but twin verification and maintenance workflows assume this layout.
 
 ### 6. Neovim Ownership
 
@@ -246,6 +247,7 @@ Checklist before stowing:
 
 - Required packages are installed
 - EyrWSL was cloned locally
+- EyrArcHy was cloned beside EyrWSL for fail-closed twin verification
 - EyrAgents was cloned beside EyrWSL if the shared AI agent harness is used
 - `~/.config/git/config.local` exists with your local Git identity
 - Any existing conflicting files were reviewed and moved or merged

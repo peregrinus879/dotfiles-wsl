@@ -56,6 +56,15 @@ expect_failure() {
   fi
 }
 
+expect_failure_with() {
+  local label=$1 expected=$2 output
+  shift 2
+  if output=$("$@" 2>&1); then
+    fail "$label did not fail closed"
+  fi
+  [[ $output == *"$expected"* ]] || fail "$label failed without its expected diagnostic"
+}
+
 make_baseline "$TMP/baseline"
 run_verify "$TMP/baseline" fixture >/dev/null
 
@@ -119,7 +128,18 @@ fi
 
 clone_baseline missing-twin
 rm -- "$TMP/missing-twin/sibling/nvim/.config/nvim/lua/plugins/obsidian.lua"
-expect_failure "missing twin" run_verify "$TMP/missing-twin" repo
+expect_failure_with "missing twin" "FAIL: twin missing in EyrArcHy: nvim/.config/nvim/lua/plugins/obsidian.lua" \
+  run_verify "$TMP/missing-twin" repo
+
+clone_baseline missing-sibling
+rm -rf -- "$TMP/missing-sibling/sibling"
+expect_failure_with "missing twin sibling" "FAIL: EyrArcHy clone not found:" \
+  run_verify "$TMP/missing-sibling" repo
+
+clone_baseline drifted-twin
+printf '\n# fixture drift\n' >>"$TMP/drifted-twin/sibling/nvim/.config/nvim/lua/plugins/obsidian.lua"
+expect_failure_with "drifted twin" "FAIL: nvim/.config/nvim/lua/plugins/obsidian.lua drifted from the EyrArcHy twin" \
+  run_verify "$TMP/drifted-twin" repo
 
 clone_baseline missing-deployment
 rm -- "$TMP/missing-deployment/home/.bashrc"

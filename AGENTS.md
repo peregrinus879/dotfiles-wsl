@@ -13,6 +13,7 @@ Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basec
 - Target machine: WSL; run stow and make targets only on the WSL host.
 - When editing sibling dotfiles repos, use identical wording for shared concepts; only repo-specific values (scope, package lists, invariants) differ.
 - The Makefile `TWIN_SPECS` files (nvim vault plugin specs, the `tdw` and `hdw` workspace functions, `yazi.toml`) are byte-identical twins with EyrArcHy; `make verify` fails on drift.
+- `make verify` requires the sibling EyrArcHy clone at `~/Projects/eyrie/eyrarchy` for read-only twin comparison; never stow it or run its Omarchy-host Make targets from WSL.
 - `make verify` must fail closed across WSL2/interoperability, the command baseline, deployment ownership, resolved Git identity, owned config syntax and runtime parsing, twins, and theme tombstones; fixture-only overrides must not weaken normal mode.
 - Gruvbox is the only configured theme; terminal-side files track Omarchy's semantic palette, while Neovim and OpenCode track `ellisonleao/gruvbox.nvim`'s dark palette and highlights.
 - `nvim/` owns the complete LazyVim bootstrap, static configuration, and generated plugin lockfile; setup requires no separate Neovim configuration clone.

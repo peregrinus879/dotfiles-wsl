@@ -227,7 +227,7 @@ fi
 tmux -L "$tmux_socket" kill-server >/dev/null 2>&1 || true
 
 if [[ ! -d $sibling ]]; then
-  printf 'note: EyrArcHy clone not found, skipped twin checks\n'
+  problem "EyrArcHy clone not found: $sibling"
 else
   for relative in "${twin_specs[@]}"; do
     if [[ ! -e $sibling/$relative ]]; then
