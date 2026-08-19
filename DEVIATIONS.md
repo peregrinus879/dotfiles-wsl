@@ -72,7 +72,7 @@ Gruvbox follows Omarchy's behavior on each owned surface. Windows Terminal and b
 ### Terminal
 
 - Windows Terminal replaces Ghostty from the Omarchy desktop.
-- Gruvbox colors, JetBrainsMono Nerd Font, and padding are adapted into `windows-terminal/settings.json`.
+- Gruvbox colors, JetBrainsMono Nerd Font at size 9, and padding 14 mirror Omarchy's terminal appearance in `windows-terminal/settings.json`.
 - The Gruvbox color scheme maps Omarchy's semantic terminal palette to all 16 ANSI colors, cursor, selection, foreground, and background.
 - `defaultProfile` uses the dynamic profile name `archlinux`; host-specific profile entries are omitted, and the `Windows.Terminal.Wsl` generator is disabled so the current `Microsoft.WSL` profile is unambiguous.
 - Windows Terminal settings are never stowed. `make wt-push` resolves the active Windows account through PowerShell, validates both files, creates a timestamped adjacent backup only when they differ, and atomically deploys the tracked file; `make wt-diff` reports normalized drift without changing either side.

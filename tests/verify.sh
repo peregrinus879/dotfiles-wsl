@@ -75,6 +75,12 @@ clone_baseline bad-json
 printf '{\n' >"$TMP/bad-json/repo/windows-terminal/settings.json"
 expect_failure "malformed Windows Terminal JSON" run_verify "$TMP/bad-json" repo
 
+clone_baseline wrong-terminal-font
+terminal="$TMP/wrong-terminal-font/repo/windows-terminal/settings.json"
+jq '.profiles.defaults.font.size = 10' "$terminal" >"$terminal.tmp"
+mv -- "$terminal.tmp" "$terminal"
+expect_failure "wrong Windows Terminal font size" run_verify "$TMP/wrong-terminal-font" repo
+
 clone_baseline bad-fastfetch
 printf '{ invalid\n' >"$TMP/bad-fastfetch/repo/fastfetch/.config/fastfetch/config.jsonc"
 expect_failure "malformed Fastfetch JSONC" run_verify "$TMP/bad-fastfetch" repo

@@ -337,7 +337,7 @@ If automatic discovery is unavailable, open Windows Terminal settings JSON with 
 %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
 ```
 
-After deployment, confirm the default profile resolves to `archlinux`; if Windows Terminal warns about a missing default profile, re-select it once in the settings UI.
+After deployment, confirm the default profile resolves to `archlinux` and the font is JetBrainsMono Nerd Font at size 9. If Windows Terminal warns about a missing default profile, re-select it once in the settings UI.
 
 ## Verify
 
@@ -362,7 +362,7 @@ Complete these manual fresh-session checks:
 - In Neovim, confirm yanks reach the Windows clipboard and pastes from the Windows clipboard reach Neovim.
 - If the vault is synced to this machine, open a vault note and confirm obsidian.nvim loads (`<leader>oo` opens the note switcher).
 - In OpenCode, run `/theme` and confirm `system` is selected so the TUI inherits Windows Terminal's Gruvbox ANSI palette.
-- Confirm Windows Terminal uses JetBrainsMono Nerd Font and the Gruvbox color scheme after applying `windows-terminal/settings.json`.
+- Confirm Windows Terminal uses JetBrainsMono Nerd Font at size 9 and the Gruvbox color scheme after applying `windows-terminal/settings.json`.
 
 ## Troubleshooting
 
