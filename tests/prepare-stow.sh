@@ -142,6 +142,16 @@ case_special_file() {
   [[ -p $home/.bashrc ]] || fail "special-file conflict was removed"
 }
 
+case_missing_ai_repo() {
+  local home="$TMP/missing-ai-repo/home"
+  mkdir -p "$home"
+  if HOME="$home" EYRAGENTS_REPO='' EYRWSL_PACKAGES=fixture \
+    bash "$ROOT/scripts/prepare-stow.sh" >/dev/null 2>&1; then
+    fail "empty EYRAGENTS_REPO did not abort"
+  fi
+}
+
+case_missing_ai_repo
 make_ai_payload
 case_fresh_home
 case_owned_links
