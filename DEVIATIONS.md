@@ -120,8 +120,7 @@ Gruvbox has two intentional canons in this repo. Terminal-side files (btop, Yazi
 ### Neovim
 
 - `lua/config/options.lua` keeps Omarchy's `vim.opt.relativenumber = false` and `vim.g.autoformat = false` baseline and adds WSL clipboard integration directly, guarded by `clip.exe` and `powershell.exe` availability so the block is a no-op outside WSL. Copy uses `clip.exe`; paste uses `powershell.exe Get-Clipboard`.
-- The `nvim/` package owns the LazyVim bootstrap, static starter configuration, and generated `lazy-lock.json`; setup requires no separate starter clone.
-- `make migrate-nvim` accepts only the pinned official predecessor bytes from signed LazyVim starter commit `803bc181d7c0d6d5eeba9274d9be49b287294d99` for the six static starter files and treats the generated predecessor lockfile as variable content. It preflights all paths, verifies a timestamped backup before removal, rejects foreign symlinks and symlinked parents, and leaves starter `LICENSE`, `README.md`, and `.gitignore` files untouched.
+- The `nvim/` package owns the complete LazyVim bootstrap, static configuration, and generated `lazy-lock.json`; setup requires no separate Neovim configuration clone.
 - `all-themes.lua` and `omarchy-theme-hotreload.lua` are omitted because Neovim uses a fixed Gruvbox configuration.
 - Kept verbatim from `omarchy-nvim`: `disable-news-alert.lua`, `snacks-animated-scrolling-off.lua`, `vim.opt.relativenumber = false`, and `vim.g.autoformat = false`.
 - `transparency.lua` content is verbatim from `omarchy-nvim` but lives at `after/plugin/` instead of upstream's `plugin/after/` to use Neovim's actual after-load mechanism. Upstream `omarchy-nvim` uses the incorrect path.

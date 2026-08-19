@@ -222,18 +222,7 @@ Skip the EyrAgents clone only for an EyrWSL-only installation. Stow can work fro
 
 ### 6. Neovim Ownership
 
-The `nvim/` package includes the LazyVim starter bootstrap and generated plugin lockfile. A separate starter clone is not required.
-
-An installation created under the previous setup may still have regular starter files at `~/.config/nvim`. Before `make clean`, migrate those files with the guarded backup-first target:
-
-```bash
-cd ~/Projects/eyrie/eyrwsl
-make migrate-nvim
-```
-
-The migration accepts the six unmodified static files from the pinned official starter predecessor and any regular `lazy-lock.json`. It preflights the complete path set, creates a timestamped `~/.config/nvim.eyrwsl-backup-<timestamp>`, verifies each copy, removes only those backed-up files, and stows the owned replacements. Modified files, foreign links, symlinked foreign parents, and special files abort before any backup or removal. Starter `LICENSE`, `README.md`, and `.gitignore` files remain untouched.
-
-If a static file was modified, merge its needed content into the corresponding tracked file, move the live file aside, and rerun the migration. To roll back, inspect each file present in the reported backup, require its corresponding live endpoint to be a direct symlink resolving to the same path under this repo's `nvim/.config/nvim/`, remove only that link, then copy the backup contents into `~/.config/nvim/`. Stop if an endpoint is not that exact owned link; the backup remains available for manual recovery.
+The `nvim/` package includes the complete LazyVim bootstrap, static configuration, and generated plugin lockfile. Setup requires no separate Neovim configuration clone.
 
 ### 7. Private Git Identity
 
@@ -258,7 +247,6 @@ Checklist before stowing:
 - Required packages are installed
 - EyrWSL was cloned locally
 - EyrAgents was cloned beside EyrWSL if the shared AI agent harness is used
-- Any regular LazyVim starter files from an earlier installation were handled with `make migrate-nvim`
 - `~/.config/git/config.local` exists with your local Git identity
 - Any existing conflicting files were reviewed and moved or merged
 
@@ -378,7 +366,7 @@ make verify
 make lint
 ```
 
-`make verify` fails closed unless the host is WSL2 with Windows interop, the configured command baseline is available, every Git-visible Stow source resolves to this repo, Git identity resolves without exposing its values, all owned Bash/Lua/TOML/JSON/JSONC and runtime configs validate, every twin matches EyrArcHy, and retired theme content and paths remain absent. It then runs the deployment, migration, and verifier attack fixtures. `make lint` applies ShellCheck to the Bash package, scripts, and tests.
+`make verify` fails closed unless the host is WSL2 with Windows interop, the configured command baseline is available, every Git-visible Stow source resolves to this repo, Git identity resolves without exposing its values, all owned Bash/Lua/TOML/JSON/JSONC and runtime configs validate, every twin matches EyrArcHy, and retired theme content and paths remain absent. It then runs the deployment and verifier attack fixtures. `make lint` applies ShellCheck to the Bash package, scripts, and tests.
 
 Complete these manual fresh-session checks:
 
@@ -399,7 +387,6 @@ Complete these manual fresh-session checks:
 
 - **WSL or Arch does not start**: Confirm hardware virtualization is enabled in UEFI, run `wsl --update` from elevated PowerShell, and repeat `wsl --status` and `wsl --list --verbose`. Do not continue until `archlinux` launches under WSL2.
 - **Preparation reports a conflict**: Compare the reported path, move or merge any needed content, then rerun `make clean`. The script never deletes regular files, foreign links, broken links, or special files.
-- **Neovim starter migration reports a conflict**: Merge needed edits into the corresponding tracked file, move the reported live file aside, and rerun `make migrate-nvim`. The migration changes nothing until the complete path set passes preflight.
 - **Neovim clipboard not working**: Confirm `clip.exe` and `powershell.exe` are accessible from WSL (`which clip.exe`). If Windows interop is disabled, check `[interop]` in `/etc/wsl.conf`.
 - **Obsidian image paste unavailable**: `:Obsidian paste_img` expects `wl-clipboard` or `xclip`, which this WSL baseline does not install. Save the image through Windows or the vault's own workflow, then link or embed it from the note.
 - **OpenCode Gruvbox not listed**: Confirm `~/.config/opencode/themes/gruvbox.json` is a symlink to `opencode-wsl/.config/opencode/themes/gruvbox.json`. If `~/.config/opencode` or `~/.config/opencode/themes` is still a directory symlink to another dotfiles package, repeat the merge directory prep in section 8, then re-run the stow command.
@@ -412,8 +399,7 @@ A repo-root `Makefile` keeps the package list in one place and wraps the routine
 - `make stow-all` - stows EyrAgents' `opencode` package first, then all packages here
 - `make verify` - delegate fail-closed host, deployment, identity, syntax, format, runtime, twin, and theme-tombstone checks to `scripts/verify.sh`, then run every fixture suite
 - `make clean` - WSL-only, all-or-nothing ownership preflight followed by managed-link removal and mutable-directory preparation
-- `make migrate-nvim` - WSL-only, preflight and back up recognized regular LazyVim starter files before stowing the self-contained Neovim package
-- `make test` - fake-home attack, ownership, migration, verifier, and rollback-boundary fixtures; the loop stops on the first failing suite
+- `make test` - fake-home deployment, ownership, and verifier attack fixtures; the loop stops on the first failing suite
 - `make lint` - ShellCheck over the bash package, `scripts/`, and `tests/`; `.shellcheckrc` disables the upstream-derived warnings so new issues stand out
 - `make wt-diff` - diff the tracked Windows Terminal settings against the deployed Windows-side file (normalized with `jq`, since Windows Terminal rewrites key order)
 - `make wt-pull` - WSL-only, validate and atomically copy deployed Windows Terminal settings into the repo for review

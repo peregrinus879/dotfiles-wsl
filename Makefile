@@ -15,7 +15,7 @@ TWIN_SPECS := nvim/.config/nvim/lua/plugins/obsidian.lua \
   bash/.config/bash/functions/hdw \
   yazi/.config/yazi/yazi.toml
 
-.PHONY: help require-wsl stow unstow dry-run restow stow-all verify test clean migrate-nvim lint wt-diff wt-pull wt-push
+.PHONY: help require-wsl stow unstow dry-run restow stow-all verify test clean lint wt-diff wt-pull wt-push
 
 help:
 	@echo "Targets:"
@@ -25,9 +25,8 @@ help:
 	@echo "  restow    Re-stow after repo content changes"
 	@echo "  stow-all  Stow EyrAgents' opencode package first, then all packages here"
 	@echo "  verify    Check the WSL host, deployment, owned configs, twins, and fixtures"
-	@echo "  test      Run fail-closed deployment, migration, and verifier fixtures"
+	@echo "  test      Run fail-closed deployment and verifier fixtures"
 	@echo "  clean     Preflight all endpoints, then remove managed links only"
-	@echo "  migrate-nvim  Back up known starter files and stow managed Neovim config"
 	@echo "  lint      ShellCheck over Bash config, scripts, and tests"
 	@echo "  wt-diff   Diff tracked Windows Terminal settings against the deployed file"
 	@echo "  wt-pull   Atomically copy deployed Windows Terminal settings into the repo"
@@ -65,9 +64,6 @@ test:
 clean: require-wsl
 	@bash scripts/prepare-stow.sh
 	@echo "note: run 'make stow-all' next so shared EyrAgents OpenCode entries stay linked"
-
-migrate-nvim: require-wsl
-	@bash scripts/migrate-nvim-starter.sh
 
 lint:
 	shellcheck -s bash bash/.bashrc bash/.config/bash/envs bash/.config/bash/shell \
