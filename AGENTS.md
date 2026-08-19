@@ -17,6 +17,7 @@ Self-contained Arch WSL dotfiles adapted from [Omarchy](https://github.com/basec
 - `nvim/` owns the complete LazyVim bootstrap, static configuration, and generated plugin lockfile; setup requires no separate config clone.
 - Git identity lives in the untracked per-host `~/.config/git/config.local`.
 - Shared AI agent harness and OpenCode TUI configuration stay in EyrAgents; EyrWSL carries no custom OpenCode theme.
+- EyrAgents defaults to the sibling `../eyragents` clone; pass `EYRAGENTS_REPO` to both `make clean` and `make stow-all` when its clone lives elsewhere.
 - Packages come from official Arch repos; Claude Code and Herdr use canonical installers while official packages are unavailable. No AUR packages or helper.
 - `windows-terminal/settings.json` is a full paste-ready config, never stowed; deploy it explicitly with `make wt-push`.
 - Keep every intentional difference documented in `DEVIATIONS.md`; update `README.md`, `AGENTS.md`, and `DEVIATIONS.md` together when ownership, setup, or sync assumptions change.

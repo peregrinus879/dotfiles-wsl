@@ -214,7 +214,7 @@ git clone https://github.com/peregrinus879/eyrwsl.git ~/Projects/eyrie/eyrwsl
 git clone https://github.com/peregrinus879/eyragents.git ~/Projects/eyrie/eyragents
 ```
 
-Skip the EyrAgents clone for an EyrWSL-only installation. EyrWSL can be cloned elsewhere; adjust the commands below to match its location.
+Skip the EyrAgents clone for an EyrWSL-only installation. EyrWSL can be cloned elsewhere; adjust the commands below to match its location. If EyrAgents lives outside the recommended sibling path, pass its absolute clone path to both targets, for example `make EYRAGENTS_REPO=/path/to/eyragents clean` and `make EYRAGENTS_REPO=/path/to/eyragents stow-all`.
 
 ### 6. Neovim Ownership
 
@@ -242,7 +242,7 @@ Checklist before stowing:
 
 - Required packages are installed
 - EyrWSL was cloned locally
-- EyrAgents was cloned beside EyrWSL if the shared AI agent harness is used
+- EyrAgents was cloned beside EyrWSL, or `EYRAGENTS_REPO` will identify its clone, if the shared AI agent harness is used
 - `~/.config/git/config.local` exists with your local Git identity
 - Any existing conflicting files were reviewed and moved or merged
 

@@ -3,7 +3,7 @@
 
 SHELL := /bin/bash
 PACKAGES := bash btop editorconfig fastfetch git nvim starship tmux yazi
-AI_REPO := ../eyragents
+EYRAGENTS_REPO ?= ../eyragents
 
 .PHONY: help require-wsl stow unstow dry-run restow stow-all verify test clean lint wt-diff wt-push
 
@@ -37,8 +37,8 @@ restow: require-wsl
 	stow -R -v -t ~ $(PACKAGES)
 
 stow-all: require-wsl
-	@[[ -d $(AI_REPO) ]] || { echo "error: $(AI_REPO) not found; clone EyrAgents next to this repo"; exit 1; }
-	cd $(AI_REPO) && stow -v -t ~ opencode
+	@[[ -d "$(EYRAGENTS_REPO)" ]] || { echo "error: $(EYRAGENTS_REPO) not found; clone EyrAgents or set EYRAGENTS_REPO"; exit 1; }
+	cd "$(EYRAGENTS_REPO)" && stow -v -t ~ opencode
 	stow -v -t ~ $(PACKAGES)
 
 verify:
@@ -50,7 +50,7 @@ test:
 	@set -e; for test in tests/*.sh; do EYRWSL_PACKAGES='$(PACKAGES)' bash "$$test"; done
 
 clean: require-wsl
-	@EYRWSL_PACKAGES='$(PACKAGES)' bash scripts/prepare-stow.sh
+	@EYRAGENTS_REPO="$(EYRAGENTS_REPO)" EYRWSL_PACKAGES='$(PACKAGES)' bash scripts/prepare-stow.sh
 	@echo "note: run 'make stow-all' next so shared EyrAgents OpenCode entries stay linked"
 
 lint:

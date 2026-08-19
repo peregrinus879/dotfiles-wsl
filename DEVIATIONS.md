@@ -59,7 +59,7 @@ Gruvbox follows Omarchy's behavior on each owned surface. Windows Terminal and b
 ### Dotfile Management
 
 - GNU Stow with symlinked package ownership replaces Omarchy's file-copy and package-install model.
-- `make clean` performs an all-or-nothing ownership preflight and removes only links into EyrWSL or the sibling EyrAgents OpenCode package. Regular files, foreign or broken links, special files, and unrecognized repo-resolving parents abort untouched.
+- `make clean` performs an all-or-nothing ownership preflight and removes only links into EyrWSL or the configured EyrAgents OpenCode package. EyrAgents defaults to `../eyragents`; `EYRAGENTS_REPO` overrides that path for both `make clean` and `make stow-all`. Regular files, foreign or broken links, special files, and unrecognized repo-resolving parents abort untouched.
 - `make verify` fails closed on the WSL2/interoperability host contract, command baseline, deployed package ownership, resolved Git identity, and owned config parsers and runtimes before running isolated attack fixtures.
 - Git, Neovim, OpenCode, btop, and Yazi mutable or merge roots stay real; immutable package directories retain GNU Stow's normal tree-folding behavior.
 - `/omasync` owns reference-clone maintenance and upstream comparison; `docs/maintenance.md` owns dated findings, known limitations, and deferred work.
