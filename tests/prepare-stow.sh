@@ -152,8 +152,8 @@ case_missing_ai_repo() {
 }
 
 case_missing_ai_repo
-make_ai_payload
 case_fresh_home
+make_ai_payload
 case_owned_links
 case_mutable_directories
 case_opencode_merge
