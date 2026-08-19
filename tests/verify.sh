@@ -106,14 +106,4 @@ clone_baseline missing-deployment
 rm -- "$TMP/missing-deployment/home/.bashrc"
 expect_failure "missing deployment" run_verify "$TMP/missing-deployment" fixture
 
-clone_baseline retired-content
-printf '%s\n' "mia""sma" >"$TMP/retired-content/repo/retired-theme.txt"
-git -C "$TMP/retired-content/repo" add retired-theme.txt
-expect_failure "retired theme content" run_verify "$TMP/retired-content" repo
-
-clone_baseline retired-path
-printf 'retired\n' >"$TMP/retired-path/repo/mia""sma-theme.txt"
-git -C "$TMP/retired-path/repo" add "mia""sma-theme.txt"
-expect_failure "retired theme path" run_verify "$TMP/retired-path" repo
-
-printf 'ok: verifier fixtures fail closed across host, deployment, format, and theme errors\n'
+printf 'ok: verifier fixtures fail closed across host, deployment, and format errors\n'

@@ -4,7 +4,7 @@
 
 This document records the intentional differences carried by EyrWSL relative to [Omarchy](https://github.com/basecamp/omarchy), and defines the boundary between this repo and its siblings.
 
-Omarchy tag `v4.0.0` at commit `f0020448ca87329199de7cb12f2015ebc4a3e5e7` is the stable upstream baseline. This repo carries the full terminal baseline for Arch Linux inside WSL, plus the WSL and Windows-specific behavior that a Linux desktop distribution does not cover.
+Omarchy tag `v4.0.0` at commit `f0020448ca87329199de7cb12f2015ebc4a3e5e7` is the reproducible upstream comparison baseline. The lightweight tag names the release, while the commit ID records the exact reviewed source. Reference clones and the tag are maintenance inputs only; setup, Stow deployment, and verification do not use them.
 
 ## Deviation Policy
 
@@ -25,7 +25,7 @@ Omarchy is an opinionated Arch Linux distribution targeting a full desktop envir
 - [omacom-io/omarchy-pkgs](https://github.com/omacom-io/omarchy-pkgs) - package builds, including the Omarchy Neovim package
 - [OpenAI Codex](https://github.com/openai/codex) and the [Arch `openai-codex` package](https://archlinux.org/packages/extra/x86_64/openai-codex/) - official terminal CLI upstream and signed Arch package
 - [OpenCode](https://github.com/anomalyco/opencode) and the [Arch `opencode` package](https://archlinux.org/packages/extra/x86_64/opencode/) - terminal coding agent upstream and signed Arch package
-- [Herdr](https://herdr.dev/) - terminal workspace manager and canonical installer
+- [Herdr](https://github.com/herdrdev/herdr) - terminal workspace manager; its website provides the canonical installer
 - [ellisonleao/gruvbox.nvim](https://github.com/ellisonleao/gruvbox.nvim) - Neovim colorscheme
 - [microsoft/terminal](https://github.com/microsoft/terminal) - Windows Terminal settings structure and feature changes
 - [sxyazi/yazi](https://github.com/sxyazi/yazi) and the [Yazi docs](https://yazi-rs.github.io/docs/) - file manager upstream and configuration reference
@@ -60,7 +60,7 @@ Gruvbox follows Omarchy's behavior on each owned surface. Windows Terminal and b
 
 - GNU Stow with symlinked package ownership replaces Omarchy's file-copy and package-install model.
 - `make clean` performs an all-or-nothing ownership preflight and removes only links into EyrWSL or the sibling EyrAgents OpenCode package. Regular files, foreign or broken links, special files, and unrecognized repo-resolving parents abort untouched.
-- `make verify` fails closed on the WSL2/interoperability host contract, command baseline, deployed package ownership, resolved Git identity, owned config parsers and runtimes, and theme tombstones before running isolated attack fixtures.
+- `make verify` fails closed on the WSL2/interoperability host contract, command baseline, deployed package ownership, resolved Git identity, and owned config parsers and runtimes before running isolated attack fixtures.
 - Git, Neovim, OpenCode, btop, and Yazi mutable or merge roots stay real; immutable package directories retain GNU Stow's normal tree-folding behavior.
 - `/omasync` owns reference-clone maintenance and upstream comparison; `docs/maintenance.md` owns dated findings, known limitations, and deferred work.
 - Agent-tool verification approvals are handled by session or shared EyrAgents policy rather than repo-root project allowlists.
@@ -74,7 +74,7 @@ Gruvbox follows Omarchy's behavior on each owned surface. Windows Terminal and b
 - Windows Terminal replaces Ghostty from the Omarchy desktop.
 - Gruvbox colors, JetBrainsMono Nerd Font, and padding are adapted into `windows-terminal/settings.json`.
 - The Gruvbox color scheme maps Omarchy's semantic terminal palette to all 16 ANSI colors, cursor, selection, foreground, and background.
-- `defaultProfile` uses the dynamic profile name `archlinux`; host-specific profile entries are omitted, and the legacy `Windows.Terminal.Wsl` generator is disabled so the current `Microsoft.WSL` profile is unambiguous.
+- `defaultProfile` uses the dynamic profile name `archlinux`; host-specific profile entries are omitted, and the `Windows.Terminal.Wsl` generator is disabled so the current `Microsoft.WSL` profile is unambiguous.
 - Windows Terminal settings are never stowed. Deploy the full tracked file manually; `make wt-diff` resolves the active Windows account through PowerShell, validates both files, and reports normalized drift without changing either side.
 
 ### Bash
@@ -88,8 +88,8 @@ Gruvbox follows Omarchy's behavior on each owned surface. Windows Terminal and b
 - `y()` is added for Yazi cd-on-exit support. Yazi is not part of Omarchy.
 - `tdw` is added: one tmux session per project (Git root, else current directory) with two windows: a full-width AI agent (`tdw cc` for Claude Code, `tdw oc` for OpenCode; the choice is mandatory at creation so a single agent owns the working tree) and `$EDITOR` above a 25% shell. `-c` continues that agent's last conversation in the project; bare `tdw` re-attaches an existing session. Creation checks the selected agent before changing tmux state. Additive alongside Omarchy's `tdl` pane layout. The `t`/`h` prefix follows Omarchy's multiplexer lettering (`tdl`/`hdl`).
 - `hdw` is added: the Herdr counterpart of `tdw`, one workspace per project with the same agent and editor/shell layout, single-agent choice, continue flag, and root-collision guard. It starts a headless Herdr server when needed and falls back to attaching plain Herdr with a rerun hint.
-- Omarchy `v4.0.0` Herdr helpers `hdl`, `hdlm`, and `hsl` are adopted. `hds` is omitted because it invokes Hunk, which is outside the official-repository baseline.
-- Omarchy `v4.0.0` SSH port-forwarding, dropped-connection recovery, and rsync-on-change helpers are adopted. The rsync watcher is backed by the official `rsync` and `inotify-tools` packages.
+- Omarchy's Herdr helpers `hdl`, `hdlm`, and `hsl` are adopted. `hds` is omitted because it invokes Hunk, which is outside the official-repository baseline.
+- Omarchy's SSH port-forwarding, dropped-connection recovery, and rsync-on-change helpers are adopted. The rsync watcher is backed by the official `rsync` and `inotify-tools` packages.
 - Interactive Bash exports `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` and `OPENCODE_ENABLE_EXA=1` so terminal-launched OpenCode selects its EyrAgents-managed skills and configured web-search tool. Shell initialization removes inherited `$HOME/.opencode/bin` entries and appends approved user-level directories after existing system entries, so Pacman's OpenCode and Codex binaries retain precedence.
 - Safe AI launch defaults intentionally differ from Omarchy: `c` remains plain OpenCode, `cx` uses Claude's reviewed `auto` permission mode, and `cy` honors EyrAgents' Codex defaults.
 - `mise`-specific shell handling is omitted.
@@ -111,11 +111,11 @@ Gruvbox follows Omarchy's behavior on each owned surface. Windows Terminal and b
 
 - Upstream's `M-Enter`, `M-S-Enter`, and `M-Escape` pane bindings are adopted verbatim; `alt+enter` is unbound in `windows-terminal/settings.json` (`"id": null`) because Windows Terminal's default binds it to fullscreen and would swallow `M-Enter` before it reaches tmux.
 - The `?` keybindings-popup binding is omitted; it shells out to `omarchy-menu-tmux-keybindings`, which exists only on an Omarchy install.
-- Omarchy `v4.0.0` binding descriptions, generic clipboard feature, and terminal title settings are adopted. The Kitty-only extended-key feature is omitted because Windows Terminal is the host terminal.
+- Omarchy's binding descriptions, generic clipboard feature, and terminal title settings are adopted. The Kitty-only extended-key feature is omitted because Windows Terminal is the host terminal.
 
 ### Tmux Dev Layout
 
-- `tdl`, `tdlm`, and `tsl` retain the `v4.0.0`-compatible terminal layouts. `tdl` selects `editor_pane` rather than the upstream tag's unset `opencode_pane`; Hunk-dependent `tds` is omitted.
+- `tdl`, `tdlm`, and `tsl` retain Omarchy's terminal layouts. `tdl` selects `editor_pane` rather than the upstream baseline's unset `opencode_pane`; Hunk-dependent `tds` is omitted.
 
 ### Neovim
 
@@ -143,7 +143,7 @@ Gruvbox follows Omarchy's behavior on each owned surface. Windows Terminal and b
 - Omarchy's ASCII logo is replaced with fastfetch's built-in small logo.
 - Icon codepoints use the Material Design Icons range for broader terminal font compatibility.
 - Standard modules `shell` and `os` are added.
-- `display.disableLinewrap` follows the `v4.0.0` baseline so long values do not disturb the box layout.
+- `display.disableLinewrap` follows the Omarchy baseline so long values do not disturb the box layout.
 
 ### Btop
 

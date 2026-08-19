@@ -10,4 +10,3 @@ Read this file before package changes, WSL or Windows Terminal updates, `/omasyn
 ## Deferred Items
 
 - watch the tree-folded `~/.config/yazi`: the first `ya pkg` install writes `plugins/` and `package.toml` into the repo working tree; decide then whether to track them (the EyrAgents opencode-deps pattern) or gitignore them (the git-identity pattern already guarded by this repo's `.gitignore`).
-- finish the EyrAgents WSL host pass in fresh Claude Code, Codex, and OpenCode processes: verify `/commit` and `/spar`, review app-managed trust rewrites before reconciliation, and narrow the broader WSL item in EyrAgents' ledger to the checks that remain.

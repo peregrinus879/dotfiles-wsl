@@ -26,7 +26,7 @@ Related clones can live side by side under `~/Projects/eyrie/`, but EyrWSL insta
 
 - **Shell**: [Bash](https://www.gnu.org/software/bash/)
 - **Prompt**: [Starship](https://github.com/starship/starship)
-- **Terminal Workspaces**: [Tmux](https://github.com/tmux/tmux), [Herdr](https://herdr.dev/)
+- **Terminal Workspaces**: [Tmux](https://github.com/tmux/tmux), [Herdr](https://github.com/herdrdev/herdr)
 - **Editor**: [Neovim](https://github.com/neovim/neovim) ([LazyVim](https://github.com/LazyVim/LazyVim))
 - **Version Control**: [Git](https://git-scm.com/), [GitHub CLI](https://cli.github.com/), [LazyGit](https://github.com/jesseduffield/lazygit)
 - **File Manager**: [Yazi](https://github.com/sxyazi/yazi), [eza](https://github.com/eza-community/eza), [zoxide](https://github.com/ajeetdsouza/zoxide)
@@ -204,8 +204,6 @@ curl -fsSL https://herdr.dev/install.sh | sh
 
 Package ownership is Pacman-first. Before future reinstalls, recheck the official repositories; if `claude-code` or `herdr` becomes packaged, replace its standalone installation with the official package. Authentication and subscriptions are separate from installation; complete interactive sign-in only after the shell configuration is stowed.
 
-If an existing shell resolves `opencode` to `~/.opencode/bin/opencode`, do not remove that binary while an OpenCode session is running. After the session ends, remove only `~/.opencode/bin/opencode`, start a fresh shell, run `hash -r`, and confirm `command -v opencode` prints `/usr/bin/opencode`. Leave the remaining `~/.opencode` content in place unless it is separately audited.
-
 ### 5. Clone
 
 Create the parent directory and clone EyrWSL. EyrAgents is optional and recommended when this host will run Claude Code, Codex, or OpenCode with the shared agent harness:
@@ -299,17 +297,6 @@ cd ~/Projects/eyrie/eyrwsl
 stow -R -v -t ~ bash btop editorconfig fastfetch git nvim starship tmux yazi
 ```
 
-To migrate from a different clone path, unstow from the old location first:
-
-```bash
-cd /old/clone/path
-stow -D -v -t ~ bash btop editorconfig fastfetch git nvim starship tmux yazi
-cd ~/Projects/eyrie/eyrwsl
-stow -v -t ~ bash btop editorconfig fastfetch git nvim starship tmux yazi
-```
-
-If the old clone is no longer available, run the full cleanup in section 8 before stowing.
-
 ### 10. First Launch
 
 Open Neovim once to install the revisions recorded in the tracked lockfile:
@@ -362,7 +349,7 @@ make verify
 make lint
 ```
 
-`make verify` fails closed unless the host is WSL2 with Windows interop, the configured command baseline is available, every Git-visible Stow source resolves to this repo, Git identity resolves without exposing its values, all owned Bash/Lua/TOML/JSON/JSONC and runtime configs validate, and retired theme content and paths remain absent. It then runs the deployment and verifier attack fixtures. `make lint` applies ShellCheck to the Bash package, scripts, and tests.
+`make verify` fails closed unless the host is WSL2 with Windows interop, the configured command baseline is available, every Git-visible Stow source resolves to this repo, Git identity resolves without exposing its values, and all owned Bash/Lua/TOML/JSON/JSONC and runtime configs validate. It then runs the deployment and verifier attack fixtures. `make lint` applies ShellCheck to the Bash package, scripts, and tests.
 
 Complete these manual fresh-session checks:
 
@@ -392,7 +379,7 @@ A repo-root `Makefile` keeps the package list in one place and wraps the routine
 
 - `make stow` / `make unstow` / `make dry-run` / `make restow` - the stow command sets from Setup
 - `make stow-all` - stows EyrAgents' `opencode` package first, then all packages here
-- `make verify` - delegate fail-closed host, deployment, identity, syntax, format, runtime, and theme-tombstone checks to `scripts/verify.sh`, then run every fixture suite
+- `make verify` - delegate fail-closed host, deployment, identity, syntax, format, and runtime checks to `scripts/verify.sh`, then run every fixture suite
 - `make clean` - WSL-only, all-or-nothing ownership preflight followed by managed-link removal and mutable-directory preparation
 - `make test` - fake-home deployment, ownership, and verifier attack fixtures; the loop stops on the first failing suite
 - `make lint` - ShellCheck over the bash package, `scripts/`, and `tests/`; `.shellcheckrc` disables the upstream-derived warnings so new issues stand out

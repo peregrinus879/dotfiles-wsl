@@ -208,27 +208,6 @@ else
 fi
 tmux -L "$tmux_socket" kill-server >/dev/null 2>&1 || true
 
-retired_theme="mia""sma"
-theme_content_status=0
-git -C "$repo" grep -Iin "$retired_theme" -- . >/dev/null 2>&1 || theme_content_status=$?
-if (( theme_content_status == 1 )); then
-  ok "retired theme is absent from tracked content"
-elif (( theme_content_status == 0 )); then
-  problem "retired theme remains in tracked content"
-else
-  problem "tracked theme tombstone check failed"
-fi
-
-retired_path=0
-while IFS= read -r relative; do
-  [[ ${relative,,} == *"$retired_theme"* ]] && retired_path=1
-done < <(git -C "$repo" ls-files)
-if (( retired_path == 0 )); then
-  ok "retired theme is absent from tracked paths"
-else
-  problem "retired theme remains in a tracked path"
-fi
-
 if [[ -f $repo/btop/.config/btop/btop.conf ]] &&
   [[ $(<"$repo/btop/.config/btop/btop.conf") == *'color_theme = "gruvbox"'* ]]; then
   ok "btop selects Gruvbox"

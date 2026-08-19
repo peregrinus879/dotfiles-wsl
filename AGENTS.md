@@ -1,6 +1,6 @@
 # AGENTS.md - EyrWSL
 
-Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basecamp/omarchy), managed with [GNU Stow](https://www.gnu.org/software/stow/): the full terminal baseline for Arch Linux inside WSL (Bash, Git, Neovim, tmux, Herdr, starship, fastfetch, btop, editorconfig, Yazi), plus WSL and Windows-specific behavior in `windows-terminal/`. Omarchy tag `v4.0.0`, official docs, official package docs, and `DEVIATIONS.md` are the source of truth for default behavior and intentional differences; ownership boundaries live in `DEVIATIONS.md` (Deviation Policy and Out Of Scope).
+Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basecamp/omarchy), managed with [GNU Stow](https://www.gnu.org/software/stow/): the full terminal baseline for Arch Linux inside WSL (Bash, Git, Neovim, tmux, Herdr, starship, fastfetch, btop, editorconfig, Yazi), plus WSL and Windows-specific behavior in `windows-terminal/`. Omarchy's pinned baseline, official docs, official package docs, and `DEVIATIONS.md` are the source of truth for default behavior and intentional differences; ownership boundaries live in `DEVIATIONS.md` (Deviation Policy and Out Of Scope).
 
 ## Load Map
 
@@ -12,7 +12,7 @@ Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basec
 
 - Target machine: WSL; run stow and make targets only on the WSL host.
 - When editing sibling dotfiles repos, use identical wording for shared concepts; only repo-specific values (scope, package lists, invariants) differ.
-- `make verify` must fail closed across WSL2/interoperability, the command baseline, deployment ownership, resolved Git identity, owned config syntax and runtime parsing, and theme tombstones; fixture-only overrides must not weaken normal mode.
+- `make verify` must fail closed across WSL2/interoperability, the command baseline, deployment ownership, resolved Git identity, and owned config syntax and runtime parsing; fixture-only overrides must not weaken normal mode.
 - Gruvbox is the only configured theme. Windows Terminal and btop track Omarchy's semantic palette, Neovim uses Omarchy's `ellisonleao/gruvbox.nvim` selection, and ANSI-aware applications inherit the terminal palette.
 - `nvim/` owns the complete LazyVim bootstrap, static configuration, and generated plugin lockfile; setup requires no separate Neovim configuration clone.
 - The vault is expected at `~/Projects/vault` (override with `OBSIDIAN_VAULT`) for the obsidian.nvim workflow.
