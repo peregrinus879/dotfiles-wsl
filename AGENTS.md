@@ -5,16 +5,14 @@ Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basec
 ## Load Map
 
 - Claude Code loads this file through the root `CLAUDE.md` `@AGENTS.md` import; skills load on invocation only.
-- The `Makefile` is the single source of the package and twin lists; `scripts/verify.sh` consumes both through environment arguments, and `README.md` carries the human-facing setup, verification, and maintenance detail.
+- The `Makefile` is the single source of the package list; `scripts/verify.sh` consumes it through an environment argument, and `README.md` carries the human-facing setup, verification, and maintenance detail.
 - `docs/maintenance.md` is the on-demand ledger for known limitations, deferred items, and dated findings; read it before package changes, WSL or Windows Terminal updates, `/omasync`, or work on a deferred item.
 
 ## Invariants
 
 - Target machine: WSL; run stow and make targets only on the WSL host.
 - When editing sibling dotfiles repos, use identical wording for shared concepts; only repo-specific values (scope, package lists, invariants) differ.
-- The Makefile `TWIN_SPECS` files (nvim vault plugin specs, the `tdw` and `hdw` workspace functions, `yazi.toml`) are byte-identical twins with EyrArcHy; `make verify` fails on drift.
-- `make verify` requires the sibling EyrArcHy clone at `~/Projects/eyrie/eyrarchy` for read-only twin comparison; never stow it or run its Omarchy-host Make targets from WSL.
-- `make verify` must fail closed across WSL2/interoperability, the command baseline, deployment ownership, resolved Git identity, owned config syntax and runtime parsing, twins, and theme tombstones; fixture-only overrides must not weaken normal mode.
+- `make verify` must fail closed across WSL2/interoperability, the command baseline, deployment ownership, resolved Git identity, owned config syntax and runtime parsing, and theme tombstones; fixture-only overrides must not weaken normal mode.
 - Gruvbox is the only configured theme; terminal-side files track Omarchy's semantic palette, while Neovim and OpenCode track `ellisonleao/gruvbox.nvim`'s dark palette and highlights.
 - `nvim/` owns the complete LazyVim bootstrap, static configuration, and generated plugin lockfile; setup requires no separate Neovim configuration clone.
 - The vault is expected at `~/Projects/vault` (override with `OBSIDIAN_VAULT`) for the obsidian.nvim workflow.

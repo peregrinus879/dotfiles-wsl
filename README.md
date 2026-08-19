@@ -20,7 +20,7 @@ Omarchy + WSL deviations        → EyrWSL
 - [`eyrarchy`](https://github.com/peregrinus879/eyrarchy) - Personal Omarchy customizations: Bash overrides, Hyprland bindings, Neovim plugins, and Yazi
 - [`eyrwsl`](https://github.com/peregrinus879/eyrwsl) - Self-contained WSL Arch environment: terminal baseline plus Windows Terminal, clipboard integration, and OpenCode theme
 
-Local clones live side by side under `~/Projects/eyrie/`.
+Related clones can live side by side under `~/Projects/eyrie/`, but EyrWSL installs and verifies independently.
 
 ## Stack
 
@@ -60,7 +60,7 @@ Key ownership rules:
 - `nvim/` owns the full Neovim config, including the LazyVim bootstrap and lockfile plus `lua/config/options.lua` with the built-in WSL clipboard integration
 - `nvim/` includes the vault plugin specs (`obsidian.lua`, `render-markdown.lua`); the vault is expected at `~/Projects/vault` (override with `OBSIDIAN_VAULT`)
 - Bash supports additive machine overlays through `~/.config/bash-overlays/*`; the directory is optional and reserved for untracked machine-local additions
-- Claude Code launches use the supported maximum effort, `--effort max`. `tdw` and `hdw` are byte-identical twins with EyrArcHy.
+- Claude Code launches use the supported maximum effort, `--effort max`.
 - Interactive Bash exports `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` and `OPENCODE_ENABLE_EXA=1`; EyrAgents owns OpenCode runtime configuration
 - EyrAgents keeps ownership of shared OpenCode runtime config; `opencode-wsl/` only adds Gruvbox theme availability without forcing the selected theme
 - `~/.config/opencode/` and `~/.config/opencode/themes/` must be real merge directories so EyrAgents and `opencode-wsl` can both link files inside them
@@ -210,16 +210,15 @@ If an existing shell resolves `opencode` to `~/.opencode/bin/opencode`, do not r
 
 ### 5. Clone
 
-Create the shared parent directory. EyrWSL is required, EyrArcHy supplies the read-only twin baseline required by `make verify`, and EyrAgents is recommended when this host will run Claude Code, Codex, or OpenCode with the shared agent harness:
+Create the parent directory and clone EyrWSL. EyrAgents is optional and recommended when this host will run Claude Code, Codex, or OpenCode with the shared agent harness:
 
 ```bash
 mkdir -p ~/Projects/eyrie
 git clone https://github.com/peregrinus879/eyrwsl.git ~/Projects/eyrie/eyrwsl
-git clone https://github.com/peregrinus879/eyrarchy.git ~/Projects/eyrie/eyrarchy
 git clone https://github.com/peregrinus879/eyragents.git ~/Projects/eyrie/eyragents
 ```
 
-The EyrArcHy clone is comparison data on WSL; do not stow it or run its host-bound Make targets here. Skip the EyrAgents clone only for an EyrWSL-only installation. Stow can work from another clone location, but twin verification and maintenance workflows assume this layout.
+Skip the EyrAgents clone for an EyrWSL-only installation. EyrWSL can be cloned elsewhere; adjust the commands below to match its location.
 
 ### 6. Neovim Ownership
 
@@ -247,7 +246,6 @@ Checklist before stowing:
 
 - Required packages are installed
 - EyrWSL was cloned locally
-- EyrArcHy was cloned beside EyrWSL for fail-closed twin verification
 - EyrAgents was cloned beside EyrWSL if the shared AI agent harness is used
 - `~/.config/git/config.local` exists with your local Git identity
 - Any existing conflicting files were reviewed and moved or merged
@@ -368,7 +366,7 @@ make verify
 make lint
 ```
 
-`make verify` fails closed unless the host is WSL2 with Windows interop, the configured command baseline is available, every Git-visible Stow source resolves to this repo, Git identity resolves without exposing its values, all owned Bash/Lua/TOML/JSON/JSONC and runtime configs validate, every twin matches EyrArcHy, and retired theme content and paths remain absent. It then runs the deployment and verifier attack fixtures. `make lint` applies ShellCheck to the Bash package, scripts, and tests.
+`make verify` fails closed unless the host is WSL2 with Windows interop, the configured command baseline is available, every Git-visible Stow source resolves to this repo, Git identity resolves without exposing its values, all owned Bash/Lua/TOML/JSON/JSONC and runtime configs validate, and retired theme content and paths remain absent. It then runs the deployment and verifier attack fixtures. `make lint` applies ShellCheck to the Bash package, scripts, and tests.
 
 Complete these manual fresh-session checks:
 
@@ -399,7 +397,7 @@ A repo-root `Makefile` keeps the package list in one place and wraps the routine
 
 - `make stow` / `make unstow` / `make dry-run` / `make restow` - the stow command sets from Setup
 - `make stow-all` - stows EyrAgents' `opencode` package first, then all packages here
-- `make verify` - delegate fail-closed host, deployment, identity, syntax, format, runtime, twin, and theme-tombstone checks to `scripts/verify.sh`, then run every fixture suite
+- `make verify` - delegate fail-closed host, deployment, identity, syntax, format, runtime, and theme-tombstone checks to `scripts/verify.sh`, then run every fixture suite
 - `make clean` - WSL-only, all-or-nothing ownership preflight followed by managed-link removal and mutable-directory preparation
 - `make test` - fake-home deployment, ownership, and verifier attack fixtures; the loop stops on the first failing suite
 - `make lint` - ShellCheck over the bash package, `scripts/`, and `tests/`; `.shellcheckrc` disables the upstream-derived warnings so new issues stand out

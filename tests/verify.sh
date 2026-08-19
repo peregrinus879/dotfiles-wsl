@@ -5,7 +5,6 @@ ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 TMP=$(mktemp -d)
 trap 'rm -rf -- "$TMP"' EXIT
 PACKAGES="bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi"
-TWINS="nvim/.config/nvim/lua/plugins/obsidian.lua nvim/.config/nvim/lua/plugins/render-markdown.lua bash/.config/bash/functions/tdw bash/.config/bash/functions/hdw yazi/.config/yazi/yazi.toml"
 
 fail() {
   printf 'FAIL: %s\n' "$1" >&2
@@ -13,8 +12,8 @@ fail() {
 }
 
 make_baseline() {
-  local base=$1 repo="$1/repo" home="$1/home" sibling="$1/sibling" source relative
-  mkdir -p "$repo" "$home/.config/git" "$sibling"
+  local base=$1 repo="$1/repo" home="$1/home" source
+  mkdir -p "$repo" "$home/.config/git"
   while IFS= read -r source; do
     [[ -e $ROOT/$source || -L $ROOT/$source ]] || continue
     mkdir -p "$repo/$(dirname -- "$source")"
@@ -24,10 +23,6 @@ make_baseline() {
   git -C "$repo" add .
   printf '[user]\n  name = Fixture User\n  email = fixture@example.invalid\n' >"$home/.config/git/config.local"
   stow -t "$home" -d "$repo" bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
-  for relative in $TWINS; do
-    mkdir -p "$sibling/$(dirname -- "$relative")"
-    cp -a -- "$repo/$relative" "$sibling/$relative"
-  done
 }
 
 clone_baseline() {
@@ -40,10 +35,8 @@ run_verify() {
     VERIFY_MODE="$mode" \
     VERIFY_REPO="$base/repo" \
     VERIFY_HOME="$base/home" \
-    VERIFY_SIBLING="$base/sibling" \
     VERIFY_KERNEL_RELEASE="6.6.0-microsoft-standard-WSL2" \
     VERIFY_PACKAGES="$PACKAGES" \
-    VERIFY_TWIN_SPECS="$TWINS" \
     VERIFY_EXTRA_REQUIRED_TOOL="$extra_tool" \
     bash "$ROOT/scripts/verify.sh"
 }
@@ -54,15 +47,6 @@ expect_failure() {
   if "$@" >/dev/null 2>&1; then
     fail "$label did not fail closed"
   fi
-}
-
-expect_failure_with() {
-  local label=$1 expected=$2 output
-  shift 2
-  if output=$("$@" 2>&1); then
-    fail "$label did not fail closed"
-  fi
-  [[ $output == *"$expected"* ]] || fail "$label failed without its expected diagnostic"
 }
 
 make_baseline "$TMP/baseline"
@@ -118,28 +102,11 @@ if HOME="$TMP/non-wsl/home" \
   VERIFY_MODE=fixture \
   VERIFY_REPO="$TMP/non-wsl/repo" \
   VERIFY_HOME="$TMP/non-wsl/home" \
-  VERIFY_SIBLING="$TMP/non-wsl/sibling" \
   VERIFY_KERNEL_RELEASE=linux-fixture \
   VERIFY_PACKAGES="$PACKAGES" \
-  VERIFY_TWIN_SPECS="$TWINS" \
   bash "$ROOT/scripts/verify.sh" >/dev/null 2>&1; then
   fail "non-WSL fixture did not fail closed"
 fi
-
-clone_baseline missing-twin
-rm -- "$TMP/missing-twin/sibling/nvim/.config/nvim/lua/plugins/obsidian.lua"
-expect_failure_with "missing twin" "FAIL: twin missing in EyrArcHy: nvim/.config/nvim/lua/plugins/obsidian.lua" \
-  run_verify "$TMP/missing-twin" repo
-
-clone_baseline missing-sibling
-rm -rf -- "$TMP/missing-sibling/sibling"
-expect_failure_with "missing twin sibling" "FAIL: EyrArcHy clone not found:" \
-  run_verify "$TMP/missing-sibling" repo
-
-clone_baseline drifted-twin
-printf '\n# fixture drift\n' >>"$TMP/drifted-twin/sibling/nvim/.config/nvim/lua/plugins/obsidian.lua"
-expect_failure_with "drifted twin" "FAIL: nvim/.config/nvim/lua/plugins/obsidian.lua drifted from the EyrArcHy twin" \
-  run_verify "$TMP/drifted-twin" repo
 
 clone_baseline missing-deployment
 rm -- "$TMP/missing-deployment/home/.bashrc"
@@ -155,4 +122,4 @@ printf 'retired\n' >"$TMP/retired-path/repo/mia""sma-theme.txt"
 git -C "$TMP/retired-path/repo" add "mia""sma-theme.txt"
 expect_failure "retired theme path" run_verify "$TMP/retired-path" repo
 
-printf 'ok: verifier fixtures fail closed across host, deployment, format, twin, and theme errors\n'
+printf 'ok: verifier fixtures fail closed across host, deployment, format, and theme errors\n'

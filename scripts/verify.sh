@@ -6,16 +6,12 @@ script_repo=$(realpath -e -- "$(dirname -- "${BASH_SOURCE[0]}")/..")
 mode=${VERIFY_MODE:-full}
 repo=${VERIFY_REPO:-$script_repo}
 verify_home=${VERIFY_HOME:-$HOME}
-sibling=${VERIFY_SIBLING:-$verify_home/Projects/eyrie/eyrarchy}
 
 [[ -n ${VERIFY_PACKAGES:-} ]] || { printf 'FAIL: VERIFY_PACKAGES is required\n' >&2; exit 1; }
-[[ -n ${VERIFY_TWIN_SPECS:-} ]] || { printf 'FAIL: VERIFY_TWIN_SPECS is required\n' >&2; exit 1; }
 repo=$(realpath -e -- "$repo")
 verify_home=$(realpath -e -- "$verify_home")
 read -r -a packages <<<"$VERIFY_PACKAGES"
-read -r -a twin_specs <<<"$VERIFY_TWIN_SPECS"
 (( ${#packages[@]} )) || { printf 'FAIL: package list is empty\n' >&2; exit 1; }
-(( ${#twin_specs[@]} )) || { printf 'FAIL: twin list is empty\n' >&2; exit 1; }
 
 case $mode in
   full)
@@ -225,20 +221,6 @@ else
   problem "tmux config failed to parse"
 fi
 tmux -L "$tmux_socket" kill-server >/dev/null 2>&1 || true
-
-if [[ ! -d $sibling ]]; then
-  problem "EyrArcHy clone not found: $sibling"
-else
-  for relative in "${twin_specs[@]}"; do
-    if [[ ! -e $sibling/$relative ]]; then
-      problem "twin missing in EyrArcHy: $relative"
-    elif cmp -s "$repo/$relative" "$sibling/$relative"; then
-      ok "$relative matches the EyrArcHy twin"
-    else
-      problem "$relative drifted from the EyrArcHy twin"
-    fi
-  done
-fi
 
 retired_theme="mia""sma"
 theme_content_status=0

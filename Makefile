@@ -5,16 +5,6 @@ SHELL := /bin/bash
 PACKAGES := bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
 AI_REPO := ../eyragents
 
-# Twin files are byte-identical with EyrArcHy, synced manually; verify
-# fails on drift so the copies cannot silently diverge. Paths are repo-relative
-# and identical in both repos.
-SIBLING := $(HOME)/Projects/eyrie/eyrarchy
-TWIN_SPECS := nvim/.config/nvim/lua/plugins/obsidian.lua \
-  nvim/.config/nvim/lua/plugins/render-markdown.lua \
-  bash/.config/bash/functions/tdw \
-  bash/.config/bash/functions/hdw \
-  yazi/.config/yazi/yazi.toml
-
 .PHONY: help require-wsl stow unstow dry-run restow stow-all verify test clean lint wt-diff wt-pull wt-push
 
 help:
@@ -24,7 +14,7 @@ help:
 	@echo "  dry-run   Preview stow actions without making changes"
 	@echo "  restow    Re-stow after repo content changes"
 	@echo "  stow-all  Stow EyrAgents' opencode package first, then all packages here"
-	@echo "  verify    Check the WSL host, deployment, owned configs, twins, and fixtures"
+	@echo "  verify    Check the WSL host, deployment, owned configs, and fixtures"
 	@echo "  test      Run fail-closed deployment and verifier fixtures"
 	@echo "  clean     Preflight all endpoints, then remove managed links only"
 	@echo "  lint      ShellCheck over Bash config, scripts, and tests"
@@ -54,8 +44,7 @@ stow-all: require-wsl
 
 verify:
 	@VERIFY_MODE=full VERIFY_REPO='$(CURDIR)' VERIFY_HOME='$(HOME)' \
-	  VERIFY_PACKAGES='$(PACKAGES)' VERIFY_TWIN_SPECS='$(TWIN_SPECS)' \
-	  VERIFY_SIBLING='$(SIBLING)' bash scripts/verify.sh
+	  VERIFY_PACKAGES='$(PACKAGES)' bash scripts/verify.sh
 	@$(MAKE) --no-print-directory test
 
 test:

@@ -18,7 +18,7 @@ Local reference clones live under `~/Projects/quarry/`:
 - `obsidian.nvim/` - obsidian.nvim upstream for the vault plugin spec
 - `terminal/` - Windows Terminal reference repo for settings structure and feature changes
 
-Upstream URLs, official docs, and descriptions live in `DEVIATIONS.md` (Reference Sources). Durable findings and deferred items live in `docs/maintenance.md`; sibling coordination lives at `~/Projects/eyrie/eyragents/docs/maintenance.md` and `~/Projects/eyrie/eyrarchy/docs/maintenance.md`.
+Upstream URLs, official docs, and descriptions live in `DEVIATIONS.md` (Reference Sources). Durable findings and deferred items live in `docs/maintenance.md`.
 
 ## When To Use
 
@@ -35,16 +35,15 @@ Upstream URLs, official docs, and descriptions live in `DEVIATIONS.md` (Referenc
 4. For non-Omarchy tools, compare Yazi against `yazi/` and official docs, and the vault plugin specs against `obsidian.nvim/` and the render-markdown.nvim README
 5. Check the WSL and Windows contract against official WSL, Arch-on-WSL, and Windows Terminal docs: WSL2, Windows interop, `clip.exe`, `powershell.exe`, Windows-side font ownership, and `windows-terminal/settings.json` against `terminal/`; run `make wt-diff` when Terminal settings are involved
 6. Check official-package ownership at maintenance time: run `pacman -Qo /usr/bin/codex /usr/bin/opencode`, re-probe with `pacman -Si claude-code` and `pacman -Si herdr` before retaining their canonical installers, and keep Yazi media helpers explicitly optional
-7. Cross-repo coordination: read the sibling ledgers for items assigned to this repo and for stale entries describing this host's environment
-8. For each difference, classify it:
+7. For each difference, classify it:
    - **Intentional deviation**: documented in `DEVIATIONS.md`, should stay different
    - **New upstream addition**: added upstream after the last sync, should be reviewed for inclusion
    - **Upstream change to existing config**: modified upstream, needs review
-9. Check `git log --format="%h %ad %s" --date=short -- <file>` on the relevant reference repo when you need to determine when a difference was introduced
-10. Cross-check differences against `DEVIATIONS.md`. If a difference is not documented there, treat it as a likely upstream change that needs review
-11. Apply new upstream additions and changes where they belong in this repo
-12. Update `README.md`, `AGENTS.md`, `DEVIATIONS.md`, and `docs/maintenance.md` when ownership, setup, workflow, or durable maintenance findings change
-13. Summarize which changes were adopted, rejected, or intentionally kept different
+8. Check `git log --format="%h %ad %s" --date=short -- <file>` on the relevant reference repo when you need to determine when a difference was introduced
+9. Cross-check differences against `DEVIATIONS.md`. If a difference is not documented there, treat it as a likely upstream change that needs review
+10. Apply new upstream additions and changes where they belong in this repo
+11. Update `README.md`, `AGENTS.md`, `DEVIATIONS.md`, and `docs/maintenance.md` when ownership, setup, workflow, or durable maintenance findings change
+12. Summarize which changes were adopted, rejected, or intentionally kept different
 
 ## Completion Checks
 

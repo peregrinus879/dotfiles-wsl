@@ -60,10 +60,9 @@ Gruvbox has two intentional canons in this repo. Terminal-side files (btop, Yazi
 
 - GNU Stow with symlinked package ownership replaces Omarchy's file-copy and package-install model.
 - `make clean` performs an all-or-nothing ownership preflight and removes only links into EyrWSL or the sibling EyrAgents OpenCode package. Regular files, foreign or broken links, special files, and unrecognized repo-resolving parents abort untouched.
-- `make verify` fails closed on the WSL2/interoperability host contract, command baseline, deployed package ownership, resolved Git identity, owned config parsers and runtimes, cross-repo twins, and theme tombstones before running isolated attack fixtures.
-- Twin verification requires the sibling EyrArcHy clone at `~/Projects/eyrie/eyrarchy` as read-only comparison data; its Omarchy-host deployment and Make targets never run from WSL.
+- `make verify` fails closed on the WSL2/interoperability host contract, command baseline, deployed package ownership, resolved Git identity, owned config parsers and runtimes, and theme tombstones before running isolated attack fixtures.
 - Git, Neovim, OpenCode, btop, and Yazi mutable or merge roots stay real; immutable package directories retain GNU Stow's normal tree-folding behavior.
-- `/omasync` owns reference-clone maintenance and upstream comparison; `docs/maintenance.md` owns dated findings, known limitations, deferred work, and sibling-ledger coordination.
+- `/omasync` owns reference-clone maintenance and upstream comparison; `docs/maintenance.md` owns dated findings, known limitations, and deferred work.
 - Agent-tool verification approvals are handled by session or shared EyrAgents policy rather than repo-root project allowlists.
 
 ### Theme
@@ -88,7 +87,7 @@ Gruvbox has two intentional canons in this repo. Terminal-side files (btop, Yazi
 - Claude Code launches use the supported maximum effort, `--effort max`. The `claude` alias applies it to every interactive launch, including `cx` and `tdl`-launched AIs; scripts and hooks stay plain because they do not expand aliases.
 - `y()` is added for Yazi cd-on-exit support. Yazi is not part of Omarchy.
 - `tdw` is added: one tmux session per project (Git root, else current directory) with two windows: a full-width AI agent (`tdw cc` for Claude Code, `tdw oc` for OpenCode; the choice is mandatory at creation so a single agent owns the working tree) and `$EDITOR` above a 25% shell. `-c` continues that agent's last conversation in the project; bare `tdw` re-attaches an existing session. Creation checks the selected agent before changing tmux state. Additive alongside Omarchy's `tdl` pane layout. The `t`/`h` prefix follows Omarchy's multiplexer lettering (`tdl`/`hdl`).
-- `hdw` is added: the Herdr counterpart of `tdw`, one workspace per project with the same agent and editor/shell layout, single-agent choice, continue flag, and root-collision guard. It starts a headless Herdr server when needed and falls back to attaching plain Herdr with a rerun hint. `tdw` and `hdw` are byte-identical twins with EyrArcHy.
+- `hdw` is added: the Herdr counterpart of `tdw`, one workspace per project with the same agent and editor/shell layout, single-agent choice, continue flag, and root-collision guard. It starts a headless Herdr server when needed and falls back to attaching plain Herdr with a rerun hint.
 - Omarchy `v4.0.0` Herdr helpers `hdl`, `hdlm`, and `hsl` are adopted. `hds` is omitted because it invokes Hunk, which is outside the official-repository baseline.
 - Omarchy `v4.0.0` SSH port-forwarding, dropped-connection recovery, and rsync-on-change helpers are adopted. The rsync watcher is backed by the official `rsync` and `inotify-tools` packages.
 - Interactive Bash exports `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` and `OPENCODE_ENABLE_EXA=1` so terminal-launched OpenCode selects its EyrAgents-managed skills and configured web-search tool. Shell initialization removes inherited `$HOME/.opencode/bin` entries and appends approved user-level directories after existing system entries, so Pacman's OpenCode and Codex binaries retain precedence.
@@ -127,7 +126,7 @@ Gruvbox has two intentional canons in this repo. Terminal-side files (btop, Yazi
 - `transparency.lua` content is verbatim from `omarchy-nvim` but lives at `after/plugin/` instead of upstream's `plugin/after/` to use Neovim's actual after-load mechanism. Upstream `omarchy-nvim` uses the incorrect path.
 - Owned Lua files use 2-space indentation per the shared `.editorconfig` in this repo. Upstream `omarchy-nvim` uses tabs. Contents are otherwise unchanged.
 - Two additive plugin specs are carried: `obsidian.lua` (obsidian.nvim against the vault at `~/Projects/vault`, override with `OBSIDIAN_VAULT`) and `render-markdown.lua` (visual markdown rendering companion). `python` is in the baseline package list because the vault keybindings shell out to the vault's `normalize.py`.
-- The spec's `open.func` routes `obsidian://` and web URIs through Windows interop (`powershell.exe Start-Process`) when running under WSL, so `:Obsidian open` and link-following reach the Windows apps without `wsl-open`, which is not in official Arch repos. The override is guarded by `vim.fn.has("wsl")` and inert elsewhere; both repos track byte-identical copies of the spec.
+- The spec's `open.func` routes `obsidian://` and web URIs through Windows interop (`powershell.exe Start-Process`) when running under WSL, so `:Obsidian open` and link-following reach the Windows apps without `wsl-open`, which is not in official Arch repos. The override is guarded by `vim.fn.has("wsl")` and inert elsewhere.
 
 ### OpenCode
 
@@ -158,7 +157,7 @@ Gruvbox has two intentional canons in this repo. Terminal-side files (btop, Yazi
 ### Yazi
 
 - Added entirely. Yazi is not part of Omarchy.
-- `yazi.toml` keeps the local layout and behavior choices: ratio `[2, 4, 4]`, hidden files shown, directories sorted first, `sort_by = "natural"`, and `linemode = "size"`. Tracked as a byte-identical twin with EyrArcHy.
+- `yazi.toml` keeps the local layout and behavior choices: ratio `[2, 4, 4]`, hidden files shown, directories sorted first, `sort_by = "natural"`, and `linemode = "size"`.
 - `theme.toml` maps mode, status, tab, and manager readability roles to the Omarchy Gruvbox semantic palette.
 
 ### WSL Bootstrap
