@@ -4,7 +4,8 @@
 -- for pickers); an install may use fzf-lua instead, which obsidian.nvim also
 -- supports.
 --
--- Required system packages: ripgrep, python3, wl-clipboard (Wayland) or xclip (X11).
+-- Required system packages: ripgrep and python3. Image paste additionally
+-- requires wl-clipboard (Wayland) or xclip (X11).
 -- On WSL, obsidian:// and web URIs route through Windows interop
 -- (powershell.exe); no Linux-side opener like wsl-open is needed.
 --
@@ -13,7 +14,7 @@
 -- markdown rendering; it is not required by obsidian.nvim.
 --
 -- ---------------------------------------------------------------------------
--- Deviations from obsidian.nvim defaults (full table and rationale in
+-- Deviations from obsidian.nvim defaults (full table and rationale in the vault's
 -- DESIGN.md §12; the underlying design decisions live in §5, §9, §11):
 --
 -- Opts that change obsidian.nvim behavior beyond naming the workspace:
@@ -33,7 +34,7 @@
 --                                      0-fleeting/, literature →
 --                                      1-literature/, etc.).
 --   note_id_func                       Slugifies titles → filenames. Slug
---                                      rules documented in DESIGN.md §11.
+--                                      rules documented in the vault's DESIGN.md §11.
 --   attachments.folder                 Image saves go to 6-assets/.
 --   ui.enable = false                  render-markdown.nvim handles visual
 --                                      rendering; obsidian.nvim's UI would
@@ -51,7 +52,7 @@
 --                      with aliases[0].
 --   <leader>od         Delete current buffer's note with confirm prompt.
 --                      Safer than neo-tree deletes; recoverable via hub
---                      .stversions/ (SETUP-SYNC.md §1.1).
+--                      .stversions/ (the vault's SETUP-SYNC.md §1.1).
 --   <leader>oD         Pick a note from the vault and delete it with
 --                      the same confirm prompt. Handy for triaging
 --                      0-fleeting/ without opening each candidate.
@@ -67,7 +68,7 @@
 --
 -- Pass-through keybindings to obsidian.nvim native commands. Letters
 -- are vault choices (obsidian.nvim ships no <leader> defaults);
--- descriptions are our own short forms (see AGENTS.md §Conventions).
+-- descriptions are our own short forms (see the vault's AGENTS.md §Conventions).
 --
 -- Uppercase convention: when a lowercase/uppercase letter pair is a
 -- natural fit, uppercase prompts a picker; lowercase acts directly.
@@ -93,7 +94,7 @@ vim.g.markdown_folding = 1
 --   4. strip leading and trailing hyphens
 --   5. lowercase
 -- Worked examples and known limitations (non-ASCII stripping, punctuation
--- collision) documented in DESIGN.md §11.
+-- collision) documented in the vault's DESIGN.md §11.
 local function slugify(title)
   return title:gsub(" ", "-"):gsub("[^A-Za-z0-9-]", ""):gsub("%-+", "-"):gsub("^%-", ""):gsub("%-$", ""):lower()
 end
@@ -174,7 +175,7 @@ end
 -- Delete a note file with a confirm prompt. Wipes any loaded buffer
 -- holding the file. Caller is responsible for validating the path is
 -- inside the vault. Deletion propagates via Syncthing; the deleted
--- file is recoverable from hub .stversions/ (see SETUP-SYNC.md §1.1).
+-- file is recoverable from hub .stversions/ (see the vault's SETUP-SYNC.md §1.1).
 local function delete_note(path, display_name)
   if vim.fn.confirm("Delete " .. display_name .. "?", "&No\n&Yes", 1) ~= 2 then
     return false
@@ -276,7 +277,7 @@ return {
       -- neo-tree (which can wipe the wrong file by accident). This
       -- binding requires an explicit Y+Enter, making deletion a
       -- deliberate act. The deleted file propagates via Syncthing;
-      -- hub .stversions/ retains a copy per SETUP-SYNC.md §1.1.
+      -- hub .stversions/ retains a copy per the vault's SETUP-SYNC.md §1.1.
       {
         "<leader>od",
         function()
