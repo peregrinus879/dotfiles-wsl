@@ -60,6 +60,7 @@ Gruvbox has two intentional canons in this repo. Terminal-side files (btop, Yazi
 
 - GNU Stow with symlinked package ownership replaces Omarchy's file-copy and package-install model.
 - `make clean` performs an all-or-nothing ownership preflight and removes only links into EyrWSL or the sibling EyrAgents OpenCode package. Regular files, foreign or broken links, special files, and unrecognized repo-resolving parents abort untouched.
+- `make verify` fails closed on the WSL2/interoperability host contract, command baseline, deployed package ownership, resolved Git identity, owned config parsers and runtimes, cross-repo twins, and theme tombstones before running isolated attack fixtures.
 - Git, Neovim, OpenCode, btop, and Yazi mutable or merge roots stay real; immutable package directories retain GNU Stow's normal tree-folding behavior.
 
 ### Theme

@@ -302,7 +302,16 @@ If rollback is needed, copy the reported `settings.json.backup-<timestamp>` over
 
 ## Verify
 
-After stowing:
+After stowing, run the automated gates from the repository root:
+
+```bash
+make verify
+make lint
+```
+
+`make verify` fails closed unless the host is WSL2 with Windows interop, the configured command baseline is available, every Git-visible Stow source resolves to this repo, Git identity resolves without exposing its values, all owned Bash/Lua/TOML/JSON/JSONC and runtime configs validate, every twin matches EyrArcHy, and retired theme content and paths remain absent. It then runs the deployment, migration, and verifier attack fixtures. `make lint` applies ShellCheck to the Bash package, scripts, and tests.
+
+Complete these manual fresh-session checks:
 
 - Confirm the core symlinks and local Git identity exist: `test -L ~/.bashrc && test -L ~/.config/starship.toml && test -L ~/.config/nvim/lua/config/options.lua && test -f ~/.config/git/config.local`
 - Confirm the OpenCode theme symlink exists: `test -L ~/.config/opencode/themes/gruvbox.json`
@@ -330,10 +339,10 @@ A repo-root `Makefile` keeps the package list in one place and wraps the routine
 
 - `make stow` / `make unstow` / `make dry-run` / `make restow` - the stow command sets from Setup
 - `make stow-all` - stows EyrAgents' `opencode` package first, then all packages here
-- `make verify` - every Git-visible Stow source resolves to its deployed target, the local Git identity exists, Bash and Lua syntax pass, the Neovim bootstrap and lockfile are valid, `yazi.toml` parses, every twin matches EyrArcHy, and guarded deployment fixtures pass; required verifier tools fail closed
+- `make verify` - delegate fail-closed host, deployment, identity, syntax, format, runtime, twin, and theme-tombstone checks to `scripts/verify.sh`, then run every fixture suite
 - `make clean` - WSL-only, all-or-nothing ownership preflight followed by managed-link removal and mutable-directory preparation
 - `make migrate-nvim` - WSL-only, preflight and back up recognized regular LazyVim starter files before stowing the self-contained Neovim package
-- `make test` - fake-home attack, ownership, migration, and rollback-boundary fixtures
+- `make test` - fake-home attack, ownership, migration, verifier, and rollback-boundary fixtures; the loop stops on the first failing suite
 - `make lint` - ShellCheck over the bash package, `scripts/`, and `tests/`; `.shellcheckrc` disables the upstream-derived warnings so new issues stand out
 - `make wt-diff` - diff the tracked Windows Terminal settings against the deployed Windows-side file (normalized with `jq`, since Windows Terminal rewrites key order)
 - `make wt-pull` - WSL-only, validate and atomically copy deployed Windows Terminal settings into the repo for review

@@ -5,7 +5,7 @@ Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basec
 ## Load Map
 
 - Claude Code loads this file through the root `CLAUDE.md` `@AGENTS.md` import; skills load on invocation only.
-- The `Makefile` is the single source of the package list; `README.md` carries the human-facing setup, verification, and maintenance detail.
+- The `Makefile` is the single source of the package and twin lists; `scripts/verify.sh` consumes both through environment arguments, and `README.md` carries the human-facing setup, verification, and maintenance detail.
 - Repo-root `.claude/settings.json` and `opencode.json` are per-tool project allowlists for this repo's verification make targets (`verify`, `lint`).
 
 ## Invariants
@@ -13,6 +13,7 @@ Self-contained WSL Arch dotfiles adapted from [Omarchy](https://github.com/basec
 - Target machine: WSL; run stow and make targets only on the WSL host.
 - When editing sibling dotfiles repos, use identical wording for shared concepts; only repo-specific values (scope, package lists, invariants) differ.
 - The Makefile `TWIN_SPECS` files (nvim vault plugin specs, the `tdw` and `hdw` workspace functions, `yazi.toml`) are byte-identical twins with EyrArcHy; `make verify` fails on drift.
+- `make verify` must fail closed across WSL2/interoperability, the command baseline, deployment ownership, resolved Git identity, owned config syntax and runtime parsing, twins, and theme tombstones; fixture-only overrides must not weaken normal mode.
 - Gruvbox is the only configured theme; terminal-side files track Omarchy's semantic palette, while Neovim and OpenCode track `ellisonleao/gruvbox.nvim`'s dark palette and highlights.
 - `nvim/` owns the LazyVim bootstrap and generated plugin lockfile; setup must not require a separate starter clone.
 - `make migrate-nvim` recognizes only the pinned predecessor bytes for six static starter files, accepts the host-generated lockfile as variable content, verifies a complete timestamped backup before removal, and leaves starter `LICENSE`, `README.md`, and `.gitignore` files untouched.
