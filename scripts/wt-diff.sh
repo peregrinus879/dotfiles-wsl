@@ -2,6 +2,9 @@
 # Diff the tracked Windows Terminal settings.json against the deployed
 # Windows-side file. Run from the repo root on the WSL machine.
 #
+# Usage: scripts/wt-diff.sh [--push]
+#   --push  back up changed deployed settings, then replace them from the repo
+#
 # Set WT_SETTINGS to the deployed file path to skip auto-detection.
 set -euo pipefail
 
@@ -13,7 +16,9 @@ abort() {
   exit 2
 }
 
-(( $# == 0 )) || abort "usage: scripts/wt-diff.sh"
+mode=${1:-diff}
+(( $# <= 1 )) || abort "usage: scripts/wt-diff.sh [--push]"
+[[ $mode == diff || $mode == --push ]] || abort "usage: scripts/wt-diff.sh [--push]"
 
 deployed="${WT_SETTINGS:-}"
 if [[ -z "${deployed}" ]]; then
@@ -45,8 +50,45 @@ normalize() {
   strip_bom "$1" | jq -S .
 }
 
+same_settings() {
+  diff -q <(normalize "$tracked") <(normalize "$deployed") >/dev/null
+}
+
+tmp=""
+cleanup() {
+  [[ -z $tmp || ! -e $tmp ]] || rm -f -- "$tmp"
+}
+trap cleanup EXIT
+
+atomic_copy_json() {
+  local source=$1 destination=$2 destination_dir
+  destination_dir=$(dirname -- "$destination")
+  tmp=$(mktemp "$destination_dir/.settings.json.tmp.XXXXXX")
+  strip_bom "$source" >"$tmp"
+  validate_json "$tmp"
+  chmod --reference="$destination" "$tmp"
+  mv -f -- "$tmp" "$destination"
+  tmp=""
+}
+
 validate_json "$deployed"
 validate_json "$tracked"
+
+if [[ $mode == --push ]]; then
+  if same_settings; then
+    echo "no changes: tracked and deployed settings already match"
+    exit 0
+  fi
+
+  timestamp=$(date +%Y%m%d-%H%M%S)
+  backup="${deployed}.backup-${timestamp}"
+  [[ ! -e $backup ]] || abort "backup already exists: $backup"
+  cp -p -- "$deployed" "$backup"
+  atomic_copy_json "$tracked" "$deployed"
+  printf 'backed up deployed settings: %s\n' "$backup"
+  printf 'pushed tracked settings: %s\n' "$deployed"
+  exit 0
+fi
 
 echo "tracked:  ${tracked}"
 echo "deployed: ${deployed}"

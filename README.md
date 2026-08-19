@@ -62,7 +62,7 @@ Key ownership rules:
 - Claude Code launches use the supported maximum effort, `--effort max`.
 - Interactive Bash exports `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` and `OPENCODE_ENABLE_EXA=1`; EyrAgents owns OpenCode runtime configuration
 - EyrAgents owns shared OpenCode runtime and TUI configuration; its `system` theme selection inherits the Windows Terminal ANSI palette
-- `windows-terminal/` stays Windows-side and intentionally tracks the full paste-ready `settings.json`; deployment is manual
+- `windows-terminal/` stays Windows-side and intentionally tracks the full paste-ready `settings.json`; setup deploys it through idempotent, backup-first `make wt-push`
 
 ## Setup
 
@@ -319,26 +319,25 @@ Authentication failures do not indicate a dotfile deployment failure; resolve ac
 
 ### 11. Windows Terminal
 
-Open Windows Terminal settings JSON with `Ctrl+Shift+,` and replace the contents with `windows-terminal/settings.json`.
+Launch Windows Terminal once so its settings file exists, then complete the required automated deployment step from WSL:
 
-This repo intentionally tracks the full `settings.json` so it can be copied and pasted as-is without reconstructing a partial JSON fragment.
+```bash
+cd ~/Projects/eyrie/eyrwsl
+make wt-push
+make wt-diff
+```
 
-After pasting on a fresh Windows install, confirm the default profile still resolves to `archlinux`; if Windows Terminal warns about a missing default profile, re-select it once in the settings UI.
+`make wt-push` resolves the active Windows account through PowerShell and validates both JSON files. If they already match, it exits without writing anything. If they differ, it creates a timestamped `settings.json.backup-<timestamp>` beside the deployed file and atomically replaces the deployment with the tracked file. The following `make wt-diff` confirms there is no normalized drift after Windows Terminal's key-order rewrites.
 
-Alternatively, edit the file directly at:
+To roll back, copy the reported backup over the deployed `settings.json`. Delete obsolete backups manually after confirming the replacement is stable. Set `WT_SETTINGS` only when Windows Terminal uses a nonstandard settings path.
+
+If automatic discovery is unavailable, open Windows Terminal settings JSON with `Ctrl+Shift+,` and replace its contents with the full tracked `windows-terminal/settings.json`. The deployed file normally lives at:
 
 ```text
 %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
 ```
 
-From WSL, compare the tracked and deployed files without changing either one:
-
-```bash
-cd ~/Projects/eyrie/eyrwsl
-make wt-diff
-```
-
-The comparison resolves the active Windows account through PowerShell, validates both JSON files, normalizes Windows Terminal's key ordering, and reports any drift. Set `WT_SETTINGS` only when Windows Terminal uses a nonstandard settings path.
+After deployment, confirm the default profile resolves to `archlinux`; if Windows Terminal warns about a missing default profile, re-select it once in the settings UI.
 
 ## Verify
 
@@ -384,6 +383,7 @@ A repo-root `Makefile` keeps the package list in one place and wraps the routine
 - `make test` - fake-home deployment, ownership, and verifier attack fixtures; the loop stops on the first failing suite
 - `make lint` - ShellCheck over the bash package, `scripts/`, and `tests/`; `.shellcheckrc` disables the upstream-derived warnings so new issues stand out
 - `make wt-diff` - diff the tracked Windows Terminal settings against the deployed Windows-side file (normalized with `jq`, since Windows Terminal rewrites key order)
+- `make wt-push` - WSL-only, validate both settings files, back up a changed deployment, and atomically deploy the tracked file
 
 `nvim/.config/nvim/lazy-lock.json` is generated but tracked. Update it only through an intentional Lazy sync, review the pinned revision changes, verify a clean headless bootstrap, and commit the lockfile with the plugin-spec change that required it.
 
