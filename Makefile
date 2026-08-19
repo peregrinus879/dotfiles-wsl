@@ -2,7 +2,7 @@
 # The package list here is the single source of truth for the stow command sets.
 
 SHELL := /bin/bash
-PACKAGES := bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
+PACKAGES := bash btop editorconfig fastfetch git nvim starship tmux yazi
 AI_REPO := ../eyragents
 
 .PHONY: help require-wsl stow unstow dry-run restow stow-all verify test clean lint wt-diff wt-pull wt-push

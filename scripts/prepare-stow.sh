@@ -4,7 +4,7 @@ set -euo pipefail
 
 repo=$(realpath -e -- "$(dirname -- "${BASH_SOURCE[0]}")/..")
 ai_repo=$(realpath -m -- "${EYRAGENTS_REPO:-$repo/../eyragents}")
-packages=(bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi)
+packages=(bash btop editorconfig fastfetch git nvim starship tmux yazi)
 
 declare -a remove_links=()
 declare -a create_dirs=()

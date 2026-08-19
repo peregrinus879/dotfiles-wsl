@@ -46,7 +46,7 @@ Omarchy is an opinionated Arch Linux distribution targeting a full desktop envir
 - [btop](https://github.com/aristocratos/btop) - config options and themes
 - [fastfetch Wiki](https://github.com/fastfetch-cli/fastfetch/wiki) - modules and JSON config
 
-Gruvbox has two intentional canons in this repo. Terminal-side files (btop, Yazi, and Windows Terminal) track `themes/gruvbox/colors.toml` in `basecamp/omarchy`, including foreground `#d4be98` and accent/blue `#7daea3`. Neovim and the OpenCode theme track `ellisonleao/gruvbox.nvim`'s classic dark palette, including foreground `#ebdbb2` and blue `#83a598`. The tmux status bar uses upstream's ANSI palette names, resolved through the Windows Terminal scheme. Keep each file aligned with its own canon.
+Gruvbox follows Omarchy's behavior on each owned surface. Windows Terminal and btop use the semantic palette from `themes/gruvbox/colors.toml`; Neovim selects `ellisonleao/gruvbox.nvim`; tmux and Yazi use ANSI names resolved through Windows Terminal. OpenCode's `system` theme is selected by EyrAgents and inherits the same terminal palette.
 
 ## Intentional Deviations
 
@@ -67,7 +67,7 @@ Gruvbox has two intentional canons in this repo. Terminal-side files (btop, Yazi
 
 ### Theme
 
-- Gruvbox is configured across every owned theme surface. Omarchy's multi-theme plugin set and theme hot-reload infrastructure are omitted.
+- Gruvbox is configured on Windows Terminal, btop, and Neovim; ANSI-aware applications inherit the terminal palette. Omarchy's multi-theme plugin set and theme hot-reload infrastructure are omitted.
 
 ### Terminal
 
@@ -130,12 +130,8 @@ Gruvbox has two intentional canons in this repo. Terminal-side files (btop, Yazi
 
 ### OpenCode
 
-- `opencode-wsl/` stows `~/.config/opencode/themes/gruvbox.json` so OpenCode can select the EyrWSL Gruvbox mapping.
-- The theme file is WSL-specific theme availability, not shared OpenCode runtime config. Runtime config remains owned by EyrAgents.
-- `~/.config/opencode/` and `~/.config/opencode/themes/` stay real merge directories so EyrAgents and `opencode-wsl` can both link files inside them.
-- The repo does not force OpenCode's selected theme. Select `gruvbox` with `/theme` so the choice remains a user-level OpenCode preference.
-- The custom file intentionally overrides OpenCode's built-in theme of the same name. It declares the official `https://opencode.ai/theme.json` identifier and includes the complete current role set; verification treats the documented runtime format as authoritative because the public schema URL is not retrievable.
-- Flat color references preserve the dark-only plugin canon without inventing a light palette. Definitions and syntax roles track `gruvbox.nvim/lua/gruvbox.lua`: functions and strings use green, identifiers use blue, numbers use purple, types use yellow, keywords use red, and operators use orange. Diff backgrounds use the plugin's dark red and dark green values.
+- Shared OpenCode runtime and TUI configuration remains owned by EyrAgents. Its `system` theme selection uses ANSI colors and terminal defaults, matching Omarchy's terminal-aware behavior without a custom palette in EyrWSL.
+- `~/.config/opencode/` stays a real directory so EyrAgents can link configuration while OpenCode manages its runtime content.
 
 ### Fastfetch
 
@@ -158,7 +154,7 @@ Gruvbox has two intentional canons in this repo. Terminal-side files (btop, Yazi
 
 - Added entirely. Yazi is not part of Omarchy.
 - `yazi.toml` keeps the local layout and behavior choices: ratio `[2, 4, 4]`, hidden files shown, directories sorted first, `sort_by = "natural"`, and `linemode = "size"`.
-- `theme.toml` maps mode, status, tab, and manager readability roles to the Omarchy Gruvbox semantic palette.
+- Yazi's built-in theme uses named ANSI colors for its primary interface, so Windows Terminal supplies the Gruvbox palette without a local theme override.
 
 ### WSL Bootstrap
 

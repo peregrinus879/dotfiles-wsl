@@ -14,7 +14,7 @@ Local reference clones live under `~/Projects/quarry/`:
 - `omarchy/` - main repo for bash, tmux, starship, git, fastfetch, btop, and editorconfig references; tracks the upstream default branch, which upstream moves between releases, so re-resolve its default branch and pin EyrWSL release comparisons to tag `v4.0.0` (`git show v4.0.0:<path>`)
 - `omarchy-pkgs/` - package builds, including the Omarchy Neovim package
 - `gruvbox.nvim/` - Gruvbox Neovim plugin source selected by Omarchy
-- `yazi/` - Yazi reference repo for configuration, theme, and feature changes
+- `yazi/` - Yazi reference repo for configuration and feature changes
 - `obsidian.nvim/` - obsidian.nvim upstream for the vault plugin spec
 - `terminal/` - Windows Terminal reference repo for settings structure and feature changes
 
@@ -60,7 +60,7 @@ Upstream URLs, official docs, and descriptions live in `DEVIATIONS.md` (Referenc
 - Always check all relevant sources, not just one
 - Never assume a difference is intentional without verifying it is documented in `DEVIATIONS.md`
 - Fetch changeable upstream and package facts at maintenance time instead of caching versions in this skill
-- Keep the dual Gruvbox palette canons: terminal-side files track `themes/gruvbox/colors.toml` (`#7daea3` accent), while Neovim and the OpenCode theme track `gruvbox.nvim` (`#83a598` blue)
-- Keep shared AI agent harness runtime config in EyrAgents; this repo owns only WSL-specific OpenCode theme availability
+- Keep Windows Terminal and btop on Omarchy's semantic Gruvbox palette, Neovim on Omarchy's `gruvbox.nvim` selection, and ANSI-aware applications on terminal inheritance
+- Keep shared AI agent harness and OpenCode TUI configuration in EyrAgents; this repo carries no custom OpenCode theme
 - System packages, OpenCode, and Codex CLI come from official Arch repos; Claude Code and Herdr use canonical installers only while official packages are unavailable. No AUR packages or AUR helper.
 - Keep Windows-specific behavior explicit. Anything that depends on `clip.exe`, `powershell.exe`, or Windows Terminal should be documented as a Windows interop concern.

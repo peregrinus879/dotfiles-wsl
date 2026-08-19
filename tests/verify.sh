@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 TMP=$(mktemp -d)
 trap 'rm -rf -- "$TMP"' EXIT
-PACKAGES="bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi"
+PACKAGES="bash btop editorconfig fastfetch git nvim starship tmux yazi"
 
 fail() {
   printf 'FAIL: %s\n' "$1" >&2
@@ -22,7 +22,7 @@ make_baseline() {
   git -C "$repo" init -q
   git -C "$repo" add .
   printf '[user]\n  name = Fixture User\n  email = fixture@example.invalid\n' >"$home/.config/git/config.local"
-  stow -t "$home" -d "$repo" bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
+  stow -t "$home" -d "$repo" bash btop editorconfig fastfetch git nvim starship tmux yazi
 }
 
 clone_baseline() {
@@ -64,7 +64,7 @@ printf '[broken\n' >"$TMP/bad-starship/repo/starship/.config/starship.toml"
 expect_failure "malformed Starship TOML" run_verify "$TMP/bad-starship" repo
 
 clone_baseline bad-yazi
-printf '[mgr\n' >"$TMP/bad-yazi/repo/yazi/.config/yazi/theme.toml"
+printf '[mgr\n' >"$TMP/bad-yazi/repo/yazi/.config/yazi/yazi.toml"
 expect_failure "malformed Yazi TOML" run_verify "$TMP/bad-yazi" repo
 
 clone_baseline bad-lua
@@ -90,12 +90,6 @@ expect_failure "malformed tmux config" run_verify "$TMP/bad-tmux" repo
 clone_baseline bad-lock
 printf '{}\n' >"$TMP/bad-lock/repo/nvim/.config/nvim/lazy-lock.json"
 expect_failure "incomplete LazyVim lock" run_verify "$TMP/bad-lock" repo
-
-clone_baseline undefined-theme
-theme="$TMP/undefined-theme/repo/opencode-wsl/.config/opencode/themes/gruvbox.json"
-jq '.theme.primary = "missingDefinition"' "$theme" >"$theme.tmp"
-mv -- "$theme.tmp" "$theme"
-expect_failure "undefined OpenCode theme reference" run_verify "$TMP/undefined-theme" repo
 
 clone_baseline non-wsl
 if HOME="$TMP/non-wsl/home" \

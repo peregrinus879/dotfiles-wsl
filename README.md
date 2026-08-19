@@ -2,7 +2,7 @@
 
 Self-contained Arch Linux dotfiles for WSL, adapted from [Omarchy](https://github.com/basecamp/omarchy), managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
-EyrWSL carries the full terminal baseline for Arch Linux running inside WSL, plus the WSL and Windows-specific pieces: Windows Terminal, clipboard integration, and OpenCode theme availability. It keeps Omarchy's terminal tooling and general feel while dropping desktop-specific components that do not apply inside WSL.
+EyrWSL carries the full terminal baseline for Arch Linux running inside WSL, plus the WSL and Windows-specific pieces: Windows Terminal and clipboard integration. It keeps Omarchy's terminal tooling and general feel while dropping desktop-specific components that do not apply inside WSL.
 
 Eyrie is the shared project habitat, reflected locally in `~/Projects/eyrie/`. `Eyr` is its shortened family prefix, used by EyrAgents, EyrArcHy, and EyrWSL.
 
@@ -18,7 +18,7 @@ Omarchy + WSL deviations        → EyrWSL
 
 - [`eyragents`](https://github.com/peregrinus879/eyragents) - AI agent harness: Claude Code, Codex, and OpenCode settings, shared guidance, and commit workflow
 - [`eyrarchy`](https://github.com/peregrinus879/eyrarchy) - Personal Omarchy customizations: Bash overrides, Hyprland bindings, Neovim plugins, and Yazi
-- [`eyrwsl`](https://github.com/peregrinus879/eyrwsl) - Self-contained WSL Arch environment: terminal baseline plus Windows Terminal, clipboard integration, and OpenCode theme
+- [`eyrwsl`](https://github.com/peregrinus879/eyrwsl) - Self-contained WSL Arch environment: terminal baseline plus Windows Terminal and clipboard integration
 
 Related clones can live side by side under `~/Projects/eyrie/`, but EyrWSL installs and verifies independently.
 
@@ -48,10 +48,9 @@ editorconfig/      Editor formatting rules (.editorconfig)
 fastfetch/         System info config (config.jsonc)
 git/               Git config (config, ignore)
 nvim/              Self-contained Neovim config (bootstrap, lock, LazyVim config and plugins)
-opencode-wsl/      OpenCode Gruvbox theme (themes/gruvbox.json)
 starship/          Prompt config (starship.toml)
 tmux/              Tmux config (tmux.conf)
-yazi/              File manager config (yazi.toml, theme.toml)
+yazi/              File manager config (yazi.toml)
 windows-terminal/  Windows Terminal settings.json, deployed explicitly, not stowed
 ```
 
@@ -62,8 +61,7 @@ Key ownership rules:
 - Bash supports additive machine overlays through `~/.config/bash-overlays/*`; the directory is optional and reserved for untracked machine-local additions
 - Claude Code launches use the supported maximum effort, `--effort max`.
 - Interactive Bash exports `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` and `OPENCODE_ENABLE_EXA=1`; EyrAgents owns OpenCode runtime configuration
-- EyrAgents keeps ownership of shared OpenCode runtime config; `opencode-wsl/` only adds Gruvbox theme availability without forcing the selected theme
-- `~/.config/opencode/` and `~/.config/opencode/themes/` must be real merge directories so EyrAgents and `opencode-wsl` can both link files inside them
+- EyrAgents owns shared OpenCode runtime and TUI configuration; its `system` theme selection inherits the Windows Terminal ANSI palette
 - `windows-terminal/` stays Windows-side and intentionally tracks the full paste-ready `settings.json`; deployment is manual or backup-first through `make wt-push`
 
 ## Setup
@@ -261,7 +259,7 @@ Preparation checks every endpoint before changing anything. It removes only syml
 
 A fresh Arch user normally has a regular `~/.bashrc` from `/etc/skel`, so expect the first preparation run to report it. Compare any needed local content, move or merge it deliberately, and rerun `make clean`; the script never replaces it automatically.
 
-The script keeps Git, Neovim, OpenCode, btop, and Yazi mutable or merge directories real. Other immutable config directories may use GNU Stow's normal tree-folding behavior. After preparation, use `make stow-all` when EyrAgents is present so its OpenCode config is linked before EyrWSL adds the theme.
+The script keeps Git, Neovim, OpenCode, btop, and Yazi mutable or merge directories real. Other immutable config directories may use GNU Stow's normal tree-folding behavior. After preparation, use `make stow-all` when EyrAgents is present so its OpenCode configuration is linked.
 
 ### 9. Stow
 
@@ -280,7 +278,7 @@ Start a new terminal session, or run `source ~/.bashrc`, for the shell config to
 
 ```bash
 cd ~/Projects/eyrie/eyrwsl
-stow -D -v -t ~ bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
+stow -D -v -t ~ bash btop editorconfig fastfetch git nvim starship tmux yazi
 ```
 
 ### Dry Run
@@ -289,7 +287,7 @@ Preview what stow would do without making changes:
 
 ```bash
 cd ~/Projects/eyrie/eyrwsl
-stow -v -n -t ~ bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
+stow -v -n -t ~ bash btop editorconfig fastfetch git nvim starship tmux yazi
 ```
 
 ### Re-stow
@@ -298,16 +296,16 @@ To update symlinks after the repo content changes (same clone path):
 
 ```bash
 cd ~/Projects/eyrie/eyrwsl
-stow -R -v -t ~ bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
+stow -R -v -t ~ bash btop editorconfig fastfetch git nvim starship tmux yazi
 ```
 
 To migrate from a different clone path, unstow from the old location first:
 
 ```bash
 cd /old/clone/path
-stow -D -v -t ~ bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
+stow -D -v -t ~ bash btop editorconfig fastfetch git nvim starship tmux yazi
 cd ~/Projects/eyrie/eyrwsl
-stow -v -t ~ bash btop editorconfig fastfetch git nvim opencode-wsl starship tmux yazi
+stow -v -t ~ bash btop editorconfig fastfetch git nvim starship tmux yazi
 ```
 
 If the old clone is no longer available, run the full cleanup in section 8 before stowing.
@@ -371,7 +369,6 @@ make lint
 Complete these manual fresh-session checks:
 
 - Confirm the core symlinks and local Git identity exist: `test -L ~/.bashrc && test -L ~/.config/starship.toml && test -L ~/.config/nvim/lua/config/options.lua && test -f ~/.config/git/config.local`
-- Confirm the OpenCode theme symlink exists: `test -L ~/.config/opencode/themes/gruvbox.json`
 - Start a fresh shell and confirm Bash, Starship, and Tmux load without errors.
 - Confirm `printenv OPENCODE_DISABLE_EXTERNAL_SKILLS` and `printenv OPENCODE_ENABLE_EXA` each print `1`.
 - Confirm `type tdw` shows the tmux workspace function; from a project directory, `tdw cc` or `tdw oc` opens its session (`-c` continues that agent's last conversation; bare `tdw` re-attaches an existing session). Creating a session fails before changing tmux state when the selected agent is unavailable.
@@ -380,7 +377,7 @@ Complete these manual fresh-session checks:
 - Run `nvim` once and confirm plugins install successfully and Gruvbox loads.
 - In Neovim, confirm yanks reach the Windows clipboard and pastes from the Windows clipboard reach Neovim.
 - If the vault is synced to this machine, open a vault note and confirm obsidian.nvim loads (`<leader>oo` opens the note switcher).
-- In OpenCode, run `/theme` and confirm `gruvbox` is available. Select it if OpenCode is still using another theme.
+- In OpenCode, run `/theme` and confirm `system` is selected so the TUI inherits Windows Terminal's Gruvbox ANSI palette.
 - Confirm Windows Terminal uses JetBrainsMono Nerd Font and the Gruvbox color scheme after applying `windows-terminal/settings.json`.
 
 ## Troubleshooting
@@ -389,7 +386,7 @@ Complete these manual fresh-session checks:
 - **Preparation reports a conflict**: Compare the reported path, move or merge any needed content, then rerun `make clean`. The script never deletes regular files, foreign links, broken links, or special files.
 - **Neovim clipboard not working**: Confirm `clip.exe` and `powershell.exe` are accessible from WSL (`which clip.exe`). If Windows interop is disabled, check `[interop]` in `/etc/wsl.conf`.
 - **Obsidian image paste unavailable**: `:Obsidian paste_img` expects `wl-clipboard` or `xclip`, which this WSL baseline does not install. Save the image through Windows or the vault's own workflow, then link or embed it from the note.
-- **OpenCode Gruvbox not listed**: Confirm `~/.config/opencode/themes/gruvbox.json` is a symlink to `opencode-wsl/.config/opencode/themes/gruvbox.json`. If `~/.config/opencode` or `~/.config/opencode/themes` is still a directory symlink to another dotfiles package, repeat the merge directory prep in section 8, then re-run the stow command.
+- **OpenCode does not match Windows Terminal**: Select `system` with `/theme`. When EyrAgents is installed, confirm `~/.config/opencode/tui.json` resolves into its `opencode` package.
 
 ## Maintenance
 

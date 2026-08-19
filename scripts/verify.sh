@@ -126,7 +126,6 @@ done < <(find "$repo/nvim" -type f -name '*.lua' -print0)
 toml_files=(
   starship/.config/starship.toml
   yazi/.config/yazi/yazi.toml
-  yazi/.config/yazi/theme.toml
   nvim/.config/nvim/stylua.toml
 )
 for relative in "${toml_files[@]}"; do
@@ -158,7 +157,6 @@ json_files=(
   nvim/.config/nvim/.neoconf.json
   nvim/.config/nvim/lazy-lock.json
   nvim/.config/nvim/lazyvim.json
-  opencode-wsl/.config/opencode/themes/gruvbox.json
   windows-terminal/settings.json
 )
 for relative in "${json_files[@]}"; do
@@ -174,18 +172,6 @@ if jq -e 'type == "object" and length > 0 and has("LazyVim") and has("gruvbox.nv
   ok "lazy-lock.json pins LazyVim and Gruvbox"
 else
   problem "lazy-lock.json is missing required pins"
-fi
-
-theme_roles='["primary","secondary","accent","error","warning","success","info","text","textMuted","background","backgroundPanel","backgroundElement","border","borderActive","borderSubtle","diffAdded","diffRemoved","diffContext","diffHunkHeader","diffHighlightAdded","diffHighlightRemoved","diffAddedBg","diffRemovedBg","diffContextBg","diffLineNumber","diffAddedLineNumberBg","diffRemovedLineNumberBg","markdownText","markdownHeading","markdownLink","markdownLinkText","markdownCode","markdownBlockQuote","markdownEmph","markdownStrong","markdownHorizontalRule","markdownListItem","markdownListEnumeration","markdownImage","markdownImageText","markdownCodeBlock","syntaxComment","syntaxKeyword","syntaxFunction","syntaxVariable","syntaxString","syntaxNumber","syntaxType","syntaxOperator","syntaxPunctuation"]'
-if jq -e --argjson roles "$theme_roles" '
-  ."$schema" == "https://opencode.ai/theme.json"
-  and ((.theme | keys | sort) == ($roles | sort))
-  and ([.defs[] | select(test("^#[0-9A-Fa-f]{6}$") | not)] | length == 0)
-  and (([.theme[] | select(type == "string" and . != "none" and (startswith("#") | not))] - (.defs | keys)) | length == 0)
-' "$repo/opencode-wsl/.config/opencode/themes/gruvbox.json" >/dev/null 2>&1; then
-  ok "OpenCode theme has the complete role set and resolved references"
-else
-  problem "OpenCode theme roles or references are invalid"
 fi
 
 if jq -e '
