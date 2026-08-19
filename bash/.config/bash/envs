@@ -1,5 +1,5 @@
 # Editor
-export EDITOR="nvim"
+export EDITOR="${EDITOR:-nvim}"
 export SUDO_EDITOR="$EDITOR"
 
 # Tools
@@ -7,5 +7,44 @@ export BAT_THEME=ansi
 export MANROFFOPT="-c"
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
-# Path
-export PATH="$HOME/.local/bin:$HOME/.claude/bin:$HOME/.opencode/bin:/usr/local/bin:$PATH"
+# OpenCode host behavior; EyrAgents owns runtime configuration.
+export OPENCODE_DISABLE_EXTERNAL_SKILLS=1
+export OPENCODE_ENABLE_EXA=1
+
+# Login shells load /etc/locale.conf through /etc/profile.d/locale.sh. Mirror
+# that fallback for SSH and Herdr sessions that start non-login shells.
+if [[ -z ${LANG:-} ]]; then
+  [[ -r /etc/locale.conf ]] && source /etc/locale.conf
+  LANG="${LANG:-C.UTF-8}"
+  export LANG LANGUAGE LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY \
+    LC_MESSAGES LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT \
+    LC_IDENTIFICATION
+fi
+
+# Remove the legacy standalone OpenCode path while preserving every other PATH entry.
+_path=""
+IFS=: read -ra _path_entries <<<"$PATH"
+for _path_entry in "${_path_entries[@]}"; do
+  [[ $_path_entry == "$HOME/.opencode/bin" ]] && continue
+  if [[ -z $_path ]]; then
+    _path="$_path_entry"
+  else
+    _path="$_path:$_path_entry"
+  fi
+done
+PATH="$_path"
+unset _path _path_entry _path_entries
+
+# Preserve user-level standalone tools without shadowing Pacman's OpenCode.
+case ":$PATH:" in
+  *":/usr/local/bin:"*) ;;
+  *) export PATH="$PATH:/usr/local/bin" ;;
+esac
+case ":$PATH:" in
+  *":$HOME/.claude/bin:"*) ;;
+  *) export PATH="$PATH:$HOME/.claude/bin" ;;
+esac
+case ":$PATH:" in
+  *":$HOME/.local/bin:"*) ;;
+  *) export PATH="$PATH:$HOME/.local/bin" ;;
+esac

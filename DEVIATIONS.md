@@ -4,7 +4,7 @@
 
 This document records the intentional differences carried by EyrWSL relative to [Omarchy](https://github.com/basecamp/omarchy), and defines the boundary between this repo and its siblings.
 
-Omarchy is the upstream reference. This repo carries the full terminal baseline for Arch Linux inside WSL, plus the WSL and Windows-specific behavior that a Linux desktop distribution does not cover.
+Omarchy tag `v4.0.0` is the stable upstream baseline. This repo carries the full terminal baseline for Arch Linux inside WSL, plus the WSL and Windows-specific behavior that a Linux desktop distribution does not cover.
 
 ## Deviation Policy
 
@@ -17,12 +17,15 @@ Omarchy is an opinionated Arch Linux distribution targeting a full desktop envir
 3. **Keep Windows-specific behavior explicit.** Anything that depends on `clip.exe`, `powershell.exe`, or Windows Terminal should be documented as a Windows interop concern.
 4. **Use GNU Stow for dotfile management.** Omarchy uses direct file copies and packaged assets. This repo uses symlink-based package ownership for clearer separation and reuse.
 5. **Single theme, no switching.** Omarchy supports many themes and hot-reload infrastructure. This repo uses Miasma only, so theme switching infrastructure is intentionally omitted.
-6. **Official Arch repos only.** The baseline depends on no AUR packages and installs no AUR helper.
+6. **Pacman-first package ownership.** System packages, OpenCode, and Codex CLI come from official Arch repositories. Claude Code and Herdr use canonical standalone installers only while official packages are unavailable. The baseline depends on no AUR packages and installs no AUR helper.
 
 ## Reference Sources
 
 - [basecamp/omarchy](https://github.com/basecamp/omarchy) - main repo for bash, tmux, starship, git, fastfetch, btop, and editorconfig references
 - [omacom-io/omarchy-pkgs](https://github.com/omacom-io/omarchy-pkgs) - package builds, including the Omarchy Neovim package
+- [OpenAI Codex](https://github.com/openai/codex) and the [Arch `openai-codex` package](https://archlinux.org/packages/extra/x86_64/openai-codex/) - official terminal CLI upstream and signed Arch package
+- [OpenCode](https://github.com/anomalyco/opencode) and the [Arch `opencode` package](https://archlinux.org/packages/extra/x86_64/opencode/) - terminal coding agent upstream and signed Arch package
+- [Herdr](https://herdr.dev/) - terminal workspace manager and canonical installer
 - [OldJobobo/miasma.nvim](https://github.com/OldJobobo/miasma.nvim) - Miasma Neovim plugin used by Omarchy (optimized fork of `xero/miasma.nvim`)
 - [microsoft/terminal](https://github.com/microsoft/terminal) - Windows Terminal settings structure and feature changes
 - [sxyazi/yazi](https://github.com/sxyazi/yazi) and the [Yazi docs](https://yazi-rs.github.io/docs/) - file manager upstream and configuration reference
@@ -74,9 +77,14 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 - Optional Bash overlays are sourced from `~/.config/bash-overlays/*` after the shared init. The directory is untracked and reserved for machine-local additions.
 - Dropped aliases: `open` (GUI-only), `d='docker'`, and `r='rails'`.
 - The kitty-conditional `ff` image-preview variant is omitted; Windows Terminal is not kitty, so the conditional would always take the plain `bat` branch kept here.
-- `claude` is aliased to add `--effort ultracode`, so every interactive launch, including `cx` and `tdl`-launched AIs, inherits it via alias expansion; scripts and hooks stay plain. Ultracode is session-only upstream and cannot be set in `settings.json`.
+- Claude Code launches use the supported maximum effort, `--effort max`. The `claude` alias applies it to every interactive launch, including `cx` and `tdl`-launched AIs; scripts and hooks stay plain because they do not expand aliases.
 - `y()` is added for Yazi cd-on-exit support. Yazi is not part of Omarchy.
-- `tdw` is added: one tmux session per project (Git root, else current directory) with two windows: a full-width AI agent (`tdw cc` for Claude Code, `tdw oc` for OpenCode; the choice is mandatory at creation so a single agent owns the working tree) and `$EDITOR` above a 25% shell. `-c` continues that agent's last conversation in the project; bare `tdw` re-attaches an existing session. Additive alongside Omarchy's `tdl`/`tds` pane layouts; tracked as a byte-identical twin with EyrArcHy. The `t`/`h` prefix follows Omarchy's multiplexer lettering (`tdl`/`hdl`).
+- `tdw` is added: one tmux session per project (Git root, else current directory) with two windows: a full-width AI agent (`tdw cc` for Claude Code, `tdw oc` for OpenCode; the choice is mandatory at creation so a single agent owns the working tree) and `$EDITOR` above a 25% shell. `-c` continues that agent's last conversation in the project; bare `tdw` re-attaches an existing session. Creation checks the selected agent before changing tmux state. Additive alongside Omarchy's `tdl` pane layout. The `t`/`h` prefix follows Omarchy's multiplexer lettering (`tdl`/`hdl`).
+- `hdw` is added: the Herdr counterpart of `tdw`, one workspace per project with the same agent and editor/shell layout, single-agent choice, continue flag, and root-collision guard. It starts a headless Herdr server when needed and falls back to attaching plain Herdr with a rerun hint. `tdw` and `hdw` are byte-identical twins with EyrArcHy.
+- Omarchy `v4.0.0` Herdr helpers `hdl`, `hdlm`, and `hsl` are adopted. `hds` is omitted because it invokes Hunk, which is outside the official-repository baseline.
+- Omarchy `v4.0.0` SSH port-forwarding, dropped-connection recovery, and rsync-on-change helpers are adopted. The rsync watcher is backed by the official `rsync` and `inotify-tools` packages.
+- Interactive Bash exports `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` and `OPENCODE_ENABLE_EXA=1` so terminal-launched OpenCode selects its EyrAgents-managed skills and configured web-search tool. Shell initialization removes inherited `$HOME/.opencode/bin` entries and appends approved user-level directories after existing system entries, so Pacman's OpenCode and Codex binaries retain precedence.
+- Safe AI launch defaults intentionally differ from Omarchy: `c` remains plain OpenCode, `cx` uses Claude's reviewed `auto` permission mode, and `cy` honors EyrAgents' Codex defaults.
 - `mise`-specific shell handling is omitted.
 - No `pacman` alias and no AUR helper. Omarchy routes updates through `omarchy-update-perform`, which is Hyprland/desktop-bound; this repo uses plain `pacman` against official repos only.
 
@@ -96,10 +104,11 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 
 - Upstream's `M-Enter`, `M-S-Enter`, and `M-Escape` pane bindings are adopted verbatim; `alt+enter` is unbound in `windows-terminal/settings.json` (`"id": null`) because Windows Terminal's default binds it to fullscreen and would swallow `M-Enter` before it reaches tmux.
 - The `?` keybindings-popup binding is omitted; it shells out to `omarchy-menu-tmux-keybindings`, which exists only on an Omarchy install.
+- Omarchy `v4.0.0` binding descriptions, generic clipboard feature, and terminal title settings are adopted. The Kitty-only extended-key feature is omitted because Windows Terminal is the host terminal.
 
 ### Tmux Dev Layout
 
-- `tdl`, `tdlm`, and `tsl` track Omarchy's v3.8.4 `default/bash/fns/tmux` verbatim.
+- `tdl`, `tdlm`, and `tsl` retain the `v4.0.0`-compatible terminal layouts. `tdl` selects `editor_pane` rather than the upstream tag's unset `opencode_pane`; Hunk-dependent `tds` is omitted.
 
 ### Neovim
 
@@ -130,6 +139,7 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 - Omarchy's ASCII logo is replaced with fastfetch's built-in small logo.
 - Icon codepoints use the Material Design Icons range for broader terminal font compatibility.
 - Standard modules `shell` and `os` are added.
+- `display.disableLinewrap` follows the `v4.0.0` baseline so long values do not disturb the box layout.
 
 ### Btop
 
@@ -147,7 +157,7 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 
 - `/etc/wsl.conf` carries the default user and keeps Windows interop enabled, which the clipboard integration requires.
 - Windows-side installation of WSL, the Nerd Font, and Windows Terminal is documented in this repo's README.
-- The WSL baseline includes `inetutils` for the `hostname` host gate, `lua` for EyrWSL's fail-closed syntax verification, and `nodejs` for EyrAgents verification.
+- The WSL baseline includes `inetutils` for the `hostname` host gate, `lua` for EyrWSL's fail-closed syntax verification, `nodejs` for EyrAgents verification, `tree-sitter-cli` for LazyVim, and `man-db`/`man-pages` for local documentation. The official `openai-codex` and `opencode` packages own the AI terminal binaries.
 
 ## Skipped From Omarchy
 
@@ -156,6 +166,8 @@ The Miasma palette has two intentional canons in this repo. Terminal-side files 
 - `omarchy-fish`, `omarchy-zsh`, and `omarchy-walker`
 - `drives` functions such as `iso2sd` and `format-drive`
 - `transcoding` functions for video and image conversion
+- Hunk-dependent `tds` and `hds` layouts
+- Omarchy's `open`, `a`, and `mup` shell helpers, which depend on desktop launchers, `omarchy-agent`, or mise
 - Hardware-focused tooling and desktop automation
 - Theme switching infrastructure not needed for a single-theme setup
 - Shell or app packages outside the chosen Bash plus terminal-tooling baseline

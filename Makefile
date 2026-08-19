@@ -12,6 +12,7 @@ SIBLING := $(HOME)/Projects/eyrie/eyrarchy
 TWIN_SPECS := nvim/.config/nvim/lua/plugins/obsidian.lua \
   nvim/.config/nvim/lua/plugins/render-markdown.lua \
   bash/.config/bash/functions/tdw \
+  bash/.config/bash/functions/hdw \
   yazi/.config/yazi/yazi.toml
 
 .PHONY: help stow unstow dry-run restow stow-all verify clean lint wt-diff wt-pull

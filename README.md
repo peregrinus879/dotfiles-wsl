@@ -26,7 +26,7 @@ Local clones live side by side under `~/Projects/eyrie/`.
 
 - **Shell**: [Bash](https://www.gnu.org/software/bash/)
 - **Prompt**: [Starship](https://github.com/starship/starship)
-- **Multiplexer**: [Tmux](https://github.com/tmux/tmux)
+- **Terminal Workspaces**: [Tmux](https://github.com/tmux/tmux), [Herdr](https://herdr.dev/)
 - **Editor**: [Neovim](https://github.com/neovim/neovim) ([LazyVim](https://github.com/LazyVim/LazyVim))
 - **Version Control**: [Git](https://git-scm.com/), [GitHub CLI](https://cli.github.com/), [LazyGit](https://github.com/jesseduffield/lazygit)
 - **File Manager**: [Yazi](https://github.com/sxyazi/yazi), [eza](https://github.com/eza-community/eza), [zoxide](https://github.com/ajeetdsouza/zoxide)
@@ -60,6 +60,8 @@ Key ownership rules:
 - `nvim/` owns the full Neovim config, including `lua/config/options.lua` with the built-in WSL clipboard integration
 - `nvim/` includes the vault plugin specs (`obsidian.lua`, `render-markdown.lua`); the vault is expected at `~/Projects/vault` (override with `OBSIDIAN_VAULT`)
 - Bash supports additive machine overlays through `~/.config/bash-overlays/*`; the directory is optional and reserved for untracked machine-local additions
+- Claude Code launches use the supported maximum effort, `--effort max`. `tdw` and `hdw` are byte-identical twins with EyrArcHy.
+- Interactive Bash exports `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` and `OPENCODE_ENABLE_EXA=1`; EyrAgents owns OpenCode runtime configuration
 - EyrAgents keeps ownership of shared OpenCode runtime config; `opencode-wsl/` only adds Miasma theme availability without forcing the selected theme
 - `~/.config/opencode/` and `~/.config/opencode/themes/` must be real merge directories so EyrAgents and `opencode-wsl` can both link files inside them
 - `windows-terminal/` stays Windows-side, is applied manually, and intentionally tracks the full paste-ready `settings.json`
@@ -132,12 +134,22 @@ sudo locale-gen
 Install the baseline packages required by these dotfiles:
 
 ```bash
-sudo pacman -S --needed bash-completion bat btop diffutils eza fastfetch fd findutils fzf gcc git github-cli \
-  gum inetutils jq lazygit less lua make neovim nodejs openssh python ripgrep shellcheck starship \
-  stow sudo tmux unzip which yazi zoxide
+sudo pacman -S --needed 7zip bash-completion bat btop curl diffutils eza fastfetch fd file findutils \
+  fzf gcc git github-cli gum inetutils inotify-tools jq lazygit less lua make man-db man-pages \
+  neovim nodejs openai-codex openssh opencode procps-ng python ripgrep rsync shellcheck starship \
+  stow sudo tmux tree-sitter-cli unzip util-linux which yazi zoxide
 ```
 
-All baseline packages come from official Arch repositories. This repo intentionally depends on no AUR packages and installs no AUR helper.
+All baseline packages come from official Arch repositories. `openai-codex` installs the official OpenAI terminal CLI as `codex`; `opencode` installs the OpenCode terminal CLI. The local documentation baseline uses `man-db` and `man-pages`, and 7-Zip enables Yazi archive previews and extraction. This repo intentionally depends on no AUR packages and installs no AUR helper.
+
+Claude Code and Herdr are not currently packaged in the official Arch repositories. Install them from their canonical user-level installers:
+
+```bash
+curl -fsSL https://claude.ai/install.sh | bash
+curl -fsSL https://herdr.dev/install.sh | sh
+```
+
+If an existing shell resolves `opencode` to `~/.opencode/bin/opencode`, do not remove that binary while an OpenCode session is running. After the session ends, remove only `~/.opencode/bin/opencode`, start a fresh shell, run `hash -r`, and confirm `command -v opencode` prints `/usr/bin/opencode`. Leave the remaining `~/.opencode` content in place unless it is separately audited.
 
 ### 5. Clone
 
@@ -307,7 +319,10 @@ After stowing:
 - Confirm the core symlinks and local Git identity exist: `test -L ~/.bashrc && test -L ~/.config/starship.toml && test -L ~/.config/nvim/lua/config/options.lua && test -f ~/.config/git/config.local`
 - Confirm the OpenCode theme symlink exists: `test -L ~/.config/opencode/themes/miasma.json`
 - Start a fresh shell and confirm Bash, Starship, and Tmux load without errors.
-- Confirm `type tdw` shows the tmux workspace function; from a project directory, `tdw cc` or `tdw oc` opens its session (`-c` continues that agent's last conversation; bare `tdw` re-attaches an existing session).
+- Confirm `printenv OPENCODE_DISABLE_EXTERNAL_SKILLS` and `printenv OPENCODE_ENABLE_EXA` each print `1`.
+- Confirm `type tdw` shows the tmux workspace function; from a project directory, `tdw cc` or `tdw oc` opens its session (`-c` continues that agent's last conversation; bare `tdw` re-attaches an existing session). Creating a session fails before changing tmux state when the selected agent is unavailable.
+- Confirm `type hdw`, `type hdl`, `type hdlm`, and `type hsl` show the Herdr workspace functions. `hds` is intentionally unavailable because it requires Hunk.
+- Confirm `pacman -Qo /usr/bin/codex /usr/bin/opencode` reports `openai-codex` and `opencode` ownership.
 - Run `nvim` once and confirm plugins install successfully and Miasma loads.
 - In Neovim, confirm yanks reach the Windows clipboard and pastes from the Windows clipboard reach Neovim.
 - If the vault is synced to this machine, open a vault note and confirm obsidian.nvim loads (`<leader>oo` opens the note switcher).

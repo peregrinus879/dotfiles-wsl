@@ -36,11 +36,12 @@ alias ....='cd ../../..'
 
 # Tools
 alias c='opencode'
-# Launch Claude Code with ultracode; interactive aliases (cx, tdl targets) inherit via alias rescan
-alias claude='claude --effort ultracode'
-alias cx='printf "\033[2J\033[3J\033[H" && claude --permission-mode bypassPermissions'
-alias cy='codex -s danger-full-access -a never'
+# Launch Claude Code with maximum effort; interactive aliases (cx, tdl targets) inherit via alias rescan
+alias claude='claude --effort max'
+alias cx='printf "\033[2J\033[3J\033[H" && claude --permission-mode auto'
+alias cy='codex'
 alias t='tmux attach || tmux new -s Work'
+alias h='herdr'
 alias ic='tdl c'
 alias ix='tdl cx'
 alias icx='tdl c cx'

@@ -37,6 +37,10 @@ tdw() {
       echo "Usage: tdw <cc|oc> [-c]"
       return 1
     fi
+    if ! type -P "$agent" > /dev/null 2>&1; then
+      echo "tdw: required agent '$agent' is not installed"
+      return 1
+    fi
     local editor_pane
     tmux new-session -d -s "$session" -c "$root" -n "$window"
     tmux set-option -t "$session" @dw_root "$root"
