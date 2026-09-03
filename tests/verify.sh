@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Verifier fixtures: fixture mode over a fake repo and home fails closed on
+# every host, deployment, identity, and format error, and never targets the
+# live home; repo mode needs only the verifier tools.
 set -euo pipefail
 
 ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
@@ -23,8 +26,8 @@ make_baseline() {
   done < <(git -C "$ROOT" ls-files)
   git -C "$repo" init -q
   git -C "$repo" add .
-  printf '[user]\n  name = Fixture User\n  email = fixture@example.invalid\n' >"$home/.config/git/config.local"
-  stow -t "$home" -d "$repo" "${PACKAGES[@]}"
+  printf '[user]\n  name = Fixture User\n  email = fixture@users.noreply.github.com\n' >"$home/.config/git/config.local"
+  stow --no-folding -t "$home" -d "$repo" "${PACKAGES[@]}"
 }
 
 clone_baseline() {
@@ -60,6 +63,19 @@ expect_failure "missing verifier" run_verify "$TMP/baseline" repo eyrwsl-missing
 clone_baseline bad-identity
 : >"$TMP/bad-identity/home/.config/git/config.local"
 expect_failure "empty Git identity" run_verify "$TMP/bad-identity" fixture
+
+clone_baseline personal-identity
+printf '[user]\n  name = Fixture User\n  email = fixture@example.invalid\n' >"$TMP/personal-identity/home/.config/git/config.local"
+expect_failure "Git identity outside the GitHub no-reply domain" run_verify "$TMP/personal-identity" fixture
+
+clone_baseline folded
+rm -rf -- "$TMP/folded/home/.config/yazi"
+ln -s ../repo/yazi/.config/yazi "$TMP/folded/home/.config/yazi"
+expect_failure "folded managed directory" run_verify "$TMP/folded" fixture
+
+expect_failure "fixture mode against the live HOME" env HOME="$HOME" VERIFY_MODE=fixture VERIFY_REPO="$TMP/baseline/repo" \
+  VERIFY_HOME="$HOME" VERIFY_KERNEL_RELEASE="6.6.0-microsoft-standard-WSL2" VERIFY_PACKAGES="${PACKAGES[*]}" \
+  bash "$ROOT/scripts/verify.sh"
 
 clone_baseline bad-starship
 printf '[broken\n' >"$TMP/bad-starship/repo/starship/.config/starship.toml"

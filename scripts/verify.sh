@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 # Verify the deployed WSL environment and every repository-owned config.
+#
+# Modes: full (the live host: command baseline, Windows interop, WSL2 kernel,
+# deployment with real managed parents, no-reply Git identity, then every
+# owned config), fixture (the same deployment, identity, and config checks
+# against a fake repo and home, never the live home), and repo (owned configs
+# only, runnable anywhere, including CI). Verifier tools fail closed in every
+# mode; the command baseline and interop commands are host facts checked in
+# full mode only.
 set -euo pipefail
 
 script_repo=$(realpath -e -- "$(dirname -- "${BASH_SOURCE[0]}")/..")
@@ -27,6 +35,11 @@ case $mode in
       printf 'FAIL: fixture mode requires VERIFY_REPO, VERIFY_HOME, and VERIFY_KERNEL_RELEASE\n' >&2
       exit 1
     }
+    login_home=$(getent passwd "$(id -un)" | cut -d: -f6)
+    [[ -n $login_home && $verify_home != "$(realpath -m -- "$login_home")" ]] || {
+      printf 'FAIL: fixture mode must not target the live HOME\n' >&2
+      exit 1
+    }
     ;;
   *)
     printf 'FAIL: unknown VERIFY_MODE: %s\n' "$mode" >&2
@@ -45,20 +58,38 @@ problem() {
   fail=1
 }
 
-required_tools=(
-  7z bash bat btop claude cmp codex curl diff eza fastfetch fd file find fzf gcc git gh gum
-  herdr hostname inotifywait jq lazygit less lua luac make man nvim node pgrep python3
-  opencode readlink realpath rg rsync shellcheck ssh starship stow sudo tmux tree-sitter
-  unzip which yazi zoxide
-)
-[[ -n ${VERIFY_EXTRA_REQUIRED_TOOL:-} ]] && required_tools+=("$VERIFY_EXTRA_REQUIRED_TOOL")
-for tool in "${required_tools[@]}"; do
+# Tools this script runs itself; a missing one fails every mode.
+verifier_tools=(bash cmp diff fastfetch find git jq luac python3 readlink realpath tmux)
+[[ -n ${VERIFY_EXTRA_REQUIRED_TOOL:-} ]] && verifier_tools+=("$VERIFY_EXTRA_REQUIRED_TOOL")
+for tool in "${verifier_tools[@]}"; do
   command -v "$tool" >/dev/null || {
-    printf 'FAIL: required tool is missing: %s\n' "$tool" >&2
+    printf 'FAIL: required verifier is missing: %s\n' "$tool" >&2
     exit 1
   }
 done
-ok "required command baseline is available"
+ok "verifier tools are available"
+
+if [[ $mode == full ]]; then
+  baseline_tools=(
+    7z bat btop claude codex curl eza fd file fzf gcc gh gum herdr hostname inotifywait
+    lazygit less lua make man nvim pgrep opencode rg rsync shellcheck ssh starship stow sudo
+    tree-sitter unzip which yazi zoxide
+  )
+  for tool in "${baseline_tools[@]}"; do
+    command -v "$tool" >/dev/null || {
+      printf 'FAIL: required tool is missing: %s\n' "$tool" >&2
+      exit 1
+    }
+  done
+  ok "required command baseline is available"
+  for tool in clip.exe powershell.exe; do
+    if command -v "$tool" >/dev/null; then
+      ok "Windows interop command is available: $tool"
+    else
+      problem "Windows interop command is missing: $tool"
+    fi
+  done
+fi
 
 if [[ $mode != repo ]]; then
   if [[ $mode == fixture ]]; then
@@ -72,13 +103,6 @@ if [[ $mode != repo ]]; then
   else
     problem "WSL2 kernel marker is required, got: $kernel"
   fi
-  for tool in clip.exe powershell.exe; do
-    if command -v "$tool" >/dev/null; then
-      ok "Windows interop command is available: $tool"
-    else
-      problem "Windows interop command is missing: $tool"
-    fi
-  done
 fi
 
 if [[ $mode != repo ]]; then
@@ -98,12 +122,26 @@ if [[ $mode != repo ]]; then
   done < <(git -C "$repo" ls-files --cached --others --exclude-standard -- "${packages[@]}")
   (( deployed_sources > 0 )) || problem "Git-visible Stow source set is empty"
 
+  # Every managed parent must be a real directory: a folded one means a
+  # deployment made with folding that make restow has not replaced.
+  while IFS= read -r rel; do
+    target="$verify_home/$rel"
+    if [[ -d $target && ! -L $target ]]; then
+      ok "$target is a real directory"
+    else
+      problem "managed directory is folded or missing: $target"
+    fi
+  done < <(git -C "$repo" ls-files --cached --others --exclude-standard -- "${packages[@]}" |
+    while IFS= read -r source; do rel=${source#*/}
+      while [[ $rel == */* ]]; do rel=${rel%/*}; printf '%s\n' "$rel"; done; done | sort -u)
+
+  # The values are never printed: the email must be a GitHub no-reply address.
   name=$(HOME="$verify_home" git config --includes --file "$verify_home/.config/git/config" --get user.name 2>/dev/null || true)
   email=$(HOME="$verify_home" git config --includes --file "$verify_home/.config/git/config" --get user.email 2>/dev/null || true)
-  if [[ -n ${name//[[:space:]]/} && -n ${email//[[:space:]]/} ]]; then
-    ok "Git identity resolves to non-empty name and email"
+  if [[ -n ${name//[[:space:]]/} && $email == *@users.noreply.github.com ]]; then
+    ok "Git identity resolves to a name and a GitHub no-reply address"
   else
-    problem "Git identity must resolve to non-empty name and email"
+    problem "Git identity must resolve to a name and a GitHub no-reply address"
   fi
 fi
 
