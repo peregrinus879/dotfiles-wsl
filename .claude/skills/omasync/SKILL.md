@@ -9,7 +9,7 @@ Source configs from reference repos and official docs, compare against EyrWSL, a
 
 ## Sources
 
-Local reference clones live under `~/Projects/quarry/`:
+Local reference clones live under `~/Projects/quarry/`; `references.txt` at the repo root names the ones this repo needs, and the family union of every sibling's file defines the quarry (`make refs` clones, updates, and prunes to it):
 
 - `omarchy/` - main repo for bash, tmux, starship, git, fastfetch, btop, and editorconfig references; `make refs` keeps it on the upstream default branch, which upstream moves between releases, so pin EyrWSL release comparisons to tag `v4.0.0` (`git show v4.0.0:<path>`)
 - `omarchy-pkgs/` - package builds, including the Omarchy Neovim package
@@ -29,7 +29,7 @@ Upstream URLs, official docs, and descriptions live in `DEVIATIONS.md` (Referenc
 
 ## Workflow
 
-1. Run `make refs` first, every time: `scripts/update-references.sh` resolves each clone under `~/Projects/quarry/` to its current GitHub location, repoints a moved remote, checks out the upstream default branch, and fast-forwards it. Fix any clone it reports before comparing anything, and when it reports a repointed origin, update that URL in `DEVIATIONS.md` (Reference Sources). Then confirm Omarchy tag `v4.0.0` resolves in `omarchy/` (`git rev-parse v4.0.0^{commit}`). Updating the clones is this skill's job, never H's preparation
+1. Run `make refs` first, every time: `scripts/update-references.sh` clones what `references.txt` lists and the quarry lacks, resolves each listed clone to its current GitHub location and repoints a moved remote, checks out the upstream default branch and fast-forwards it, and removes clean clones no family repository lists. Fix anything it reports before comparing, and when it reports a repointed origin, update that URL in `references.txt` and `DEVIATIONS.md` (Reference Sources). When this repo starts or stops using a reference, change `references.txt`; the clones follow. Then confirm Omarchy tag `v4.0.0` resolves in `omarchy/` (`git rev-parse v4.0.0^{commit}`). Updating the quarry is this skill's job, never H's preparation
 2. Compare reference repos against the packages owned by EyrWSL
 3. For Omarchy-derived packages, compare against tag `v4.0.0` in `omarchy/`, plus `omarchy-pkgs/` and `gruvbox.nvim/`; never substitute moving-branch contents for the pinned release comparison
 4. For non-Omarchy tools, compare Yazi against `yazi/` and official docs, and the vault plugin specs against `obsidian.nvim/` and the render-markdown.nvim README

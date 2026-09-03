@@ -382,7 +382,7 @@ A repo-root `Makefile` keeps the package list in one place and wraps the routine
 - `make clean` - WSL-only, all-or-nothing ownership preflight followed by managed-link removal and mutable-directory preparation
 - `make test` - fake-home deployment, ownership, and verifier attack fixtures; the loop stops on the first failing suite
 - `make lint` - ShellCheck over the bash package, `scripts/`, and `tests/`; `.shellcheckrc` disables the upstream-derived warnings so new issues stand out
-- `make refs` - fast-forward the reference clones under `~/Projects/quarry` to their upstream default branches, repointing moved GitHub remotes (`/omasync` step 1)
+- `make refs` - clone, fast-forward, and prune the reference clones under `~/Projects/quarry` to the family's `references.txt` files, repointing moved GitHub remotes (`/omasync` step 1)
 - `make wt-diff` - diff the tracked Windows Terminal settings against the deployed Windows-side file (normalized with `jq`, since Windows Terminal rewrites key order)
 - `make wt-push` - WSL-only, validate both settings files, back up a changed deployment, and atomically deploy the tracked file
 

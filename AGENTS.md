@@ -5,7 +5,7 @@ Self-contained Arch WSL dotfiles adapted from [Omarchy](https://github.com/omaco
 ## Load Map
 
 - Claude Code loads this file through the root `CLAUDE.md` `@AGENTS.md` import; skills load on invocation only.
-- The `Makefile` owns the package list, `scripts/verify.sh` consumes it, and `README.md` owns human-facing setup, verification, and maintenance detail.
+- The `Makefile` owns the package list, `scripts/verify.sh` consumes it, and `README.md` owns human-facing setup, verification, and maintenance detail. `references.txt` lists the reference clones `/omasync` needs, and the family union of those files owns `~/Projects/quarry`.
 - `docs/maintenance.md` is the on-demand ledger for known limitations, deferred items, and dated findings; read it before package, WSL, or Windows Terminal changes, `/omasync`, or deferred work.
 
 ## Invariants

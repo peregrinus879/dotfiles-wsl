@@ -20,7 +20,7 @@ help:
 	@echo "  lint      ShellCheck over Bash config, scripts, and tests"
 	@echo "  wt-diff   Diff tracked Windows Terminal settings against the deployed file"
 	@echo "  wt-push   Back up changed settings and deploy the tracked Windows Terminal file"
-	@echo "  refs      Fast-forward the reference clones under ~/Projects/quarry to their current upstream default branches"
+	@echo "  refs      Clone, fast-forward, and prune the reference clones under ~/Projects/quarry to the family's references.txt files"
 
 require-wsl:
 	@kernel="$$(uname -r)"; [[ "$${kernel,,}" == *microsoft* ]] || { echo "FAIL: WSL is required for this target"; exit 1; }
@@ -66,7 +66,8 @@ wt-diff:
 wt-push: require-wsl
 	scripts/wt-diff.sh --push
 
-# omasync step 1. Repoints a moved GitHub remote, then fast-forwards each clone
-# to its upstream default branch; a clone it cannot update fails the run.
+# omasync step 1. Clones what references.txt lists and the quarry lacks,
+# repoints moved GitHub remotes, fast-forwards each listed clone, and removes
+# unlisted clean clones; anything it cannot settle fails the run.
 refs:
 	@bash scripts/update-references.sh
