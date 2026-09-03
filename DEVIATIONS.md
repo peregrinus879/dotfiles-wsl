@@ -84,13 +84,13 @@ Gruvbox follows Omarchy's behavior on each owned surface. Windows Terminal and b
 - Optional Bash overlays are sourced from `~/.config/bash-overlays/*` after the shared init. The directory is untracked and reserved for machine-local additions.
 - Dropped aliases: `open` (GUI-only), `d='docker'`, and `r='rails'`.
 - The kitty-conditional `ff` image-preview variant is omitted; Windows Terminal is not kitty, so the conditional would always take the plain `bat` branch kept here.
-- Claude Code launches use the supported maximum effort, `--effort max`. The `claude` alias applies it to every interactive launch, including `cx` and `tdl`-launched AIs; scripts and hooks stay plain because they do not expand aliases.
+- Claude Code launches use the supported maximum effort, `--effort max`. The `claude` alias applies it to every interactive launch, including the `cx` alias, which composes with it through alias expansion, and `tdl`-launched AIs; scripts, hooks, and the pinned `spar-claude` bridge stay plain because they do not expand aliases. This intentionally overrides the `CLAUDE_CODE_EFFORT_LEVEL=xhigh` pin that EyrAgents tracks in its Claude settings `env` for interactive WSL sessions.
 - `y()` is added for Yazi cd-on-exit support. Yazi is not part of Omarchy.
 - `tdw` is added: one tmux session per project (Git root, else current directory) with two windows: a full-width AI agent (`tdw cc` for Claude Code, `tdw oc` for OpenCode; the choice is mandatory at creation so a single agent owns the working tree) and `$EDITOR` above a 25% shell. `-c` continues that agent's last conversation in the project; bare `tdw` re-attaches an existing session. Creation checks the selected agent before changing tmux state. Additive alongside Omarchy's `tdl` pane layout. The `t`/`h` prefix follows Omarchy's multiplexer lettering (`tdl`/`hdl`).
-- `hdw` is added: the Herdr counterpart of `tdw`, one workspace per project with the same agent and editor/shell layout, single-agent choice, continue flag, and root-collision guard. It starts a headless Herdr server when needed and falls back to attaching plain Herdr with a rerun hint.
+- `hdw` is added: the herdr counterpart of `tdw`, one herdr workspace per project with the same layout (full agent tab; `$EDITOR` over a 25% shell in an editor+terminal tab), the same `cc|oc` single-agent choice and `-c` flag, and a root-collision guard backed by a label-to-root record under `~/.local/state/hdw/roots` (workspace ids recycle across server restarts, so the record keys on the label). Bare `hdw` refocuses; when the herdr server is down, `hdw` starts it headless and attaches, so one invocation works from a cold boot, and if the headless start fails it attaches plain herdr with a hint to rerun `hdw` inside. Additive alongside Omarchy's `hdl` pane layout. `tdw` and `hdw` are byte-identical twins with EyrArcHy.
 - Omarchy's Herdr helpers `hdl`, `hdlm`, and `hsl` are adopted. `hds` is omitted because it invokes Hunk, which is outside the official-repository baseline.
 - Omarchy's SSH port-forwarding, dropped-connection recovery, and rsync-on-change helpers are adopted. The rsync watcher is backed by the official `rsync` and `inotify-tools` packages.
-- Interactive Bash exports `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` and `OPENCODE_ENABLE_EXA=1` so terminal-launched OpenCode selects its EyrAgents-managed skills and configured web-search tool. Shell initialization removes inherited `$HOME/.opencode/bin` entries and appends approved user-level directories after existing system entries, so Pacman's OpenCode and Codex binaries retain precedence.
+- Interactive Bash exports `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` and `OPENCODE_ENABLE_EXA=1` so terminal-launched OpenCode selects its managed skills and exposes its configured web-search tool. EyrAgents owns OpenCode configuration; this repo owns the WSL host environment. Shell initialization removes inherited `$HOME/.opencode/bin` entries and appends approved user-level directories after existing system entries, so Pacman's OpenCode and Codex binaries retain precedence.
 - Safe AI launch defaults intentionally differ from Omarchy: `c` remains plain OpenCode, `cx` uses Claude's reviewed `auto` permission mode, and `cy` honors EyrAgents' Codex defaults.
 - `mise`-specific shell handling is omitted.
 - No `pacman` alias and no AUR helper. Omarchy routes updates through `omarchy-update-perform`, which is Hyprland/desktop-bound; this repo uses plain `pacman` against official repos only.
@@ -126,7 +126,7 @@ Gruvbox follows Omarchy's behavior on each owned surface. Windows Terminal and b
 - `transparency.lua` content is verbatim from `omarchy-nvim` but lives at `after/plugin/` instead of upstream's `plugin/after/` to use Neovim's actual after-load mechanism. Upstream `omarchy-nvim` uses the incorrect path.
 - Owned Lua files use 2-space indentation per the shared `.editorconfig` in this repo. Upstream `omarchy-nvim` uses tabs. Contents are otherwise unchanged.
 - Two additive plugin specs are carried: `obsidian.lua` (obsidian.nvim against the vault at `~/Projects/vault`, override with `OBSIDIAN_VAULT`) and `render-markdown.lua` (visual markdown rendering companion). `python` is in the baseline package list because the vault keybindings shell out to the vault's `normalize.py`.
-- The spec's `open.func` routes `obsidian://` and web URIs through Windows interop (`powershell.exe Start-Process`) when running under WSL, so `:Obsidian open` and link-following reach the Windows apps without `wsl-open`, which is not in official Arch repos. The override is guarded by `vim.fn.has("wsl")` and inert elsewhere.
+- The spec's `open.func` routes `obsidian://` and web URIs through Windows interop (`powershell.exe Start-Process`) when running under WSL, so `:Obsidian open` and link-following reach the Windows apps without `wsl-open`, which is not in official Arch repos. The override is guarded by `vim.fn.has("wsl")` and inert elsewhere. Both repos track byte-identical copies of the spec.
 
 ### OpenCode
 
@@ -153,7 +153,7 @@ Gruvbox follows Omarchy's behavior on each owned surface. Windows Terminal and b
 ### Yazi
 
 - Added entirely. Yazi is not part of Omarchy.
-- `yazi.toml` keeps the local layout and behavior choices: ratio `[2, 4, 4]`, hidden files shown, directories sorted first, `sort_by = "natural"`, and `linemode = "size"`.
+- `yazi.toml` carries local layout and behavior choices: ratio `[2, 4, 4]`, hidden files shown, directories sorted first, `sort_by = "natural"`, and `linemode = "size"`. Tracked as a byte-identical twin with EyrArcHy.
 - Yazi's built-in theme uses named ANSI colors for its primary interface, so Windows Terminal supplies the Gruvbox palette without a local theme override.
 
 ### WSL Bootstrap

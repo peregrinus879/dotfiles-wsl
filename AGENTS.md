@@ -5,7 +5,7 @@ Self-contained Arch WSL dotfiles adapted from [Omarchy](https://github.com/omaco
 ## Load Map
 
 - Claude Code loads this file through the root `CLAUDE.md` `@AGENTS.md` import; skills load on invocation only.
-- The `Makefile` owns the package list, `scripts/verify.sh` and `scripts/prepare-stow.sh` consume it, and `README.md` owns human-facing setup, verification, and maintenance detail; script headers own local constraints. `references.txt` lists the reference clones `/omasync` needs, and the family union of those files owns `~/Projects/quarry`.
+- The `Makefile` is the single source of the package list (`scripts/verify.sh` and `scripts/prepare-stow.sh` consume it); `references.txt` lists the reference clones `/omasync` needs, and the family union of those files owns `~/Projects/quarry`; `README.md` carries the human-facing setup, verification, and maintenance detail; script headers own local constraints.
 - `docs/maintenance.md` owns unresolved decisions, deferred work, active limitations, and dated revalidation evidence; read it before package, WSL, or Windows Terminal changes, `/omasync`, or deferred work. Prose describes current behavior; Git history owns provenance.
 
 ## Invariants
@@ -18,7 +18,7 @@ Self-contained Arch WSL dotfiles adapted from [Omarchy](https://github.com/omaco
 - `make verify` must fail closed across WSL2/interoperability, commands, deployment ownership with real managed parents, Git identity (a GitHub no-reply address, never printed), and config parsing; fixture overrides must not weaken normal mode and never target the live home.
 - Gruvbox is the only configured theme. Windows Terminal and btop use Omarchy's palette, Neovim uses Omarchy's `ellisonleao/gruvbox.nvim` selection, and ANSI-aware applications inherit the terminal palette.
 - `nvim/` owns the complete LazyVim bootstrap, static configuration, and generated plugin lockfile; setup requires no separate config clone.
-- Git identity lives in the untracked per-host `~/.config/git/config.local`.
+- Git identity lives in the untracked per-host `~/.config/git/config.local`; `make verify` asserts that it resolves to a GitHub no-reply address without printing it.
 - Shared AI agent harness and OpenCode TUI configuration stay in EyrAgents, which deploys its own packages with `make stow` in its clone; nothing here touches `~/.config/opencode`, and EyrWSL carries no custom OpenCode theme.
 - Packages come from official Arch repos; Claude Code and Herdr use canonical installers while official packages are unavailable. No AUR packages or helper.
 - `windows-terminal/settings.json` is a full paste-ready config, never stowed; deploy it explicitly with `make wt-push`.

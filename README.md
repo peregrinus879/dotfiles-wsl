@@ -20,7 +20,7 @@ Omarchy + WSL deviations        → EyrWSL
 - [`eyrarchy`](https://github.com/peregrinus879/eyrarchy) - Personal Omarchy customizations: Bash overrides, Hyprland bindings, Neovim plugins, and Yazi
 - [`eyrwsl`](https://github.com/peregrinus879/eyrwsl) - Self-contained WSL Arch environment: terminal baseline plus Windows Terminal and clipboard integration
 
-Related clones can live side by side under `~/Projects/eyrie/`, but EyrWSL installs and verifies independently.
+Local clones live side by side under `~/Projects/eyrie/`.
 
 ## Stack
 
@@ -292,6 +292,16 @@ cd ~/Projects/eyrie/eyrwsl
 make restow
 ```
 
+To migrate from a different clone path, unstow from the old location first:
+
+```bash
+make -C /old/clone/path unstow
+cd ~/Projects/eyrie/eyrwsl
+make stow
+```
+
+If the old clone is no longer available, `make clean` (section 8) removes its dangling links; then run `make stow`.
+
 ### 10. First Launch
 
 Open Neovim once to install the revisions recorded in the tracked lockfile:
@@ -336,15 +346,10 @@ After deployment, confirm the default profile resolves to `archlinux` and the fo
 
 ## Verify
 
-After stowing, run the automated gates from the repository root:
+After stowing or changing owned packages:
 
-```bash
-make lint
-make check
-make verify
-```
-
-`make lint` applies ShellCheck to the Bash package, scripts, and tests. `make check` runs anywhere: every owned Bash, Lua, TOML, JSON, JSONC, Git, tmux, btop, and Fastfetch config validates, then every fixture suite runs in fake homes. GitHub Actions runs both on every push to `main` and every pull request, plus `make twins` against a fresh EyrArcHy clone. `make verify` runs on the WSL host only and fails closed unless the host is WSL2 with Windows interop, the configured command baseline is available, every Git-visible Stow source resolves to this repo with its managed parents real directories, Git identity resolves to a GitHub no-reply address without exposing its values, and every owned config validates; it then runs the fixture suites.
+- Run `make lint` and `make check` after any change; both are repository-only (ShellCheck; every owned Bash, Lua, TOML, JSON, JSONC, Git, tmux, btop, and Fastfetch config in `repo` mode; the `tests/` fixtures), and GitHub Actions runs them on every push to `main` and every pull request, plus `make twins` against a fresh EyrArcHy clone.
+- Run `make verify` from the repo root on the WSL host after stowing or changing owned packages: `twins`, then `scripts/verify.sh` in `full` mode (WSL2 kernel and Windows interop, the command baseline, every Git-visible Stow source resolving into this repo with its managed parents real directories, a GitHub no-reply Git identity that is never printed, and every owned config), then every fixture suite.
 
 Complete these manual fresh-session checks:
 
@@ -391,7 +396,7 @@ Periodically, review the local reference repos and official docs for upstream ch
 
 ## Related Repos
 
-Upstream comparison runs through the `/omasync` skill, which carries the local reference clone paths. Upstream URLs and official docs live in [DEVIATIONS.md](DEVIATIONS.md) (Reference Sources).
+Upstream comparison runs through the `/omasync` skill; `make refs` keeps the reference clones listed in `references.txt` current. Upstream URLs and official docs live in [DEVIATIONS.md](DEVIATIONS.md) (Reference Sources).
 
 ## Credits
 

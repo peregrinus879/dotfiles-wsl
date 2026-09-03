@@ -29,7 +29,7 @@ help:
 	@echo "  unstow    Remove all package symlinks"
 	@echo "  dry-run   Preview stow actions without making changes"
 	@echo "  restow    Re-stow after repo content changes"
-	@echo "  lint      ShellCheck over Bash config, scripts, and tests"
+	@echo "  lint      ShellCheck over the bash package, scripts/, and tests/ (.shellcheckrc holds the disable list)"
 	@echo "  check     Repository-only checks: every owned config in repo mode, then the tests/ fixtures (runs in CI)"
 	@echo "  twins     Twin-file sync against the EyrArcHy clone at SIBLING (skipped when absent)"
 	@echo "  verify    twins, then the WSL host, command baseline, deployment, identity, and config checks, then the fixtures"

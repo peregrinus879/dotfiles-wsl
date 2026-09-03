@@ -22,7 +22,7 @@ Upstream URLs, official docs, and descriptions live in `DEVIATIONS.md` (Referenc
 
 ## When To Use
 
-- Use this skill when Omarchy or a reference repo changed materially.
+- Use this skill when Omarchy or a reference repo changed materially, including after an Omarchy release.
 - Use this skill when repo scope or behavior changed materially.
 - Use this skill when you suspect undocumented drift between this repo and its references.
 - Use this skill before broad sync-oriented doc updates.
