@@ -1,6 +1,6 @@
 # AGENTS.md - EyrWSL
 
-Self-contained Arch WSL dotfiles adapted from [Omarchy](https://github.com/basecamp/omarchy) and managed with [GNU Stow](https://www.gnu.org/software/stow/). EyrWSL owns the terminal baseline plus WSL and Windows behavior. Omarchy's pinned baseline, official documentation, and `DEVIATIONS.md` define defaults, intentional differences, and ownership boundaries.
+Self-contained Arch WSL dotfiles adapted from [Omarchy](https://github.com/omacom/omarchy) and managed with [GNU Stow](https://www.gnu.org/software/stow/). EyrWSL owns the terminal baseline plus WSL and Windows behavior. Omarchy's pinned baseline, official documentation, and `DEVIATIONS.md` define defaults, intentional differences, and ownership boundaries.
 
 ## Load Map
 

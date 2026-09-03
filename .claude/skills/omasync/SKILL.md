@@ -11,7 +11,7 @@ Source configs from reference repos and official docs, compare against EyrWSL, a
 
 Local reference clones live under `~/Projects/quarry/`:
 
-- `omarchy/` - main repo for bash, tmux, starship, git, fastfetch, btop, and editorconfig references; tracks the upstream default branch, which upstream moves between releases, so re-resolve its default branch and pin EyrWSL release comparisons to tag `v4.0.0` (`git show v4.0.0:<path>`)
+- `omarchy/` - main repo for bash, tmux, starship, git, fastfetch, btop, and editorconfig references; `make refs` keeps it on the upstream default branch, which upstream moves between releases, so pin EyrWSL release comparisons to tag `v4.0.0` (`git show v4.0.0:<path>`)
 - `omarchy-pkgs/` - package builds, including the Omarchy Neovim package
 - `gruvbox.nvim/` - Gruvbox Neovim plugin source selected by Omarchy
 - `yazi/` - Yazi reference repo for configuration and feature changes
@@ -29,7 +29,7 @@ Upstream URLs, official docs, and descriptions live in `DEVIATIONS.md` (Referenc
 
 ## Workflow
 
-1. Before updating any clone, require `git status --porcelain=v1 --untracked-files=all` to be empty in every listed reference clone and verify each `git remote get-url origin` against `DEVIATIONS.md`. Then, for each clone, run `git fetch --prune --tags origin`, `git remote set-head origin -a`, match the checkout to the resolved `refs/remotes/origin/HEAD`, run `git pull --ff-only`, and confirm `HEAD` equals `origin/<default>` and the worktree remains clean; require Omarchy tag `v4.0.0` to resolve locally
+1. Run `make refs` first, every time: `scripts/update-references.sh` resolves each clone under `~/Projects/quarry/` to its current GitHub location, repoints a moved remote, checks out the upstream default branch, and fast-forwards it. Fix any clone it reports before comparing anything, and when it reports a repointed origin, update that URL in `DEVIATIONS.md` (Reference Sources). Then confirm Omarchy tag `v4.0.0` resolves in `omarchy/` (`git rev-parse v4.0.0^{commit}`). Updating the clones is this skill's job, never H's preparation
 2. Compare reference repos against the packages owned by EyrWSL
 3. For Omarchy-derived packages, compare against tag `v4.0.0` in `omarchy/`, plus `omarchy-pkgs/` and `gruvbox.nvim/`; never substitute moving-branch contents for the pinned release comparison
 4. For non-Omarchy tools, compare Yazi against `yazi/` and official docs, and the vault plugin specs against `obsidian.nvim/` and the render-markdown.nvim README
@@ -48,7 +48,7 @@ Upstream URLs, official docs, and descriptions live in `DEVIATIONS.md` (Referenc
 ## Completion Checks
 
 - `README.md`, `AGENTS.md`, and `DEVIATIONS.md` reflect any ownership, setup, or workflow changes
-- Reference clones are clean, follow their resolved upstream default branches, and match `origin/<default>`; Omarchy release comparisons still use tag `v4.0.0`
+- `make refs` passed in this run; Omarchy release comparisons still use tag `v4.0.0`
 - Every retained difference is still documented in `DEVIATIONS.md`
 - Official-package probes and WSL/Windows gates reflect current sources; `make verify` and `make lint` pass, plus `make wt-diff` when Terminal settings are involved
 - The final summary distinguishes adopted changes, rejected changes, and intentional retained differences

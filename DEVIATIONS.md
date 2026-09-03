@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document records the intentional differences carried by EyrWSL relative to [Omarchy](https://github.com/basecamp/omarchy), and defines the boundary between this repo and its siblings.
+This document records the intentional differences carried by EyrWSL relative to [Omarchy](https://github.com/omacom/omarchy), and defines the boundary between this repo and its siblings.
 
 Omarchy tag `v4.0.0` at commit `f0020448ca87329199de7cb12f2015ebc4a3e5e7` is the reproducible upstream comparison baseline. The lightweight tag names the release, while the commit ID records the exact reviewed source. Reference clones and the tag are maintenance inputs only; setup, Stow deployment, and verification do not use them.
 
@@ -21,7 +21,7 @@ Omarchy is an opinionated Arch Linux distribution targeting a full desktop envir
 
 ## Reference Sources
 
-- [basecamp/omarchy](https://github.com/basecamp/omarchy) - main repo for bash, tmux, starship, git, fastfetch, btop, and editorconfig references
+- [omacom/omarchy](https://github.com/omacom/omarchy) - main repo for bash, tmux, starship, git, fastfetch, btop, and editorconfig references
 - [omacom-io/omarchy-pkgs](https://github.com/omacom-io/omarchy-pkgs) - package builds, including the Omarchy Neovim package
 - [OpenAI Codex](https://github.com/openai/codex) and the [Arch `openai-codex` package](https://archlinux.org/packages/extra/x86_64/openai-codex/) - official terminal CLI upstream and signed Arch package
 - [OpenCode](https://github.com/anomalyco/opencode) and the [Arch `opencode` package](https://archlinux.org/packages/extra/x86_64/opencode/) - terminal coding agent upstream and signed Arch package

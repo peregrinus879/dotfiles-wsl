@@ -1,6 +1,6 @@
 # EyrWSL
 
-Self-contained Arch Linux dotfiles for WSL, adapted from [Omarchy](https://github.com/basecamp/omarchy), managed with [GNU Stow](https://www.gnu.org/software/stow/).
+Self-contained Arch Linux dotfiles for WSL, adapted from [Omarchy](https://github.com/omacom/omarchy), managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
 EyrWSL carries the full terminal baseline for Arch Linux running inside WSL, plus the WSL and Windows-specific pieces: Windows Terminal and clipboard integration. It keeps Omarchy's terminal tooling and general feel while dropping desktop-specific components that do not apply inside WSL.
 
@@ -382,6 +382,7 @@ A repo-root `Makefile` keeps the package list in one place and wraps the routine
 - `make clean` - WSL-only, all-or-nothing ownership preflight followed by managed-link removal and mutable-directory preparation
 - `make test` - fake-home deployment, ownership, and verifier attack fixtures; the loop stops on the first failing suite
 - `make lint` - ShellCheck over the bash package, `scripts/`, and `tests/`; `.shellcheckrc` disables the upstream-derived warnings so new issues stand out
+- `make refs` - fast-forward the reference clones under `~/Projects/quarry` to their upstream default branches, repointing moved GitHub remotes (`/omasync` step 1)
 - `make wt-diff` - diff the tracked Windows Terminal settings against the deployed Windows-side file (normalized with `jq`, since Windows Terminal rewrites key order)
 - `make wt-push` - WSL-only, validate both settings files, back up a changed deployment, and atomically deploy the tracked file
 
@@ -395,7 +396,7 @@ Upstream comparison runs through the `/omasync` skill, which carries the local r
 
 ## Credits
 
-Adapted from [Omarchy](https://github.com/basecamp/omarchy). See [DEVIATIONS.md](DEVIATIONS.md) for intentional differences and boundary definitions.
+Adapted from [Omarchy](https://github.com/omacom/omarchy). See [DEVIATIONS.md](DEVIATIONS.md) for intentional differences and boundary definitions.
 
 ## License
 
