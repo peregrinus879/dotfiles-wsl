@@ -37,6 +37,7 @@ alias ....='cd ../../..'
 # Tools; the AI tools run as EyrAgents configures them, so no launch aliases
 alias t='tmux attach || tmux new -s Work'
 alias h='herdr'
+alias mup='mise up'
 n() { if [ "$#" -eq 0 ]; then command nvim . ; else command nvim "$@"; fi; }
 
 # Yazi (cd on exit)

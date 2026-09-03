@@ -1,0 +1,6 @@
+# Stowed by EyrWSL. Paranoid mode: every project-level mise config needs an
+# explicit `mise trust`, hashed so an edit re-prompts; global configs, this
+# fragment included, stay implicitly trusted. Tool pins live in config.toml,
+# which the ~/.local/bin wrappers write with `mise use -g`.
+[settings]
+paranoid = true

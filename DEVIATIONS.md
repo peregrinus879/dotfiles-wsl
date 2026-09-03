@@ -17,14 +17,16 @@ Omarchy is an opinionated Arch Linux distribution targeting a full desktop envir
 3. **Keep Windows-specific behavior explicit.** Anything that depends on `clip.exe`, `powershell.exe`, or Windows Terminal should be documented as a Windows interop concern.
 4. **Use GNU Stow for dotfile management.** Omarchy uses direct file copies and packaged assets. This repo uses symlink-based package ownership for clearer separation and reuse.
 5. **Single theme, no switching.** This repo uses Gruvbox only, so Omarchy's theme switching and hot-reload infrastructure is intentionally omitted.
-6. **Pacman-first package ownership.** System packages, OpenCode, and Codex CLI come from official Arch repositories. Claude Code and Herdr use canonical standalone installers only while official packages are unavailable. The baseline depends on no AUR packages and installs no AUR helper.
+6. **Pacman-first package ownership.** System packages, `mise` included, come from official Arch repositories. Claude Code, Codex, and OpenCode are installed and updated through mise, as on Omarchy, so they track upstream releases directly. Herdr uses its canonical standalone installer only while an official package is unavailable. The baseline depends on no AUR packages and installs no AUR helper.
 
 ## Reference Sources
 
 - [omacom/omarchy](https://github.com/omacom/omarchy) - main repo for bash, tmux, starship, git, fastfetch, btop, and editorconfig references
 - [omacom/omarchy-pkgs](https://github.com/omacom/omarchy-pkgs) - package builds, including the Omarchy Neovim package
-- [OpenAI Codex](https://github.com/openai/codex) and the [Arch `openai-codex` package](https://archlinux.org/packages/extra/x86_64/openai-codex/) - official terminal CLI upstream and signed Arch package
-- [OpenCode](https://github.com/anomalyco/opencode) and the [Arch `opencode` package](https://archlinux.org/packages/extra/x86_64/opencode/) - terminal coding agent upstream and signed Arch package
+- [mise](https://mise.jdx.dev/) and the [Arch `mise` package](https://archlinux.org/packages/extra/x86_64/mise/) - tool manager upstream and signed Arch package; its registry names the backend each AI tool installs from
+- [Claude Code](https://code.claude.com/docs) - terminal agent upstream; installed through mise's `claude` registry entry
+- [OpenAI Codex](https://github.com/openai/codex) - official terminal CLI upstream; installed through mise's `codex` registry entry
+- [OpenCode](https://github.com/anomalyco/opencode) - terminal coding agent upstream; installed through mise's `opencode` registry entry
 - [Herdr](https://github.com/herdrdev/herdr) - terminal workspace manager; its website provides the canonical installer
 - [ellisonleao/gruvbox.nvim](https://github.com/ellisonleao/gruvbox.nvim) - Neovim colorscheme
 - [microsoft/terminal](https://github.com/microsoft/terminal) - Windows Terminal settings structure and feature changes
@@ -60,7 +62,7 @@ Gruvbox follows Omarchy's behavior on each owned surface. Windows Terminal and b
 
 - GNU Stow with symlinked package ownership replaces Omarchy's file-copy and package-install model.
 - `make clean` derives the owned paths from the package files, classifies every one before changing anything, and removes only folded directory links left by a folding deployment and dangling links from a moved or deleted clone; live leaf links stay for Stow. Regular files, foreign links, and special files at owned paths abort untouched.
-- `make verify` fails closed on the WSL2/interoperability host contract, command baseline, deployed package ownership with real managed parents, a GitHub no-reply Git identity, and owned config parsers and runtimes before running the fixture suites; `make check` runs the parser, runtime, and fixture parts anywhere.
+- `make verify` fails closed on the WSL2/interoperability host contract, command baseline, the AI tools installed by and resolving through a paranoid-mode mise, deployed package ownership with real managed parents, a GitHub no-reply Git identity, and owned config parsers and runtimes before running the fixture suites; `make check` runs the parser, runtime, and fixture parts anywhere.
 - Stow runs with `--no-folding`, so every managed parent stays a real directory that tools may write into and only leaf files are links.
 - `/omasync` owns reference-clone maintenance and upstream comparison; `docs/maintenance.md` owns unresolved decisions, deferred work, active limitations, and dated evidence.
 - Agent-tool verification approvals are handled by session or shared EyrAgents policy rather than repo-root project allowlists.
@@ -87,12 +89,12 @@ Gruvbox follows Omarchy's behavior on each owned surface. Windows Terminal and b
 - `y()` is added for Yazi cd-on-exit support. Yazi is not part of Omarchy.
 - `tdw` is added: one tmux session per project (Git root, else current directory) holding Omarchy's dev layout in one window named after the project: `$EDITOR` top-left, the AI agent top-right, split 50/50 by width instead of Omarchy's 70/30, and a shell across the bottom 15%; focus lands on the agent, not the editor. `tdw cc` runs Claude Code, `tdw cx` Codex, `tdw oc` OpenCode; the choice is mandatory at creation so a single agent owns the working tree, and `-c` continues that agent's last conversation in the project (`claude -c`, `codex resume --last`, `opencode -c`). Bare `tdw` re-attaches an existing session; creation checks the selected agent before changing tmux state. Additive alongside Omarchy's `tdl` pane layout. The `t`/`h` prefix follows Omarchy's multiplexer lettering (`tdl`/`hdl`).
 - `hdw` is added: the herdr counterpart of `tdw`, one herdr workspace per project with the same one-tab layout, agent choice, `-c` flag, and agent focus, plus a root-collision guard backed by a label-to-root record under `~/.local/state/hdw/roots` (workspace ids recycle across server restarts, so the record keys on the label). Bare `hdw` refocuses; when the herdr server is down, `hdw` starts it headless and attaches, so one invocation works from a cold boot, and if the headless start fails it attaches plain herdr with a hint to rerun `hdw` inside. Additive alongside Omarchy's `hdl` pane layout. `tdw` and `hdw` are byte-identical twins with EyrArcHy.
-- Omarchy's Herdr helpers `hdl`, `hdlm`, and `hsl` are adopted. `hds` is omitted because it invokes Hunk, which is outside the official-repository baseline.
+- Omarchy's Herdr helpers `hdl`, `hdlm`, and `hsl` are adopted. `hds` is omitted because it invokes Hunk, one of the mise-managed Omarchy tools this repo leaves out (see Mise).
 - Omarchy's SSH port-forwarding, dropped-connection recovery, and rsync-on-change helpers are adopted. The rsync watcher is backed by the official `rsync` and `inotify-tools` packages.
-- Interactive Bash exports `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` and `OPENCODE_ENABLE_EXA=1` so terminal-launched OpenCode selects its managed skills and exposes its configured web-search tool. EyrAgents owns OpenCode configuration; this repo owns the WSL host environment. Shell initialization removes inherited `$HOME/.opencode/bin` entries and appends approved user-level directories after existing system entries, so Pacman's OpenCode and Codex binaries retain precedence.
+- Interactive Bash exports `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` and `OPENCODE_ENABLE_EXA=1` so terminal-launched OpenCode selects its managed skills and exposes its configured web-search tool. EyrAgents owns OpenCode configuration; this repo owns the WSL host environment. Shell initialization removes inherited `$HOME/.opencode/bin` entries and appends the user-level directories after existing system entries, so system binaries retain precedence: `/usr/local/bin`, then the mise shims and `~/.local/bin` in the order Omarchy's `env-bootstrap` uses.
 - The AI tools run as EyrAgents configures them: `claude`, `codex`, and `opencode` are launched plain and inherit EyrAgents' effort pin and permission rules. Omarchy's launch aliases `c`, `cx`, `cy`, `ic`, `ix`, and `icx` set permission modes, approval flags, and `tdl` targets that EyrAgents and the workspace launchers own, so this repo does not carry them.
-- `mise`-specific shell handling is omitted.
-- No `pacman` alias and no AUR helper. Omarchy routes updates through `omarchy-update-perform`, which is Hyprland/desktop-bound; this repo uses plain `pacman` against official repos only.
+- Omarchy's mise shell handling is adopted verbatim: `mise activate bash` opens `init`, `set +h` closes `shell`, and the `mup` alias is carried as plain `mise up`, without Omarchy's `MISE_MINIMUM_RELEASE_AGE=0` prefix (see Mise). Omarchy also sources its PATH bootstrap from `/etc/profile.d` and PAM so login shells and SSH commands find the mise tools; here `envs` is the only source, so shells that skip `.bashrc` (`wsl.exe -e`, SSH commands) see the mise directories only when the system PATH already has them.
+- No `pacman` alias and no AUR helper. Omarchy routes updates through `omarchy-update`, which is Hyprland/desktop-bound and runs `mise up` after its package step; this repo uses plain `pacman -Syu` against official repos only, which carries the packaged mise, followed by `mup` for the mise-managed tools.
 
 ### Git
 
@@ -127,6 +129,16 @@ Gruvbox follows Omarchy's behavior on each owned surface. Windows Terminal and b
 - Two additive plugin specs are carried: `obsidian.lua` (obsidian.nvim against the vault at `~/Projects/vault`, override with `OBSIDIAN_VAULT`) and `render-markdown.lua` (visual markdown rendering companion). `python` is in the baseline package list because the vault keybindings shell out to the vault's `normalize.py`.
 - The spec's `open.func` routes `obsidian://` and web URIs through Windows interop (`powershell.exe Start-Process`) when running under WSL, so `:Obsidian open` and link-following reach the Windows apps without `wsl-open`, which is not in official Arch repos. The override is guarded by `vim.fn.has("wsl")` and inert elsewhere. Both repos track byte-identical copies of the spec.
 
+### Mise
+
+- The `mise/` package stows the three AI tool wrappers into `~/.local/bin`: what `omarchy-mise-install claude`, `codex`, and `opencode` write on Omarchy, minus the `MISE_MINIMUM_RELEASE_AGE=0` export. Omarchy regenerates its wrappers at install and through `omarchy-refresh-applications`; this repo deploys them with Stow and updates them through `make restow`. mise's other files (`~/.config/mise/config.toml`, `~/.local/share/mise`) stay host state the wrappers create.
+- The release cooldown stays at mise's 24-hour `minimum_release_age` default in the wrappers and `mup`. Omarchy sets it to zero in exactly two places, its generated wrappers and `omarchy-update-mise`, so an AI tool release is usable the hour it ships, while every other tool it installs through mise (the default agent, Node, the dev-env runtimes) waits out the default; this repo keeps the default everywhere and accepts the day's delay as the supply-chain guard mise documents it as.
+- Paranoid mode is on through the stowed `~/.config/mise/conf.d/eyrwsl.toml`. Omarchy runs mise with default trust and trusts `~/Work/.mise.toml` and every worktree automatically; here global configs stay implicitly trusted and every project-level config needs an explicit `mise trust`, prompted again when the file changes.
+- `mise` comes from the official `extra` repository instead of Omarchy's `mise-bin` package.
+- Only the three AI tools go through mise. Omarchy's other mise-managed tools are omitted: the wrappers for `gh`, `crush`, `gemini`, `copilot`, `playwright`, `pi`, `omp`, `grok`, `ghui`, and `hunk` at the pin (`agy` replacing `gemini`, `hey`, `ori`, and Hermes since), the global Node runtime, and the language runtimes `omarchy-install-dev-env` adds on request; `gh` comes from the official `github-cli` package.
+- Omarchy's `~/Work/.mise.toml` and global Node.js install (`mise-work.sh`) are omitted; the AI tools install as prebuilt binaries and need no runtime.
+- `omarchy-update-mise` has no counterpart; `mup` is the update path, run by hand.
+
 ### OpenCode
 
 - Shared OpenCode runtime and TUI configuration remains owned by EyrAgents. Its `system` theme selection uses ANSI colors and terminal defaults, matching Omarchy's terminal-aware behavior without a custom palette in EyrWSL.
@@ -159,7 +171,7 @@ Gruvbox follows Omarchy's behavior on each owned surface. Windows Terminal and b
 
 - `/etc/wsl.conf` carries the default user and keeps Windows interop enabled, which the clipboard integration requires.
 - Windows-side installation of Windows Terminal, the Nerd Font, and Arch directly through `wsl --install -d archlinux` is documented in this repo's README; WSL2 and a root recovery password are setup gates.
-- The WSL baseline includes `inetutils` for the `hostname` host gate, `lua` for EyrWSL's fail-closed syntax verification, `tree-sitter-cli` for LazyVim, and `man-db`/`man-pages` for local documentation. The official `openai-codex` and `opencode` packages own the AI terminal binaries.
+- The WSL baseline includes `inetutils` for the `hostname` host gate, `lua` for EyrWSL's fail-closed syntax verification, `tree-sitter-cli` for LazyVim, and `man-db`/`man-pages` for local documentation. The official `mise` package installs and updates the AI terminal tools through the stowed wrappers.
 - Yazi media helpers are optional official packages, not hidden baseline dependencies.
 
 ## Skipped From Omarchy
@@ -170,7 +182,7 @@ Gruvbox follows Omarchy's behavior on each owned surface. Windows Terminal and b
 - `drives` functions such as `iso2sd` and `format-drive`
 - `transcoding` functions for video and image conversion
 - Hunk-dependent `tds` and `hds` layouts
-- Omarchy's `open`, `a`, and `mup` shell helpers, which depend on desktop launchers, `omarchy-agent`, or mise
+- Omarchy's `open` and `a` shell helpers, which depend on desktop launchers or `omarchy-agent`
 - Hardware-focused tooling and desktop automation
 - Theme switching infrastructure not needed for fixed per-surface themes
 - Shell or app packages outside the chosen Bash plus terminal-tooling baseline

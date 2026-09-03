@@ -35,14 +35,18 @@ done
 PATH="$_path"
 unset _path _path_entry _path_entries
 
-# Preserve user-level standalone tools without shadowing Pacman's OpenCode.
+# Append the user-level directories after the system entries so system
+# binaries keep precedence: /usr/local/bin for standalone tools, then the mise
+# shims and ~/.local/bin (the stowed AI tool wrappers and Herdr) in the order
+# Omarchy's env-bootstrap uses. Interactive shells also get the mise install
+# directories from `mise activate` in init.
 case ":$PATH:" in
   *":/usr/local/bin:"*) ;;
   *) export PATH="$PATH:/usr/local/bin" ;;
 esac
 case ":$PATH:" in
-  *":$HOME/.claude/bin:"*) ;;
-  *) export PATH="$PATH:$HOME/.claude/bin" ;;
+  *":$HOME/.local/share/mise/shims:"*) ;;
+  *) export PATH="$PATH:$HOME/.local/share/mise/shims" ;;
 esac
 case ":$PATH:" in
   *":$HOME/.local/bin:"*) ;;

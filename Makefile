@@ -6,7 +6,7 @@
 # a real directory and only leaf files are links.
 
 SHELL := /bin/bash
-PACKAGES := bash btop editorconfig fastfetch git nvim starship tmux yazi
+PACKAGES := bash btop editorconfig fastfetch git mise nvim starship tmux yazi
 STOW := stow --no-folding -t ~
 
 # Twin files are byte-identical with EyrArcHy and synced manually. When the
@@ -30,10 +30,10 @@ help:
 	@echo "  unstow    Remove all package symlinks"
 	@echo "  dry-run   Preview stow actions without making changes"
 	@echo "  restow    Re-stow after repo content changes"
-	@echo "  lint      ShellCheck over the bash package, scripts/, and tests/ (.shellcheckrc holds the disable list)"
+	@echo "  lint      ShellCheck over the bash and mise packages, scripts/, and tests/ (.shellcheckrc holds the disable list)"
 	@echo "  check     Repository-only checks: every owned config in repo mode, then the tests/ fixtures (runs in CI)"
 	@echo "  twins     Twin-file sync against the EyrArcHy clone at SIBLING (skipped when absent)"
-	@echo "  verify    twins, then the WSL host, command baseline, deployment, identity, and config checks, then the fixtures"
+	@echo "  verify    twins, then the WSL host, command baseline, mise tools, deployment, identity, and config checks, then the fixtures"
 	@echo "  test      Run the fixture suites in fake homes"
 	@echo "  clean     Guarded stow preparation: leftover folds and dangling clone links only (scripts/prepare-stow.sh)"
 	@echo "  refs      Clone, fast-forward, and prune the reference clones under ~/Projects/quarry to the family's references.txt files"
@@ -58,7 +58,7 @@ restow: require-wsl
 lint:
 	shellcheck -s bash bash/.bashrc bash/.config/bash/envs bash/.config/bash/shell \
 	  bash/.config/bash/aliases bash/.config/bash/init bash/.config/bash/functions/* \
-	  scripts/*.sh tests/*.sh
+	  mise/.local/bin/* scripts/*.sh tests/*.sh
 	@echo "ok:   shellcheck clean"
 
 # Repository-only checks: every owned config validates in repo mode, then the

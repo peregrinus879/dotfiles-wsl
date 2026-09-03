@@ -1,0 +1,3 @@
+#!/bin/bash
+mise use -g --quiet "opencode" || exit 1
+exec mise x "opencode" -- "opencode" "$@"

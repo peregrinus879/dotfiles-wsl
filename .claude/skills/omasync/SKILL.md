@@ -34,7 +34,7 @@ Upstream URLs, official docs, and descriptions live in `DEVIATIONS.md` (Referenc
 3. For Omarchy-derived packages, compare against tag `v4.0.0` in `omarchy/`, plus `omarchy-pkgs/` and `gruvbox.nvim/`; never substitute moving-branch contents for the pinned release comparison
 4. For non-Omarchy tools, compare Yazi against `yazi/` and official docs, and the vault plugin specs against `obsidian.nvim/` and the render-markdown.nvim README
 5. Check the WSL and Windows contract against official WSL, Arch-on-WSL, and Windows Terminal docs: WSL2, Windows interop, `clip.exe`, `powershell.exe`, Windows-side font ownership, and `windows-terminal/settings.json` against `terminal/`; run `make wt-diff` when Terminal settings are involved
-6. Check official-package ownership at maintenance time: run `pacman -Qo /usr/bin/codex /usr/bin/opencode`, re-probe with `pacman -Si claude-code` and `pacman -Si herdr` before retaining their canonical installers, and keep Yazi media helpers explicitly optional
+6. Check package ownership at maintenance time: confirm `pacman -Si mise` still reports an official repository and `mise ls claude codex opencode` lists each tool, compare the `mise/.local/bin` wrappers against the heredoc in `git show v4.0.0:bin/omarchy-mise-install` (the dropped `MISE_MINIMUM_RELEASE_AGE=0` export is the one intended difference) and the tool list in `install/user/mise.sh`, re-probe `pacman -Si herdr` before retaining its canonical installer, and keep Yazi media helpers explicitly optional
 7. For each difference, classify it:
    - **Intentional deviation**: documented in `DEVIATIONS.md`, should stay different
    - **New upstream addition**: added upstream after the last sync, should be reviewed for inclusion
@@ -62,5 +62,5 @@ Upstream URLs, official docs, and descriptions live in `DEVIATIONS.md` (Referenc
 - Fetch changeable upstream and package facts at maintenance time instead of caching versions in this skill
 - Keep Windows Terminal and btop on Omarchy's semantic Gruvbox palette, Neovim on Omarchy's `gruvbox.nvim` selection, and ANSI-aware applications on terminal inheritance
 - Keep shared AI agent harness and OpenCode TUI configuration in EyrAgents; this repo carries no custom OpenCode theme
-- System packages, OpenCode, and Codex CLI come from official Arch repos; Claude Code and Herdr use canonical installers only while official packages are unavailable. No AUR packages or AUR helper.
+- System packages, `mise` included, come from official Arch repos; Claude Code, Codex, and OpenCode install and update through mise via the stowed wrappers, which keep mise's release cooldown, with paranoid mode on through the stowed `conf.d` fragment; Herdr uses its canonical installer only while an official package is unavailable. No AUR packages or AUR helper.
 - Keep Windows-specific behavior explicit. Anything that depends on `clip.exe`, `powershell.exe`, or Windows Terminal should be documented as a Windows interop concern.

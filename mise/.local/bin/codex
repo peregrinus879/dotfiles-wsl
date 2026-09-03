@@ -1,0 +1,3 @@
+#!/bin/bash
+mise use -g --quiet "codex" || exit 1
+exec mise x "codex" -- "codex" "$@"

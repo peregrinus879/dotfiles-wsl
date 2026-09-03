@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Verify the deployed WSL environment and every repository-owned config.
 #
-# Modes: full (the live host: command baseline, Windows interop, WSL2 kernel,
-# deployment with real managed parents, no-reply Git identity, then every
-# owned config), fixture (the same deployment, identity, and config checks
+# Modes: full (the live host: command baseline, the AI tools installed by and
+# resolving through a paranoid-mode mise, Windows interop, WSL2 kernel, deployment with real
+# managed parents, no-reply Git identity, then every owned config), fixture (the same deployment, identity, and config checks
 # against a fake repo and home, never the live home), and repo (owned configs
 # only, runnable anywhere, including CI). Verifier tools fail closed in every
 # mode; the command baseline and interop commands are host facts checked in
@@ -72,7 +72,7 @@ ok "verifier tools are available"
 if [[ $mode == full ]]; then
   baseline_tools=(
     7z bat btop claude codex curl eza fd file fzf gcc gh gum herdr hostname inotifywait
-    lazygit less lua make man nvim pgrep opencode rg rsync shellcheck ssh starship stow sudo
+    lazygit less lua make man mise nvim pgrep opencode rg rsync shellcheck ssh starship stow sudo
     tree-sitter unzip which yazi zoxide
   )
   for tool in "${baseline_tools[@]}"; do
@@ -82,6 +82,24 @@ if [[ $mode == full ]]; then
     }
   done
   ok "required command baseline is available"
+  # The AI tools are mise-managed: each must be installed (its wrapper does
+  # that on first run) and must resolve through the stowed wrapper or the mise
+  # install directories, never through a leftover package or installer.
+  for tool in claude codex opencode; do
+    resolved=$(command -v "$tool")
+    if ! mise where "$tool" >/dev/null 2>&1; then
+      problem "mise-managed tool is not installed: $tool (run it once so its wrapper installs it)"
+    elif [[ $resolved == "$verify_home/.local/bin/$tool" || $resolved == "$verify_home/.local/share/mise/"* ]]; then
+      ok "$tool is installed by mise and resolves through it: $resolved"
+    else
+      problem "$tool resolves outside mise: $resolved"
+    fi
+  done
+  if [[ $(mise settings get paranoid 2>/dev/null) == true ]]; then
+    ok "mise runs in paranoid mode"
+  else
+    problem "mise is not in paranoid mode (the stowed conf.d fragment is not in effect)"
+  fi
   for tool in clip.exe powershell.exe; do
     if command -v "$tool" >/dev/null; then
       ok "Windows interop command is available: $tool"
@@ -151,7 +169,21 @@ while IFS= read -r file; do
   else
     problem "Bash syntax failed: ${file#"$repo/"}"
   fi
-done < <(find "$repo/bash" -type f \( -name '.bashrc' -o -path '*/.config/bash/*' \) ! -name '.inputrc' -print)
+done < <(find "$repo/bash" "$repo/mise" -type f \( -name '.bashrc' -o -path '*/.config/bash/*' -o -path '*/.local/bin/*' \) ! -name '.inputrc' -print)
+
+# The stowed wrappers are what ~/.local/bin/<tool> executes, so each must stay
+# executable, keep the form omarchy-mise-install writes, and never override
+# mise's release cooldown (the one line of Omarchy's wrapper this repo drops).
+for wrapper in "$repo"/mise/.local/bin/*; do
+  tool=${wrapper##*/}
+  content=$(<"$wrapper")
+  if [[ -x $wrapper && $content != *MISE_MINIMUM_RELEASE_AGE* ]] &&
+    [[ $content == *"mise use -g --quiet \"$tool\""*"exec mise x \"$tool\" -- \"$tool\" \"\$@\""* ]]; then
+    ok "mise/.local/bin/$tool is an executable mise wrapper that keeps the release cooldown"
+  else
+    problem "mise/.local/bin/$tool is not an executable cooldown-keeping mise wrapper for $tool"
+  fi
+done
 
 while IFS= read -r -d '' file; do
   if luac -p "$file" >/dev/null; then
@@ -162,6 +194,7 @@ while IFS= read -r -d '' file; do
 done < <(find "$repo/nvim" -type f -name '*.lua' -print0)
 
 toml_files=(
+  mise/.config/mise/conf.d/eyrwsl.toml
   starship/.config/starship.toml
   yazi/.config/yazi/yazi.toml
   nvim/.config/nvim/stylua.toml
@@ -173,6 +206,13 @@ for relative in "${toml_files[@]}"; do
     problem "$relative is not valid TOML"
   fi
 done
+
+if python3 -c 'import sys,tomllib; sys.exit(0 if tomllib.load(open(sys.argv[1], "rb")).get("settings", {}).get("paranoid") is True else 1)' \
+  "$repo/mise/.config/mise/conf.d/eyrwsl.toml" 2>/dev/null; then
+  ok "mise conf.d fragment enables paranoid mode"
+else
+  problem "mise conf.d fragment does not enable paranoid mode"
+fi
 
 bootstrap_files=(
   nvim/.config/nvim/init.lua

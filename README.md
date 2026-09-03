@@ -27,6 +27,7 @@ Local clones live side by side under `~/Projects/eyrie/`.
 - **Shell**: [Bash](https://www.gnu.org/software/bash/)
 - **Prompt**: [Starship](https://github.com/starship/starship)
 - **Terminal Workspaces**: [Tmux](https://github.com/tmux/tmux), [Herdr](https://github.com/herdrdev/herdr)
+- **AI Tools**: [Claude Code](https://code.claude.com/docs), [Codex](https://github.com/openai/codex), and [OpenCode](https://github.com/anomalyco/opencode), installed and updated through [mise](https://mise.jdx.dev/)
 - **Editor**: [Neovim](https://github.com/neovim/neovim) ([LazyVim](https://github.com/LazyVim/LazyVim))
 - **Version Control**: [Git](https://git-scm.com/), [GitHub CLI](https://cli.github.com/), [LazyGit](https://github.com/jesseduffield/lazygit)
 - **File Manager**: [Yazi](https://github.com/sxyazi/yazi), [eza](https://github.com/eza-community/eza), [zoxide](https://github.com/ajeetdsouza/zoxide)
@@ -47,6 +48,7 @@ btop/              System monitor config (btop.conf, themes/gruvbox.theme)
 editorconfig/      Editor formatting rules (.editorconfig)
 fastfetch/         System info config (config.jsonc)
 git/               Git config (config, ignore)
+mise/              AI tool wrappers (.local/bin/claude, codex, opencode) that install and run each tool through mise, plus the paranoid-mode fragment (.config/mise/conf.d/eyrwsl.toml)
 nvim/              Self-contained Neovim config (bootstrap, lock, LazyVim config and plugins)
 starship/          Prompt config (starship.toml)
 tmux/              Tmux config (tmux.conf)
@@ -59,6 +61,7 @@ Key ownership rules:
 - `nvim/` owns the full Neovim config, including the LazyVim bootstrap and lockfile plus `lua/config/options.lua` with the built-in WSL clipboard integration
 - `nvim/` includes the vault plugin specs (`obsidian.lua`, `render-markdown.lua`); the vault is expected at `~/Projects/vault` (override with `OBSIDIAN_VAULT`)
 - Bash supports additive machine overlays through `~/.config/bash-overlays/*`; the directory is optional and reserved for untracked machine-local additions
+- `mise/` owns the `~/.local/bin` wrappers for Claude Code, Codex, and OpenCode, the files `omarchy-mise-install` writes on Omarchy minus its release-cooldown override, and the `~/.config/mise/conf.d/eyrwsl.toml` fragment that turns on mise's paranoid mode; each wrapper installs its tool through mise on first run, and mise's other files (`~/.config/mise/config.toml`, `~/.local/share/mise`) are host state the wrappers create
 - The AI tools run as EyrAgents configures them; Omarchy's launch aliases are not carried
 - Interactive Bash exports `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` and `OPENCODE_ENABLE_EXA=1`; EyrAgents owns OpenCode runtime configuration
 - EyrAgents owns shared OpenCode runtime and TUI configuration; its `system` theme selection inherits the Windows Terminal ANSI palette
@@ -164,19 +167,19 @@ Install the baseline packages required by these dotfiles:
 
 ```bash
 sudo pacman -S --needed 7zip bash-completion bat btop curl diffutils eza fastfetch fd file findutils \
-  fzf gcc git github-cli gum inetutils inotify-tools jq lazygit less lua make man-db man-pages \
-  neovim openai-codex openssh opencode procps-ng python ripgrep rsync shellcheck starship \
+  fzf gcc git github-cli gum inetutils inotify-tools jq lazygit less lua make man-db man-pages mise \
+  neovim openssh procps-ng python ripgrep rsync shellcheck starship \
   stow sudo tmux tree-sitter-cli unzip util-linux which yazi zoxide
 ```
 
-All baseline packages come from official Arch repositories. `openai-codex` installs the official OpenAI terminal CLI as `codex`; `opencode` installs the OpenCode terminal CLI. The local documentation baseline uses `man-db` and `man-pages`, and 7-Zip enables Yazi archive previews and extraction. Windows interoperability handles host integration, so this terminal baseline does not add the desktop-oriented `xdg-utils`. This repo intentionally depends on no AUR packages and installs no AUR helper.
+All baseline packages come from official Arch repositories. `mise` installs and updates the AI terminal tools through the stowed wrappers (section 10), as it does on Omarchy. The local documentation baseline uses `man-db` and `man-pages`, and 7-Zip enables Yazi archive previews and extraction. Windows interoperability handles host integration, so this terminal baseline does not add the desktop-oriented `xdg-utils`. This repo intentionally depends on no AUR packages and installs no AUR helper.
 
 Verify the exact baseline; successful closure prints no output. Resolve every reported package before continuing:
 
 ```bash
 pacman -T 7zip bash-completion bat btop curl diffutils eza fastfetch fd file findutils \
-  fzf gcc git github-cli gum inetutils inotify-tools jq lazygit less lua make man-db man-pages \
-  neovim openai-codex openssh opencode procps-ng python ripgrep rsync shellcheck starship \
+  fzf gcc git github-cli gum inetutils inotify-tools jq lazygit less lua make man-db man-pages mise \
+  neovim openssh procps-ng python ripgrep rsync shellcheck starship \
   stow sudo tmux tree-sitter-cli unzip util-linux which yazi zoxide
 ```
 
@@ -188,21 +191,21 @@ sudo pacman -S --needed ffmpeg imagemagick poppler resvg
 
 These helpers are optional and are not required by `make verify`.
 
-Claude Code and Herdr are not packaged in the official Arch repositories; recheck each exact package name first:
+Herdr is not packaged in the official Arch repositories; recheck the exact package name first:
 
 ```bash
-pacman -Si claude-code
 pacman -Si herdr
 ```
 
-Proceed with the corresponding canonical user-level installer only while its probe reports `package not found`:
+Proceed with its canonical user-level installer only while the probe reports `package not found`:
 
 ```bash
-curl -fsSL https://claude.ai/install.sh | bash
 curl -fsSL https://herdr.dev/install.sh | sh
 ```
 
-Package ownership is Pacman-first. Before future reinstalls, recheck the official repositories; if `claude-code` or `herdr` becomes packaged, replace its standalone installation with the official package. Authentication and subscriptions are separate from installation; complete interactive sign-in only after the shell configuration is stowed.
+Package ownership is Pacman-first. Before future reinstalls, recheck the official repositories; if `herdr` becomes packaged, replace the standalone installation with the official package.
+
+Claude Code, Codex, and OpenCode are not installed in this step. The `mise/` package stows one wrapper per tool into `~/.local/bin`, and each wrapper installs its tool through mise the first time it runs (section 10). A host that installed Codex and OpenCode from Pacman or Claude Code with its native installer removes those first, or `make clean` reports the leftover launcher at the owned path: `sudo pacman -Rns openai-codex opencode`, then `rm -f ~/.local/bin/claude` and `rm -rf ~/.local/share/claude` as the Claude Code uninstall documents (settings and credentials under `~/.claude` stay). Authentication and subscriptions are separate from installation; complete interactive sign-in only after the shell configuration is stowed.
 
 ### 5. Clone
 
@@ -312,13 +315,15 @@ nvim
 
 Run `:LazyHealth`, confirm Gruvbox loads, then exit and open Neovim again to verify the lock is stable. If the vault is synced to a different path, export `OBSIDIAN_VAULT` before launching Neovim; otherwise the vault workflow expects `~/Projects/vault`. Vault synchronization and the vault's `normalize.py` are user-owned data, not installed by this repo.
 
-Start each installed AI terminal tool once and complete its own authentication flow:
+Start each AI terminal tool once from a fresh shell and complete its own authentication flow. The stowed wrapper in `~/.local/bin` runs `mise use -g` for its tool, which installs the current release under `~/.local/share/mise` and records the `latest` pin in `~/.config/mise/config.toml`, then starts the tool; interactive shells afterwards resolve the tool through `mise activate` and skip the wrapper:
 
 ```bash
 claude
 codex
 opencode
 ```
+
+These wrappers keep mise's default 24-hour release cooldown (`minimum_release_age`), so a release installs the day after it ships, and the `mup` alias (`mise up`) keeps it too; Omarchy opts its AI tool wrappers and updater out of that cooldown while its other mise-managed tools wait it out, and here nothing opts out. Paranoid mode is on through the stowed `~/.config/mise/conf.d/eyrwsl.toml`: global configs stay implicitly trusted, and a project-level `mise.toml` or `.tool-versions` is refused until `mise trust` accepts it. `mise ls` lists the installed versions.
 
 Authentication failures do not indicate a dotfile deployment failure; resolve account access with the tool provider before testing `tdw` or `hdw`.
 
@@ -349,7 +354,7 @@ After deployment, confirm the default profile resolves to `archlinux` and the fo
 After stowing or changing owned packages:
 
 - Run `make lint` and `make check` after any change; both are repository-only (ShellCheck; every owned Bash, Lua, TOML, JSON, JSONC, Git, tmux, btop, and Fastfetch config in `repo` mode; the `tests/` fixtures), and GitHub Actions runs them on every push to `main` and every pull request, plus `make twins` against a fresh EyrArcHy clone.
-- Run `make verify` from the repo root on the WSL host after stowing or changing owned packages: `twins`, then `scripts/verify.sh` in `full` mode (WSL2 kernel and Windows interop, the command baseline, every Git-visible Stow source resolving into this repo with its managed parents real directories, a GitHub no-reply Git identity that is never printed, and every owned config), then every fixture suite.
+- Run `make verify` from the repo root on the WSL host after stowing or changing owned packages: `twins`, then `scripts/verify.sh` in `full` mode (WSL2 kernel and Windows interop, the command baseline, the three AI tools installed by mise and resolving through it, every Git-visible Stow source resolving into this repo with its managed parents real directories, a GitHub no-reply Git identity that is never printed, and every owned config), then every fixture suite.
 
 Complete these manual fresh-session checks:
 
@@ -359,7 +364,8 @@ Complete these manual fresh-session checks:
 - Start a fresh shell and confirm `alias claude c cx cy ic ix icx` reports no alias for any of them: the AI tools run as EyrAgents configures them.
 - Confirm `type tdw` shows the tmux workspace function; from a project directory, `tdw cc`, `tdw cx`, or `tdw oc` opens its session in one window with the agent focused (`-c` continues that agent's last conversation; bare `tdw` re-attaches an existing session). Creating a session fails before changing tmux state when the selected agent is unavailable.
 - Confirm `type hdw`, `type hdl`, `type hdlm`, and `type hsl` show the Herdr workspace functions. `hds` is intentionally unavailable because it requires Hunk.
-- Confirm `pacman -Qo /usr/bin/codex /usr/bin/opencode` reports `openai-codex` and `opencode` ownership.
+- Confirm `mise ls claude codex opencode` lists an installed version of each tool, and `command -v claude codex opencode` resolves every one under `~/.local/share/mise` (interactive shells, through `mise activate`) or to its `~/.local/bin` wrapper; `make verify` fails when a tool is missing from mise or resolves elsewhere.
+- Confirm `mise settings get paranoid` prints `true` and `mise settings get minimum_release_age` reports that the setting is not set, so the 24-hour default applies; `make verify` checks paranoid mode in full mode.
 - Run `nvim` once and confirm plugins install successfully and Gruvbox loads.
 - In Neovim, confirm yanks reach the Windows clipboard and pastes from the Windows clipboard reach Neovim.
 - If the vault is synced to this machine, open a vault note and confirm obsidian.nvim loads (`<leader>oo` opens the note switcher).
@@ -372,6 +378,8 @@ Complete these manual fresh-session checks:
 - **Preparation reports a conflict**: Compare the reported path, move or merge any needed content, then rerun `make clean`. The script never deletes regular files, foreign links, or special files; the only dangling links it removes name a package path of this repo.
 - **Neovim clipboard not working**: Confirm `clip.exe` and `powershell.exe` are accessible from WSL (`which clip.exe`). If Windows interop is disabled, check `[interop]` in `/etc/wsl.conf`.
 - **Obsidian image paste unavailable**: `:Obsidian paste_img` expects `wl-clipboard` or `xclip`, which this WSL baseline does not install. Save the image through Windows or the vault's own workflow, then link or embed it from the note.
+- **mise refuses a project config**: Paranoid mode is on. Review the file, then `mise trust` it; an edit to a trusted file prompts again.
+- **An AI tool wrapper fails or hangs on first run**: The wrapper resolves and downloads the release through mise, which needs network access; rerun it, or run `mise use -g <tool>` directly to see mise's own error. `mise doctor` reports activation and PATH problems.
 - **OpenCode does not match Windows Terminal**: Select `system` with `/theme`. When EyrAgents is installed, confirm `~/.config/opencode/tui.json` resolves into its `opencode` package.
 
 ## Maintenance
@@ -382,7 +390,7 @@ A repo-root `Makefile` keeps the package list in one place and wraps the routine
 - `make lint` - ShellCheck over the bash package, `scripts/`, and `tests/`; `.shellcheckrc` disables the upstream-derived warnings so new issues stand out
 - `make check` - repository-only checks: `scripts/verify.sh` in `repo` mode over every owned config, then every fixture suite (runs in CI)
 - `make twins` - twin-file sync against the EyrArcHy clone (`SIBLING`, default `~/Projects/eyrie/eyrarchy`); a missing sibling is reported as a skipped check
-- `make verify` - `twins`, then `scripts/verify.sh` in `full` mode (host, command baseline, deployment with real managed parents, no-reply identity, and every owned config), then every fixture suite
+- `make verify` - `twins`, then `scripts/verify.sh` in `full` mode (host, command baseline, mise-managed AI tools, deployment with real managed parents, no-reply identity, and every owned config), then every fixture suite
 - `make test` - fake-home deployment, ownership, verifier, Windows Terminal, and reference-clone fixtures; the loop stops on the first failing suite
 - `make clean` - WSL-only guarded stow preparation (`scripts/prepare-stow.sh`); leftover folded links and dangling clone links only, aborts before removing anything otherwise
 - `make refs` - clone, fast-forward, and prune the reference clones under `~/Projects/quarry` to the family's `references.txt` files, repointing moved GitHub remotes (`/omasync` step 1)
@@ -390,6 +398,8 @@ A repo-root `Makefile` keeps the package list in one place and wraps the routine
 - `make wt-push` - WSL-only, validate both settings files, back up a changed deployment, and atomically deploy the tracked file
 
 `.github/workflows/test.yml` runs `make lint`, `make check`, and `make twins` on every push to `main` and every pull request.
+
+Updates run in two steps, as Omarchy's updater does in one: `sudo pacman -Syu` updates the system, mise itself included (the packaged mise cannot self-update and says so when asked), and never touches the mise-managed tools; `mup` then brings Claude Code, Codex, and OpenCode current, the `mise up` call Omarchy runs after its package step, here without Omarchy's cooldown override, so a release counts once it is a day old. Under mise, Claude Code's native auto-updater is not in play; the tools change version only through mise.
 
 `nvim/.config/nvim/lazy-lock.json` is generated but tracked. Update it only through an intentional Lazy sync, review the pinned revision changes, verify a clean headless bootstrap, and commit the lockfile with the plugin-spec change that required it.
 

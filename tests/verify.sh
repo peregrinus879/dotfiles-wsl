@@ -23,7 +23,7 @@ make_baseline() {
     [[ -e $ROOT/$source || -L $ROOT/$source ]] || continue
     mkdir -p "$repo/$(dirname -- "$source")"
     cp -a -- "$ROOT/$source" "$repo/$source"
-  done < <(git -C "$ROOT" ls-files)
+  done < <(git -C "$ROOT" ls-files --cached --others --exclude-standard)
   git -C "$repo" init -q
   git -C "$repo" add .
   printf '[user]\n  name = Fixture User\n  email = fixture@users.noreply.github.com\n' >"$home/.config/git/config.local"
@@ -114,6 +114,22 @@ expect_failure "malformed tmux config" run_verify "$TMP/bad-tmux" repo
 clone_baseline bad-lock
 printf '{}\n' >"$TMP/bad-lock/repo/nvim/.config/nvim/lazy-lock.json"
 expect_failure "incomplete LazyVim lock" run_verify "$TMP/bad-lock" repo
+
+clone_baseline wrapper-not-executable
+chmod -x "$TMP/wrapper-not-executable/repo/mise/.local/bin/claude"
+expect_failure "non-executable mise wrapper" run_verify "$TMP/wrapper-not-executable" repo
+
+clone_baseline wrapper-wrong-tool
+sed -i 's/"codex"/"claude"/g' "$TMP/wrapper-wrong-tool/repo/mise/.local/bin/codex"
+expect_failure "mise wrapper naming another tool" run_verify "$TMP/wrapper-wrong-tool" repo
+
+clone_baseline wrapper-no-cooldown
+sed -i '1a export MISE_MINIMUM_RELEASE_AGE=0' "$TMP/wrapper-no-cooldown/repo/mise/.local/bin/opencode"
+expect_failure "mise wrapper overriding the release cooldown" run_verify "$TMP/wrapper-no-cooldown" repo
+
+clone_baseline not-paranoid
+printf '[settings]\nparanoid = false\n' >"$TMP/not-paranoid/repo/mise/.config/mise/conf.d/eyrwsl.toml"
+expect_failure "mise fragment without paranoid mode" run_verify "$TMP/not-paranoid" repo
 
 clone_baseline non-wsl
 if HOME="$TMP/non-wsl/home" \
