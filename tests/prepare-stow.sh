@@ -1,166 +1,217 @@
 #!/usr/bin/env bash
+# Fixtures for scripts/prepare-stow.sh: a fake HOME holding a fake clone with
+# this repo's package shape, laid out as Stow links it. Leftover folded links
+# and dangling links from a moved clone are removed; live leaf links, repo
+# content, and unowned entries are untouched; a regular file or anything
+# unrecognized aborts before any removal; the WSL gate holds; a no-folding
+# deployment keeps every managed parent real so host-local files never reach
+# a package source.
 set -euo pipefail
 
 ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 TMP=$(mktemp -d)
 trap 'rm -rf -- "$TMP"' EXIT
-AI_ROOT="$TMP/eyragents"
+PACKAGES='bash git nvim yazi'
+WSL_KERNEL='6.6.0-microsoft-standard-WSL2'
 
 fail() {
   printf 'FAIL: %s\n' "$1" >&2
   exit 1
 }
 
-run_prepare() {
-  HOME=$1 EYRAGENTS_REPO=$AI_ROOT bash "$ROOT/scripts/prepare-stow.sh"
+# A clone at $home/Projects/eyrwsl with the package shape that matters, so
+# relative link text resolves the way Stow writes it under $HOME.
+make_clone() {
+  local repo=$1
+  mkdir -p "$repo/bash/.config/bash" "$repo/git/.config/git" "$repo/nvim/.config/nvim/lua/config" \
+    "$repo/yazi/.config/yazi" "$repo/scripts"
+  printf 'bashrc\n' >"$repo/bash/.bashrc"
+  printf 'envs\n' >"$repo/bash/.config/bash/envs"
+  printf '[init]\n\tdefaultBranch = main\n' >"$repo/git/.config/git/config"
+  printf 'init\n' >"$repo/nvim/.config/nvim/init.lua"
+  printf 'options\n' >"$repo/nvim/.config/nvim/lua/config/options.lua"
+  printf 'yazi\n' >"$repo/yazi/.config/yazi/yazi.toml"
+  cp -- "$ROOT/scripts/prepare-stow.sh" "$repo/scripts/prepare-stow.sh"
+  git -C "$repo" init -q
+  git -C "$repo" add -A
 }
 
-make_ai_payload() {
-  mkdir -p "$AI_ROOT/opencode/.config/opencode/agents"
-  printf '{}\n' >"$AI_ROOT/opencode/.config/opencode/opencode.json"
-  git -C "$AI_ROOT" init -q
-  git -C "$AI_ROOT" add opencode
+prepare() { # home repo [kernel]
+  HOME=$1 EYRWSL_PACKAGES=$PACKAGES PREPARE_STOW_KERNEL_RELEASE=${3:-$WSL_KERNEL} bash "$2/scripts/prepare-stow.sh"
+}
+# shellcheck disable=SC2086
+deploy() { stow --no-folding -R -d "$2" -t "$1" $PACKAGES; }
+
+snapshot() {
+  (cd -- "$1" && find . -path ./.git -prune -o -type f -print0 | sort -z | xargs -0 sha256sum)
 }
 
 case_fresh_home() {
-  local home="$TMP/fresh/home" path
+  local home="$TMP/fresh/home" repo="$TMP/fresh/home/Projects/eyrwsl"
   mkdir -p "$home"
-  run_prepare "$home" >/dev/null
-  for path in .config .config/btop .config/btop/themes .config/git .config/nvim \
-    .config/nvim/lua/config .config/nvim/lua/plugins .config/opencode \
-    .config/opencode/themes .config/yazi; do
-    [[ -d $home/$path && ! -L $home/$path ]] || fail "fresh $path is not a real directory"
+  make_clone "$repo"
+  prepare "$home" "$repo" >/dev/null || fail "fresh home did not succeed"
+  [[ $(ls -A "$home") == Projects ]] || fail "fresh home was changed"
+}
+
+case_owned_entries() {
+  local home="$TMP/owned/home" repo="$TMP/owned/home/Projects/eyrwsl" before after path
+  mkdir -p "$home/.config/git"
+  make_clone "$repo"
+  printf 'keymaps\n' >"$repo/nvim/.config/nvim/lua/config/keymaps.lua" # untracked package file
+  ln -s Projects/eyrwsl/bash/.bashrc "$home/.bashrc"
+  ln -s ../Projects/eyrwsl/bash/.config/bash "$home/.config/bash"
+  ln -s ../Projects/eyrwsl/nvim/.config/nvim "$home/.config/nvim"
+  ln -s ../Projects/eyrwsl/yazi/.config/yazi "$home/.config/yazi"
+  ln -s ../../Projects/eyrwsl/git/.config/git/config "$home/.config/git/config"
+  printf '[user]\n\tname = fixture\n' >"$home/.config/git/config.local"
+  ln -s /usr/share/nothing/theme "$home/.config/git/theme"
+  before=$(snapshot "$repo")
+  prepare "$home" "$repo" >/dev/null || fail "owned entries did not succeed"
+  after=$(snapshot "$repo")
+  [[ $before == "$after" ]] || fail "owned-entry cleanup changed repo content"
+  for path in .config/bash .config/nvim .config/yazi; do
+    [[ ! -e $home/$path && ! -L $home/$path ]] || fail "leftover folded link remains: $path"
+  done
+  for path in .bashrc .config/git/config; do
+    [[ -L $home/$path ]] || fail "live leaf link was removed: $path"
+  done
+  [[ -d $home/.config/git && ! -L $home/.config/git ]] || fail "real git parent was touched"
+  [[ $(<"$home/.config/git/config.local") == *fixture ]] || fail "unowned regular file was changed"
+  [[ -L $home/.config/git/theme ]] || fail "unowned link was removed"
+  [[ -f $repo/nvim/.config/nvim/lua/config/keymaps.lua ]] || fail "content under a folded parent was removed from the repo"
+}
+
+case_no_folding() {
+  local home="$TMP/nofold/home" repo="$TMP/nofold/home/Projects/eyrwsl" path
+  mkdir -p "$home/.config/git"
+  make_clone "$repo"
+  printf '[user]\n\tname = fixture\n' >"$home/.config/git/config.local"
+  # Folded links as a folding deployment created them: relative, so Stow still
+  # recognizes them as its own.
+  ln -s ../Projects/eyrwsl/nvim/.config/nvim "$home/.config/nvim"
+  ln -s ../Projects/eyrwsl/yazi/.config/yazi "$home/.config/yazi"
+  prepare "$home" "$repo" >/dev/null || fail "leftover folds did not succeed"
+  deploy "$home" "$repo" >/dev/null 2>&1 || fail "no-folding stow failed after cleanup"
+  for path in .config/bash .config/git .config/nvim .config/nvim/lua/config .config/yazi; do
+    [[ -d $home/$path && ! -L $home/$path ]] || fail "$path is not a real directory after no-folding stow"
+  done
+  [[ $(readlink -f -- "$home/.config/nvim/lua/config/options.lua") == "$repo/nvim/.config/nvim/lua/config/options.lua" ]] ||
+    fail "leaf link does not resolve into the clone"
+  printf 'host-local\n' >"$home/.config/yazi/package.toml"
+  prepare "$home" "$repo" >/dev/null || fail "cleanup with live links failed"
+  [[ -L $home/.bashrc && -L $home/.config/yazi/yazi.toml ]] || fail "cleanup removed a live leaf link"
+  deploy "$home" "$repo" >/dev/null 2>&1 || fail "restow failed with host-local state present"
+  [[ $(<"$home/.config/yazi/package.toml") == host-local && $(<"$home/.config/git/config.local") == *fixture ]] ||
+    fail "restow changed host-local state"
+  [[ ! -e $repo/yazi/.config/yazi/package.toml && ! -e $repo/git/.config/git/config.local ]] ||
+    fail "host-local state reached the package source"
+}
+
+case_regular_file() {
+  local home="$TMP/regular/home" repo="$TMP/regular/home/Projects/eyrwsl"
+  mkdir -p "$home/.config"
+  make_clone "$repo"
+  printf 'skel\n' >"$home/.bashrc"
+  ln -s ../Projects/eyrwsl/yazi/.config/yazi "$home/.config/yazi"
+  if prepare "$home" "$repo" >/dev/null 2>&1; then fail "regular file at an owned path did not abort"; fi
+  [[ $(<"$home/.bashrc") == skel ]] || fail "regular file was changed"
+  [[ -L $home/.config/yazi ]] || fail "abort was not atomic: a folded link was removed first"
+}
+
+case_moved_clone() {
+  local home="$TMP/moved/home" repo="$TMP/moved/home/Projects/eyrwsl" path
+  mkdir -p "$home/.config/git"
+  make_clone "$repo"
+  ln -s Projects/old/eyrwsl/bash/.bashrc "$home/.bashrc"
+  ln -s ../Projects/old/eyrwsl/yazi/.config/yazi "$home/.config/yazi"
+  ln -s "$TMP/moved/elsewhere/eyrwsl/git/.config/git/config" "$home/.config/git/config"
+  prepare "$home" "$repo" >/dev/null || fail "moved-clone links did not succeed"
+  for path in .bashrc .config/yazi .config/git/config; do
+    [[ ! -L $home/$path ]] || fail "dangling link from a moved clone remains: $path"
   done
 }
 
-case_owned_links() {
-  local home="$TMP/owned/home"
-  mkdir -p "$home/.config"
-  ln -s "$ROOT/bash/.config/bash" "$home/.config/bash"
-  ln -s "$ROOT/tmux/.config/tmux" "$home/.config/tmux"
-  ln -s "$ROOT/bash/.bashrc" "$home/.bashrc"
-  run_prepare "$home" >/dev/null
-  [[ ! -e $home/.config/bash && ! -L $home/.config/bash ]] || fail "owned Bash fold remains"
-  [[ ! -e $home/.config/tmux && ! -L $home/.config/tmux ]] || fail "owned tmux fold remains"
-  [[ ! -e $home/.bashrc && ! -L $home/.bashrc ]] || fail "owned file link remains"
-}
-
-case_mutable_directories() {
-  local home="$TMP/mutable/home" before after
-  mkdir -p "$home/.config"
-  before=$(sha256sum "$ROOT/yazi/.config/yazi/yazi.toml")
-  ln -s "$ROOT/btop/.config/btop" "$home/.config/btop"
-  ln -s "$ROOT/yazi/.config/yazi" "$home/.config/yazi"
-  run_prepare "$home" >/dev/null
-  after=$(sha256sum "$ROOT/yazi/.config/yazi/yazi.toml")
-  [[ $before == "$after" ]] || fail "mutable-directory preparation changed repo content"
-  [[ -d $home/.config/btop && ! -L $home/.config/btop ]] || fail "btop root is not real"
-  [[ -d $home/.config/btop/themes && ! -L $home/.config/btop/themes ]] || fail "btop themes root is not real"
-  [[ -d $home/.config/yazi && ! -L $home/.config/yazi ]] || fail "Yazi root is not real"
-}
-
-case_opencode_merge() {
-  local home="$TMP/opencode/home"
-  mkdir -p "$home/.config/opencode/themes"
-  printf 'preserve\n' >"$home/.config/opencode/local-note"
-  ln -s "$AI_ROOT/opencode/.config/opencode/agents" "$home/.config/opencode/agents"
-  ln -s "$AI_ROOT/opencode/.config/opencode/opencode.json" "$home/.config/opencode/opencode.json"
-  run_prepare "$home" >/dev/null
-  [[ $(<"$home/.config/opencode/local-note") == preserve ]] || fail "OpenCode user content changed"
-  [[ -d $home/.config/opencode && ! -L $home/.config/opencode ]] || fail "OpenCode root is not real"
-  [[ -d $home/.config/opencode/themes && ! -L $home/.config/opencode/themes ]] || fail "OpenCode themes root is not real"
-  [[ ! -e $home/.config/opencode/agents ]] || fail "managed OpenCode directory link remains"
-  [[ ! -e $home/.config/opencode/opencode.json ]] || fail "managed OpenCode file link remains"
-}
-
-case_folded_parent_safety() {
-  local home="$TMP/folded/home" before after
-  mkdir -p "$home/.config"
-  before=$(sha256sum "$ROOT/bash/.config/bash/envs")
-  ln -s "$ROOT/bash/.config/bash" "$home/.config/bash"
-  run_prepare "$home" >/dev/null
-  after=$(sha256sum "$ROOT/bash/.config/bash/envs")
-  [[ $before == "$after" ]] || fail "folded-parent cleanup changed repo content"
-  [[ ! -e $home/.config/bash && ! -L $home/.config/bash ]] || fail "folded parent remains"
-}
-
-case_repo_resolving_parent_is_atomic() {
-  local home="$TMP/repo-parent/home" before after
-  mkdir -p "$home/.config/nvim/after"
-  before=$(sha256sum "$ROOT/nvim/.config/nvim/after/plugin/transparency.lua")
-  ln -s "$ROOT/bash/.bashrc" "$home/.bashrc"
-  ln -s "$ROOT/nvim/.config/nvim/after/plugin" "$home/.config/nvim/after/plugin"
-  if run_prepare "$home" >/dev/null 2>&1; then
-    fail "repo-resolving parent did not abort"
-  fi
-  after=$(sha256sum "$ROOT/nvim/.config/nvim/after/plugin/transparency.lua")
-  [[ $before == "$after" ]] || fail "repo-resolving parent changed repo content"
-  [[ -L $home/.bashrc ]] || fail "repo-parent preflight partially removed a managed link"
-  [[ -L $home/.config/nvim/after/plugin ]] || fail "repo-resolving parent was removed"
-}
-
-case_regular_conflict_is_atomic() {
-  local home="$TMP/regular/home"
-  mkdir -p "$home/.config"
-  printf 'user data\n' >"$home/.bashrc"
-  ln -s "$ROOT/tmux/.config/tmux" "$home/.config/tmux"
-  if run_prepare "$home" >/dev/null 2>&1; then
-    fail "regular-file conflict did not abort"
-  fi
-  [[ $(<"$home/.bashrc") == "user data" ]] || fail "regular-file conflict changed"
-  [[ -L $home/.config/tmux ]] || fail "preflight failure partially removed a managed link"
+case_dangling_unrelated() {
+  local home="$TMP/dangling/home" repo="$TMP/dangling/home/Projects/eyrwsl"
+  mkdir -p "$home/.config/git"
+  make_clone "$repo"
+  ln -s Projects/old/eyrwsl/bash/.bashrc "$home/.bashrc"
+  ln -s /usr/share/git/config "$home/.config/git/config"
+  if prepare "$home" "$repo" >/dev/null 2>&1; then fail "dangling link outside the package layout did not abort"; fi
+  [[ -L $home/.config/git/config ]] || fail "dangling unrelated link was removed"
+  [[ -L $home/.bashrc ]] || fail "abort was not atomic: a dangling clone link was removed first"
 }
 
 case_foreign_link() {
-  local home="$TMP/foreign/home" foreign="$TMP/foreign/user-file"
-  mkdir -p "$home" "$(dirname -- "$foreign")"
+  local home="$TMP/foreign/home" repo="$TMP/foreign/home/Projects/eyrwsl" foreign="$TMP/foreign/user-config"
+  mkdir -p "$home/.config/git"
+  make_clone "$repo"
   printf 'foreign\n' >"$foreign"
-  ln -s "$foreign" "$home/.bashrc"
-  if run_prepare "$home" >/dev/null 2>&1; then
-    fail "foreign symlink did not abort"
-  fi
-  [[ -L $home/.bashrc ]] || fail "foreign symlink was removed"
+  ln -s Projects/old/eyrwsl/bash/.bashrc "$home/.bashrc"
+  ln -s "$foreign" "$home/.config/git/config"
+  if prepare "$home" "$repo" >/dev/null 2>&1; then fail "foreign link did not abort"; fi
+  [[ -L $home/.config/git/config && $(<"$foreign") == foreign ]] || fail "foreign link or its target was changed"
+  [[ -L $home/.bashrc ]] || fail "abort was not atomic: a dangling clone link was removed first"
 }
 
-case_broken_link() {
-  local home="$TMP/broken/home"
-  mkdir -p "$home"
-  ln -s "$TMP/broken/missing" "$home/.bashrc"
-  if run_prepare "$home" >/dev/null 2>&1; then
-    fail "broken symlink did not abort"
-  fi
-  [[ -L $home/.bashrc ]] || fail "broken symlink was removed"
+case_foreign_fold() {
+  local home="$TMP/fold/home" repo="$TMP/fold/home/Projects/eyrwsl" other="$TMP/fold/other-yazi"
+  mkdir -p "$home/.config" "$other"
+  make_clone "$repo"
+  printf 'other\n' >"$other/yazi.toml"
+  ln -s ../Projects/eyrwsl/bash/.config/bash "$home/.config/bash"
+  ln -s "$other" "$home/.config/yazi"
+  if prepare "$home" "$repo" >/dev/null 2>&1; then fail "foreign directory link did not abort"; fi
+  [[ -L $home/.config/yazi && $(<"$other/yazi.toml") == other ]] || fail "foreign directory link or its content was changed"
+  [[ -L $home/.config/bash ]] || fail "abort was not atomic: a folded link was removed first"
 }
 
 case_special_file() {
-  local home="$TMP/special/home"
+  local home="$TMP/special/home" repo="$TMP/special/home/Projects/eyrwsl"
   mkdir -p "$home"
+  make_clone "$repo"
   mkfifo "$home/.bashrc"
-  if run_prepare "$home" >/dev/null 2>&1; then
-    fail "special-file conflict did not abort"
-  fi
-  [[ -p $home/.bashrc ]] || fail "special-file conflict was removed"
+  if prepare "$home" "$repo" >/dev/null 2>&1; then fail "special file did not abort"; fi
+  [[ -p $home/.bashrc ]] || fail "special file was removed"
 }
 
-case_missing_ai_repo() {
-  local home="$TMP/missing-ai-repo/home"
+case_directory_at_leaf() {
+  local home="$TMP/dirleaf/home" repo="$TMP/dirleaf/home/Projects/eyrwsl"
+  mkdir -p "$home/.bashrc"
+  make_clone "$repo"
+  if prepare "$home" "$repo" >/dev/null 2>&1; then fail "directory at a leaf path did not abort"; fi
+  [[ -d $home/.bashrc ]] || fail "directory at a leaf path was removed"
+}
+
+case_missing_packages() {
+  local home="$TMP/nopkg/home" repo="$TMP/nopkg/home/Projects/eyrwsl"
   mkdir -p "$home"
-  if HOME="$home" EYRAGENTS_REPO='' EYRWSL_PACKAGES=fixture \
-    bash "$ROOT/scripts/prepare-stow.sh" >/dev/null 2>&1; then
-    fail "empty EYRAGENTS_REPO did not abort"
+  make_clone "$repo"
+  if HOME=$home EYRWSL_PACKAGES='' PREPARE_STOW_KERNEL_RELEASE=$WSL_KERNEL bash "$repo/scripts/prepare-stow.sh" >/dev/null 2>&1; then
+    fail "empty EYRWSL_PACKAGES did not abort"
   fi
 }
 
-case_missing_ai_repo
+case_wsl_gate() {
+  local home="$TMP/gate/home" repo="$TMP/gate/home/Projects/eyrwsl"
+  mkdir -p "$home/.config"
+  make_clone "$repo"
+  ln -s ../Projects/eyrwsl/yazi/.config/yazi "$home/.config/yazi"
+  if prepare "$home" "$repo" linux-fixture >/dev/null 2>&1; then fail "non-WSL kernel did not abort"; fi
+  [[ -L $home/.config/yazi ]] || fail "non-WSL abort removed a link"
+}
+
 case_fresh_home
-make_ai_payload
-case_owned_links
-case_mutable_directories
-case_opencode_merge
-case_folded_parent_safety
-case_repo_resolving_parent_is_atomic
-case_regular_conflict_is_atomic
+case_owned_entries
+case_no_folding
+case_regular_file
+case_moved_clone
+case_dangling_unrelated
 case_foreign_link
-case_broken_link
+case_foreign_fold
 case_special_file
-printf 'ok: prepare-stow preflights ownership and preserves user data\n'
+case_directory_at_leaf
+case_missing_packages
+case_wsl_gate
+printf 'ok:   prepare-stow removes leftover folds and dangling clone links, keeps live links and user files, and aborts untouched otherwise\n'

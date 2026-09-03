@@ -1,156 +1,152 @@
 #!/usr/bin/env bash
-# Prepare EyrWSL and EyrAgents OpenCode endpoints without deleting user files.
+# Guarded stow preparation for EyrWSL (make clean).
+#
+# Stow runs with --no-folding, so live deployments are real parent directories
+# holding leaf links that Stow itself manages. This script removes only what
+# Stow cannot reconcile and never deletes user data. Owned paths are derived
+# from the Git-visible package files (tracked plus untracked, minus ignored):
+# each file maps to its stow target under $HOME, and every directory between
+# $HOME and that target is a managed parent. Every owned path is classified
+# before anything is removed, so an unrecognized entry aborts the run untouched:
+#   - a managed parent that is a symlink resolving into this repo is removed:
+#     a folded directory link left by a folding deployment
+#   - a leaf link that resolves into this repo is left alone: Stow owns it
+#   - a dangling link, parent or leaf, whose text names a package path this
+#     repo has (a moved or deleted clone) is removed
+#   - an entry beneath a folded parent queued for removal is skipped: it is
+#     repo working-tree content and disappears with the fold
+#   - a regular file at an owned path (a fresh user's /etc/skel .bashrc, say)
+#     aborts: compare and move or merge it, then rerun
+#   - anything else (a symlink that resolves elsewhere, a directory or special
+#     file at a leaf path) aborts
+# EYRWSL_PACKAGES carries the package list; the Makefile owns it. The WSL
+# kernel gate reads PREPARE_STOW_KERNEL_RELEASE instead of uname only when
+# HOME is not the invoking user's login home, so fixtures run anywhere and the
+# live home is never prepared off-host.
 set -euo pipefail
-
-repo=$(realpath -e -- "$(dirname -- "${BASH_SOURCE[0]}")/..")
-
-declare -a remove_links=()
-declare -a create_dirs=()
-declare -a replaced_dirs=()
 
 abort() {
   printf 'prepare-stow: %s\n' "$1" >&2
   exit 1
 }
 
-[[ -n ${EYRAGENTS_REPO:-} ]] || abort "EYRAGENTS_REPO is required"
-ai_repo=$(realpath -m -- "$EYRAGENTS_REPO")
-[[ -n ${EYRWSL_PACKAGES:-} ]] || abort "EYRWSL_PACKAGES is required"
+repo=$(realpath -e -- "$(dirname -- "${BASH_SOURCE[0]}")/..") || abort 'cannot resolve the repository root'
+[[ -n ${HOME:-} && $HOME != / && -d $HOME ]] || abort 'HOME must name an existing non-root directory'
+[[ -n ${EYRWSL_PACKAGES:-} ]] || abort 'EYRWSL_PACKAGES is required'
 read -r -a packages <<<"$EYRWSL_PACKAGES"
-(( ${#packages[@]} )) || abort "package list is empty"
+((${#packages[@]})) || abort 'package list is empty'
+command -v git >/dev/null || abort 'git is required'
 
-kernel=$(uname -r)
-[[ ${kernel,,} == *microsoft* ]] || abort "WSL is required for deployment preparation"
+if [[ -n ${PREPARE_STOW_KERNEL_RELEASE:-} ]]; then
+  login_home=$(getent passwd "$(id -un)" | cut -d: -f6)
+  [[ -n $login_home && $(realpath -m -- "$HOME") != "$(realpath -m -- "$login_home")" ]] ||
+    abort 'PREPARE_STOW_KERNEL_RELEASE is honored only with a non-live HOME'
+  kernel=$PREPARE_STOW_KERNEL_RELEASE
+else
+  kernel=$(uname -r)
+fi
+[[ ${kernel,,} == *microsoft* ]] || abort 'WSL is required for deployment preparation'
 
-is_managed_target() {
-  local target=$1
-  [[ $target == "$repo"/* || $target == "$ai_repo/opencode"/* ]]
+resolves_into_repo() {
+  local resolved
+  resolved=$(readlink -f -- "$1") || return 1
+  [[ $resolved == "$repo"/* ]]
 }
 
-queue_unique() {
-  local array_name=$1 value=$2 existing
-  local -n array=$array_name
-  for existing in "${array[@]}"; do
-    [[ $existing == "$value" ]] && return
-  done
-  array+=("$value")
-}
-
-under_replaced_dir() {
-  local path=$1 dir
-  for dir in "${replaced_dirs[@]}"; do
-    [[ $path == "$dir" || $path == "$dir/"* ]] && return 0
+# Link text that names a package entry this repo really has: the package name
+# followed by a top-level entry of that package, whatever clone path precedes
+# it. Only dangling links are ever judged by their text.
+managed_link_text() {
+  local text=$1 package tail
+  for package in "${packages[@]}"; do
+    [[ $text == *"/$package/"* ]] || continue
+    tail=${text#*"/$package/"}
+    [[ -n $tail && -e "$repo/$package/${tail%%/*}" ]] && return 0
   done
   return 1
 }
 
-queue_managed_link() {
-  local path=$1 target
-  target=$(realpath -e -- "$path") || abort "$path is a broken symlink; refusing to remove it"
-  is_managed_target "$target" || abort "$path is an unmanaged symlink to $(readlink -- "$path")"
-  queue_unique remove_links "$path"
+declare -a remove_folds=() remove_links=()
+
+# A dangling link is judged by its text alone; it aborts unless the text names
+# a package path this repo has.
+queue_dangling_link() {
+  local path=$1 text
+  text=$(readlink -- "$path")
+  managed_link_text "$text" ||
+    abort "$path is a dangling symlink to $text, which names no package path of this repo; refusing to remove it"
+  remove_links+=("$path")
 }
 
-prepare_real_dir() {
-  local path=$1
-  if under_replaced_dir "$path"; then
-    queue_unique create_dirs "$path"
-    queue_unique replaced_dirs "$path"
-  elif [[ -L $path ]]; then
-    queue_managed_link "$path"
-    queue_unique create_dirs "$path"
-    queue_unique replaced_dirs "$path"
-  elif [[ -e $path && ! -d $path ]]; then
-    abort "$path must be a real directory"
-  else
-    queue_unique create_dirs "$path"
-  fi
+under_queued_fold() {
+  local path=$1 fold
+  for fold in "${remove_folds[@]}"; do
+    [[ $path == "$fold"/* ]] && return 0
+  done
+  return 1
 }
 
-prepare_fold_dir() {
-  local path=$1
-  under_replaced_dir "$path" && return
-  if [[ -L $path ]]; then
-    queue_managed_link "$path"
-    queue_unique replaced_dirs "$path"
-  elif [[ -e $path && ! -d $path ]]; then
-    abort "$path conflicts with a managed directory"
-  fi
-}
-
-parent_resolves_into_managed_repo() {
-  local path=$1 parent
-  parent=$(realpath -e -- "$(dirname -- "$path")") || return 1
-  is_managed_target "$parent"
-}
-
-prepare_leaf() {
-  local path=$1
-  under_replaced_dir "$path" && return
-  if [[ -e $path || -L $path ]]; then
-    parent_resolves_into_managed_repo "$path" &&
-      abort "$path sits under a parent that resolves into a managed repo; refusing to remove repo content"
-    if [[ -L $path ]]; then
-      queue_managed_link "$path"
-    elif [[ -f $path ]]; then
-      abort "$path is a regular file; compare or move it before retrying"
-    else
-      abort "$path is an unrecognized directory or special file"
-    fi
-  fi
-}
-
-# Shared and mutable roots stay real so runtime files cannot land in a repo.
-for path in \
-  "$HOME/.config" \
-  "$HOME/.config/btop" \
-  "$HOME/.config/btop/themes" \
-  "$HOME/.config/git" \
-  "$HOME/.config/nvim" \
-  "$HOME/.config/nvim/lua" \
-  "$HOME/.config/nvim/lua/config" \
-  "$HOME/.config/nvim/lua/plugins" \
-  "$HOME/.config/opencode" \
-  "$HOME/.config/opencode/themes" \
-  "$HOME/.config/yazi"; do
-  prepare_real_dir "$path"
-done
-
-# These immutable package trees may be folded by Stow and can be removed as a
-# unit when they still resolve into EyrWSL or EyrAgents. New package parents
-# must be classified here or as real roots; unclassified repo parents abort.
-for path in \
-  "$HOME/.config/bash/functions" \
-  "$HOME/.config/bash" \
-  "$HOME/.config/fastfetch" \
-  "$HOME/.config/nvim/after" \
-  "$HOME/.config/opencode/agents" \
-  "$HOME/.config/opencode/commands" \
-  "$HOME/.config/opencode/node_modules" \
-  "$HOME/.config/opencode/plugins" \
-  "$HOME/.config/opencode/skills" \
-  "$HOME/.config/opencode/tools" \
-  "$HOME/.config/tmux"; do
-  prepare_fold_dir "$path"
-done
-
-while IFS= read -r source; do
-  [[ ${source##*/} == .gitignore ]] && continue
-  prepare_leaf "$HOME/${source#*/}"
-done < <(git -C "$repo" ls-files --cached --others --exclude-standard -- "${packages[@]}")
-
-if [[ -d $ai_repo ]]; then
-  while IFS= read -r source; do
-    [[ ${source##*/} == .gitignore ]] && continue
-    prepare_leaf "$HOME/${source#*/}"
-  done < <(git -C "$ai_repo" ls-files --cached --others --exclude-standard -- opencode)
+# Owned leaves and their parents, from the Git-visible package files.
+declare -a leaves=() parents=()
+while IFS= read -r -d '' source; do
+  rel=${source#*/}
+  leaves+=("$HOME/$rel")
+  dir=$rel
+  while [[ $dir == */* ]]; do
+    dir=${dir%/*}
+    parents+=("$HOME/$dir")
+  done
+done < <(git -C "$repo" ls-files -z --cached --others --exclude-standard -- "${packages[@]}")
+((${#leaves[@]})) || abort 'no Git-visible package files found'
+if ((${#parents[@]})); then
+  mapfile -d '' -t parents < <(printf '%s\0' "${parents[@]}" | sort -z -u)
 fi
 
-# Mutation begins only after every endpoint passes preflight.
+# Parents shallowest first, so a fold is queued before anything beneath it is
+# looked at; entries under a queued fold are repo content and are skipped.
+for dir in "${parents[@]}"; do
+  under_queued_fold "$dir" && continue
+  if [[ -L $dir ]]; then
+    if resolves_into_repo "$dir"; then
+      remove_folds+=("$dir")
+    elif [[ ! -e $dir ]]; then
+      queue_dangling_link "$dir"
+    else
+      abort "$dir is a symlink that does not resolve into this repo; refusing to remove it"
+    fi
+  elif [[ -e $dir && ! -d $dir ]]; then
+    abort "$dir is neither a directory nor a symlink; refusing to continue"
+  fi
+done
+
+for leaf in "${leaves[@]}"; do
+  under_queued_fold "$leaf" && continue
+  [[ -e $leaf || -L $leaf ]] || continue
+  if [[ -L $leaf ]]; then
+    if resolves_into_repo "$leaf"; then
+      continue
+    elif [[ ! -e $leaf ]]; then
+      queue_dangling_link "$leaf"
+    else
+      abort "$leaf is a symlink that does not resolve into this repo; refusing to remove it"
+    fi
+  elif [[ -f $leaf ]]; then
+    abort "$leaf is a regular file; compare and move or merge it before retrying"
+  else
+    abort "$leaf is neither a symlink nor a regular file; refusing to remove it"
+  fi
+done
+
+# Mutation begins only after every owned path is classified.
+if ((${#remove_folds[@]} + ${#remove_links[@]} == 0)); then
+  printf 'prepare-stow: nothing to remove\n'
+  exit 0
+fi
+for path in "${remove_folds[@]}"; do
+  rm -- "$path"
+  printf 'removed: %s (folded directory link into this repo)\n' "$path"
+done
 for path in "${remove_links[@]}"; do
   rm -- "$path"
-  printf 'removed managed symlink: %s\n' "$path"
-done
-for path in "${create_dirs[@]}"; do
-  mkdir -p -- "$path"
+  printf 'removed: %s (dangling symlink into a former clone)\n' "$path"
 done
