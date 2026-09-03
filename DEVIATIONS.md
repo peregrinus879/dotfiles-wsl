@@ -22,7 +22,7 @@ Omarchy is an opinionated Arch Linux distribution targeting a full desktop envir
 ## Reference Sources
 
 - [omacom/omarchy](https://github.com/omacom/omarchy) - main repo for bash, tmux, starship, git, fastfetch, btop, and editorconfig references
-- [omacom-io/omarchy-pkgs](https://github.com/omacom-io/omarchy-pkgs) - package builds, including the Omarchy Neovim package
+- [omacom/omarchy-pkgs](https://github.com/omacom/omarchy-pkgs) - package builds, including the Omarchy Neovim package
 - [OpenAI Codex](https://github.com/openai/codex) and the [Arch `openai-codex` package](https://archlinux.org/packages/extra/x86_64/openai-codex/) - official terminal CLI upstream and signed Arch package
 - [OpenCode](https://github.com/anomalyco/opencode) and the [Arch `opencode` package](https://archlinux.org/packages/extra/x86_64/opencode/) - terminal coding agent upstream and signed Arch package
 - [Herdr](https://github.com/herdrdev/herdr) - terminal workspace manager; its website provides the canonical installer
@@ -59,10 +59,10 @@ Gruvbox follows Omarchy's behavior on each owned surface. Windows Terminal and b
 ### Dotfile Management
 
 - GNU Stow with symlinked package ownership replaces Omarchy's file-copy and package-install model.
-- `make clean` performs an all-or-nothing ownership preflight and removes only links into EyrWSL or the configured EyrAgents OpenCode package. EyrAgents defaults to `../eyragents`; `EYRAGENTS_REPO` overrides that path for both `make clean` and `make stow-all`. Regular files, foreign or broken links, special files, and unrecognized repo-resolving parents abort untouched.
-- `make verify` fails closed on the WSL2/interoperability host contract, command baseline, deployed package ownership, resolved Git identity, and owned config parsers and runtimes before running isolated attack fixtures.
-- Git, Neovim, OpenCode, btop, and Yazi mutable or merge roots stay real; immutable package directories retain GNU Stow's normal tree-folding behavior.
-- `/omasync` owns reference-clone maintenance and upstream comparison; `docs/maintenance.md` owns dated findings, known limitations, and deferred work.
+- `make clean` derives the owned paths from the package files, classifies every one before changing anything, and removes only folded directory links left by a folding deployment and dangling links from a moved or deleted clone; live leaf links stay for Stow. Regular files, foreign links, and special files at owned paths abort untouched.
+- `make verify` fails closed on the WSL2/interoperability host contract, command baseline, deployed package ownership with real managed parents, a GitHub no-reply Git identity, and owned config parsers and runtimes before running the fixture suites; `make check` runs the parser, runtime, and fixture parts anywhere.
+- Stow runs with `--no-folding`, so every managed parent stays a real directory that tools may write into and only leaf files are links.
+- `/omasync` owns reference-clone maintenance and upstream comparison; `docs/maintenance.md` owns unresolved decisions, deferred work, active limitations, and dated evidence.
 - Agent-tool verification approvals are handled by session or shared EyrAgents policy rather than repo-root project allowlists.
 
 ### Theme
@@ -131,7 +131,7 @@ Gruvbox follows Omarchy's behavior on each owned surface. Windows Terminal and b
 ### OpenCode
 
 - Shared OpenCode runtime and TUI configuration remains owned by EyrAgents. Its `system` theme selection uses ANSI colors and terminal defaults, matching Omarchy's terminal-aware behavior without a custom palette in EyrWSL.
-- `~/.config/opencode/` stays a real directory so EyrAgents can link configuration while OpenCode manages its runtime content.
+- EyrAgents deploys its own `opencode` package without folding; nothing in EyrWSL touches `~/.config/opencode/`.
 
 ### Fastfetch
 
@@ -160,7 +160,7 @@ Gruvbox follows Omarchy's behavior on each owned surface. Windows Terminal and b
 
 - `/etc/wsl.conf` carries the default user and keeps Windows interop enabled, which the clipboard integration requires.
 - Windows-side installation of Windows Terminal, the Nerd Font, and Arch directly through `wsl --install -d archlinux` is documented in this repo's README; WSL2 and a root recovery password are setup gates.
-- The WSL baseline includes `inetutils` for the `hostname` host gate, `lua` for EyrWSL's fail-closed syntax verification, `nodejs` for EyrAgents verification, `tree-sitter-cli` for LazyVim, and `man-db`/`man-pages` for local documentation. The official `openai-codex` and `opencode` packages own the AI terminal binaries.
+- The WSL baseline includes `inetutils` for the `hostname` host gate, `lua` for EyrWSL's fail-closed syntax verification, `tree-sitter-cli` for LazyVim, and `man-db`/`man-pages` for local documentation. The official `openai-codex` and `opencode` packages own the AI terminal binaries.
 - Yazi media helpers are optional official packages, not hidden baseline dependencies.
 
 ## Skipped From Omarchy

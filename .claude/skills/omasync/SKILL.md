@@ -18,7 +18,7 @@ Local reference clones live under `~/Projects/quarry/`; `references.txt` at the 
 - `obsidian.nvim/` - obsidian.nvim upstream for the vault plugin spec
 - `terminal/` - Windows Terminal reference repo for settings structure and feature changes
 
-Upstream URLs, official docs, and descriptions live in `DEVIATIONS.md` (Reference Sources). Durable findings and deferred items live in `docs/maintenance.md`.
+Upstream URLs, official docs, and descriptions live in `DEVIATIONS.md` (Reference Sources). Unresolved decisions, deferred work, and dated evidence live in `docs/maintenance.md`.
 
 ## When To Use
 
@@ -50,12 +50,12 @@ Upstream URLs, official docs, and descriptions live in `DEVIATIONS.md` (Referenc
 - `README.md`, `AGENTS.md`, and `DEVIATIONS.md` reflect any ownership, setup, or workflow changes
 - `make refs` passed in this run; Omarchy release comparisons still use tag `v4.0.0`
 - Every retained difference is still documented in `DEVIATIONS.md`
-- Official-package probes and WSL/Windows gates reflect current sources; `make verify` and `make lint` pass, plus `make wt-diff` when Terminal settings are involved
+- Official-package probes and WSL/Windows gates reflect current sources; `make lint` and `make check` pass, `make verify` passes on the WSL host, plus `make wt-diff` when Terminal settings are involved
 - The final summary distinguishes adopted changes, rejected changes, and intentional retained differences
 
 ## Rules
 
-- Present proposed changes to the user before editing
+- Present proposed changes to the user before editing; a deliberate exception to shared guidance, because a sync pass touches many files on judgment calls and each adopted upstream change is a deviation decision
 - Omarchy, official docs, official package docs, and `DEVIATIONS.md` are the source of truth for default behavior and intentional differences
 - Always check all relevant sources, not just one
 - Never assume a difference is intentional without verifying it is documented in `DEVIATIONS.md`

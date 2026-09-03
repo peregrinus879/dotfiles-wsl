@@ -1,8 +1,11 @@
 # Maintenance Ledger - EyrWSL
 
-Read this file before package changes, WSL or Windows Terminal updates, `/omasync`, work on a deferred item, or cross-repo coordination. Current operational policy stays in `AGENTS.md`; this ledger carries dated findings, known limitations, and deferred items. It records repo decisions and behavior official docs do not state; doc-derivable facts such as defaults, version gates, package availability, and upstream status are fetched at change time, not cached here.
+Unresolved decisions, deferred work, active limitations, and the dated evidence behind them. Durable rules live in `AGENTS.md`, `DEVIATIONS.md`, a skill, a script header, or a test; remove an item here once its rule has moved there.
 
-## Known Limitations
+## Active Limitations
 
 - `:Obsidian paste_img` expects `wl-clipboard` or `xclip`, unavailable under WSL.
-- Stow tree-folds immutable config directories that do not pre-exist at stow time into package symlinks. Guarded preparation keeps Git, Neovim, OpenCode, btop, and Yazi mutable or merge roots real; folding remains the convention for the other package directories (do not add `--no-folding`).
+
+## Deferred Work
+
+- WSL host pass, for the agent to run in a session opened in the WSL clone, stopping at the first mismatch: `git pull --ff-only`; `make restow` (Stow replaces the folded parents of the previous deployment with real directories and leaf links, so expect it to unlink and relink every package; `~/.config/opencode` stays untouched); `make verify`; `make refs` (clones `gruvbox.nvim` and removes clones no family repository lists); `make wt-diff`; then `make stow` and `make verify` in the EyrAgents clone as its own ledger describes. Report the results and remove this item.
