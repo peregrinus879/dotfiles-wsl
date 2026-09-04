@@ -1,1 +1,66 @@
-../../../.claude/skills/omasync/SKILL.md
+---
+name: omasync
+description: Sync EyrWSL against Omarchy references and official WSL and Windows Terminal docs. Covers all packages owned by EyrWSL.
+---
+
+# Omasync
+
+Source configs from reference repos and official docs, compare against EyrWSL, and apply changes only where they belong in this repo.
+
+## Sources
+
+Local reference clones live under `~/Projects/quarry/`; `references.txt` at the repo root names the ones this repo needs, and the family union of every sibling's file defines the quarry (`make refs` clones, updates, and prunes to it):
+
+- `omarchy/` - main repo for bash, tmux, starship, git, fastfetch, btop, and editorconfig references; `make refs` keeps it on the upstream default branch, which upstream moves between releases, so pin EyrWSL release comparisons to tag `v4.0.0` (`git show v4.0.0:<path>`)
+- `omarchy-pkgs/` - package builds, including the Omarchy Neovim package
+- `gruvbox.nvim/` - Gruvbox Neovim plugin source selected by Omarchy
+- `yazi/` - Yazi reference repo for configuration and feature changes
+- `obsidian.nvim/` - obsidian.nvim upstream for the vault plugin spec
+- `terminal/` - Windows Terminal reference repo for settings structure and feature changes
+
+Upstream URLs, official docs, and descriptions live in `DEVIATIONS.md` (Reference Sources). Unresolved decisions, deferred work, and dated evidence live in `docs/maintenance.md`.
+
+## When To Use
+
+- Use this skill when Omarchy or a reference repo changed materially, including after an Omarchy release.
+- Use this skill when repo scope or behavior changed materially.
+- Use this skill when you suspect undocumented drift between this repo and its references.
+- Use this skill before broad sync-oriented doc updates.
+
+## Workflow
+
+1. Run `make refs` first, every time: `scripts/update-references.sh` clones what `references.txt` lists and the quarry lacks, resolves each listed clone to its current GitHub location and repoints a moved remote, checks out the upstream default branch and fast-forwards it, and removes clean clones no family repository lists. Fix anything it reports before comparing, and when it reports a repointed origin, update that URL in `references.txt` and `DEVIATIONS.md` (Reference Sources). When this repo starts or stops using a reference, change `references.txt`; the clones follow. Then confirm Omarchy tag `v4.0.0` resolves in `omarchy/` (`git rev-parse v4.0.0^{commit}`). Updating the quarry is this skill's job, never H's preparation
+2. Compare reference repos against the packages owned by EyrWSL
+3. For Omarchy-derived packages, compare against tag `v4.0.0` in `omarchy/`, plus `omarchy-pkgs/` and `gruvbox.nvim/`; never substitute moving-branch contents for the pinned release comparison
+4. For non-Omarchy tools, compare Yazi against `yazi/` and official docs, and the vault plugin specs against `obsidian.nvim/` and the render-markdown.nvim README
+5. Check the WSL and Windows contract against official WSL, Arch-on-WSL, and Windows Terminal docs: WSL2, Windows interop, `clip.exe`, `powershell.exe`, Windows-side font ownership, and `windows-terminal/settings.json` against `terminal/`; run `make wt-diff` when Terminal settings are involved
+6. Check package ownership at maintenance time: confirm `pacman -Si mise` still reports an official repository and `mise ls claude codex opencode` lists each tool, compare the `mise/.local/bin` wrappers against the heredoc in `git show v4.0.0:bin/omarchy-mise-install` (the dropped `MISE_MINIMUM_RELEASE_AGE=0` export is the one intended difference) and the tool list in `install/user/mise.sh`, re-probe `pacman -Si herdr` before retaining its canonical installer, and keep Yazi media helpers explicitly optional
+7. For each difference, classify it:
+   - **Intentional deviation**: documented in `DEVIATIONS.md`, should stay different
+   - **New upstream addition**: added upstream after the last sync, should be reviewed for inclusion
+   - **Upstream change to existing config**: modified upstream, needs review
+8. Check `git log --format="%h %ad %s" --date=short -- <file>` on the relevant reference repo when you need to determine when a difference was introduced
+9. Cross-check differences against `DEVIATIONS.md`. If a difference is not documented there, treat it as a likely upstream change that needs review
+10. Apply new upstream additions and changes where they belong in this repo
+11. Update `README.md`, `AGENTS.md`, `DEVIATIONS.md`, and `docs/maintenance.md` when ownership, setup, workflow, or durable maintenance findings change
+12. Summarize which changes were adopted, rejected, or intentionally kept different
+
+## Completion Checks
+
+- `README.md`, `AGENTS.md`, and `DEVIATIONS.md` reflect any ownership, setup, or workflow changes
+- `make refs` passed in this run; Omarchy release comparisons still use tag `v4.0.0`
+- Every retained difference is still documented in `DEVIATIONS.md`
+- Official-package probes and WSL/Windows gates reflect current sources, and `make wt-diff` is clean when Terminal settings are involved
+- The final summary distinguishes adopted changes, rejected changes, and intentional retained differences
+
+## Rules
+
+- Present proposed changes to the user before editing; a deliberate exception to shared guidance, because a sync pass touches many files on judgment calls and each adopted upstream change is a deviation decision
+- Omarchy, official docs, official package docs, and `DEVIATIONS.md` are the source of truth for default behavior and intentional differences
+- Always check all relevant sources, not just one
+- Never assume a difference is intentional without verifying it is documented in `DEVIATIONS.md`
+- Fetch changeable upstream and package facts at maintenance time instead of caching versions in this skill
+- Keep Windows Terminal and btop on Omarchy's semantic Gruvbox palette, Neovim on Omarchy's `gruvbox.nvim` selection, and ANSI-aware applications on terminal inheritance
+- Keep shared AI agent harness and OpenCode TUI configuration in EyrAgents; this repo carries no custom OpenCode theme
+- System packages, `mise` included, come from official Arch repos; Claude Code, Codex, and OpenCode install and update through mise via the stowed wrappers, which keep mise's release cooldown, with paranoid mode on through the stowed `conf.d` fragment; Herdr uses its canonical installer only while an official package is unavailable. No AUR packages or AUR helper.
+- Keep Windows-specific behavior explicit. Anything that depends on `clip.exe`, `powershell.exe`, or Windows Terminal should be documented as a Windows interop concern.
