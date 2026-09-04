@@ -31,4 +31,4 @@ Self-contained Arch WSL dotfiles adapted from [Omarchy](https://github.com/omaco
 
 ## Skills
 
-- `/omasync` - sync this repo against Omarchy references and official WSL and Windows Terminal docs; its source is `.agents/skills/omasync/SKILL.md`, the Agent Skills standard's home, with tracked symlinks under `.claude/skills` and `.opencode/skills` so all three tools load it
+- `/omasync` - sync this repo against Omarchy references and official WSL and Windows Terminal docs; its source is `.agents/skills/omasync/SKILL.md`, the Agent Skills standard's home, with a tracked symlink under `.claude/skills` for Claude Code; Codex and OpenCode read `.agents/skills` natively

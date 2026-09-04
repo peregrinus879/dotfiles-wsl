@@ -63,7 +63,7 @@ Key ownership rules:
 - Bash supports additive machine overlays through `~/.config/bash-overlays/*`; the directory is optional and reserved for untracked machine-local additions
 - `mise/` owns the `~/.local/bin` wrappers for Claude Code, Codex, and OpenCode, the files `omarchy-mise-install` writes on Omarchy minus its release-cooldown override, and the `~/.config/mise/conf.d/eyrwsl.toml` fragment that turns on mise's paranoid mode; each wrapper installs its tool through mise on first run, and mise's other files (`~/.config/mise/config.toml`, `~/.local/share/mise`) are host state the wrappers create
 - The AI tools run as EyrAgents configures them; Omarchy's launch aliases are not carried
-- Interactive Bash exports `OPENCODE_DISABLE_EXTERNAL_SKILLS=1` and `OPENCODE_ENABLE_EXA=1`; EyrAgents owns OpenCode runtime configuration
+- Interactive Bash exports `OPENCODE_DISABLE_CLAUDE_CODE_SKILLS=1` and `OPENCODE_ENABLE_EXA=1`, so OpenCode skips the Claude Code skill copies and reads `.agents/skills` natively; EyrAgents owns OpenCode runtime configuration
 - EyrAgents owns shared OpenCode runtime and TUI configuration; its `system` theme selection inherits the Windows Terminal ANSI palette
 - `windows-terminal/` stays Windows-side and intentionally tracks the full paste-ready `settings.json`; setup deploys it through idempotent, backup-first `make wt-push`
 
@@ -360,7 +360,7 @@ Complete these manual fresh-session checks:
 
 - Confirm the core symlinks and local Git identity exist: `test -L ~/.bashrc && test -L ~/.config/starship.toml && test -L ~/.config/nvim/lua/config/options.lua && test -f ~/.config/git/config.local`
 - Start a fresh shell and confirm Bash, Starship, and Tmux load without errors.
-- Confirm `printenv OPENCODE_DISABLE_EXTERNAL_SKILLS` and `printenv OPENCODE_ENABLE_EXA` each print `1`.
+- Confirm `printenv OPENCODE_DISABLE_CLAUDE_CODE_SKILLS` and `printenv OPENCODE_ENABLE_EXA` each print `1`.
 - Start a fresh shell and confirm `alias claude c cx cy ic ix icx` reports no alias for any of them: the AI tools run as EyrAgents configures them.
 - Confirm `type tdw` shows the tmux workspace function; from a project directory, `tdw cc`, `tdw cx`, or `tdw oc` opens its session in one window with the agent focused (`-c` continues that agent's last conversation; bare `tdw` re-attaches an existing session). Creating a session fails before changing tmux state when the selected agent is unavailable.
 - Confirm `type hdw`, `type hdl`, `type hdlm`, and `type hsl` show the Herdr workspace functions. `hds` is intentionally unavailable because it requires Hunk.
