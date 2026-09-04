@@ -10,7 +10,7 @@ Self-contained Arch WSL dotfiles adapted from [Omarchy](https://github.com/omaco
 
 ## Invariants
 
-- Target machine: WSL2 with Windows interop enabled; run `stow`, `restow`, `clean`, `verify`, and `wt-push` only on the WSL host. `lint`, `check`, `twins`, and `refs` run anywhere.
+- Target machine: WSL2 with Windows interop enabled. `stow`, `unstow`, `restow`, `clean`, `verify`, and `wt-push` refuse elsewhere, and `restow` refuses from a clone whose links are not the deployed ones; `lint`, `check`, `test`, `twins`, and `refs` run anywhere.
 - Because the packages are live configuration on the stowed host, an edit to a stowed file here is active for the next shell, Git command, Neovim session, or tmux server before any commit; work on this repository only in a session H is watching. `git/.config/git/config` is live for every Git command through its stow link and carries `[alias]` and `[include]`, so an alias or include edit is a code-execution change; it is diff-visible, which is why it stays inside the edit boundary rather than behind a deny.
 - Stow runs with `--no-folding`, so every managed parent under `$HOME` is a real directory and only leaf files are links; generated host state therefore never reaches a package source. `make clean` removes only leftover folded links and dangling links whose text names a package entry this repository has, and aborts on a regular file at an owned path; `make verify` fails on a folded managed directory.
 - When editing sibling dotfiles repos, use identical wording for shared concepts; only repo-specific values (scope, package lists, invariants) differ.
@@ -26,11 +26,9 @@ Self-contained Arch WSL dotfiles adapted from [Omarchy](https://github.com/omaco
 
 ## Post-Change Verification
 
-- Run `make lint` and `make check` after any change; CI runs both on every push to `main` and every pull request, and host-bound checks never run in CI.
-- Run `make restow` and then `make verify` from the repo root on the WSL host after changing owned packages; deploying and verifying are the agent's steps (shared guidance), never left to H.
 - Run `make wt-diff` before and after changing or deploying `windows-terminal/settings.json`.
 - The full human checklist lives in `README.md` (Verify and Maintenance).
 
 ## Skills
 
-- `/omasync` - sync this repo against Omarchy references and official WSL and Windows Terminal docs
+- `/omasync` - sync this repo against Omarchy references and official WSL and Windows Terminal docs; `.agents/skills` and `.opencode/skills` carry tracked symlinks so Codex and OpenCode load it too

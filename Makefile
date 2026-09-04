@@ -22,37 +22,52 @@ TWIN_SPECS := nvim/.config/nvim/lua/plugins/obsidian.lua \
   tests/update-references.sh \
   tests/tdw.sh
 
-.PHONY: help require-wsl stow unstow dry-run restow lint check twins verify test clean refs wt-diff wt-push
+.PHONY: help require-host require-clone stow unstow dry-run restow lint check twins verify test clean refs wt-diff wt-push
 
 help:
 	@echo "Targets:"
 	@echo "  stow      Stow all packages into ~"
 	@echo "  unstow    Remove all package symlinks"
 	@echo "  dry-run   Preview stow actions without making changes"
-	@echo "  restow    Re-stow after repo content changes"
+	@echo "  restow    Re-stow after repo content changes (WSL host, deployed clone only)"
 	@echo "  lint      ShellCheck over the bash and mise packages, scripts/, and tests/ (.shellcheckrc holds the disable list)"
 	@echo "  check     Repository-only checks: every owned config in repo mode, then the tests/ fixtures (runs in CI)"
 	@echo "  twins     Twin-file sync against the EyrArcHy clone at SIBLING (skipped when absent)"
-	@echo "  verify    twins, then the WSL host, command baseline, mise tools, deployment, identity, and config checks, then the fixtures"
+	@echo "  verify    lint, check, and twins, then the WSL host, command baseline, mise tools, deployment, identity, and config checks"
 	@echo "  test      Run the fixture suites in fake homes"
 	@echo "  clean     Guarded stow preparation: leftover folds and dangling clone links only (scripts/prepare-stow.sh)"
 	@echo "  refs      Clone, fast-forward, and prune the reference clones under ~/Projects/quarry to the family's references.txt files"
 	@echo "  wt-diff   Diff tracked Windows Terminal settings against the deployed file"
 	@echo "  wt-push   Back up changed settings and deploy the tracked Windows Terminal file"
 
-require-wsl:
-	@kernel="$$(uname -r)"; [[ "$${kernel,,}" == *microsoft* ]] || { echo "FAIL: WSL is required for this target"; exit 1; }
+# Host-bound targets refuse elsewhere, and a managed endpoint that is a link
+# must resolve into this clone so a reference clone never redeploys the
+# packages from itself.
+require-host:
+	@kernel="$$(uname -r)"; [[ "$${kernel,,}" == *microsoft* ]] || { echo "FAIL: the WSL host is required for this target"; exit 1; }
 
-stow: require-wsl
+require-clone:
+	@fail=0; \
+	while IFS= read -r -d '' src; do \
+	  target="$$HOME/$${src#*/}"; \
+	  [[ -L $$target ]] || continue; \
+	  case $$(readlink -f -- "$$target") in \
+	    "$(CURDIR)"/*) ;; \
+	    *) echo "FAIL: $$target is linked from another clone; run make stow from the deployed clone"; fail=1 ;; \
+	  esac; \
+	done < <(git ls-files -z --cached --others --exclude-standard -- $(PACKAGES)); \
+	exit $$fail
+
+stow: require-host
 	$(STOW) -v $(PACKAGES)
 
-unstow: require-wsl
+unstow: require-host
 	$(STOW) -D -v $(PACKAGES)
 
 dry-run:
 	$(STOW) -n -v $(PACKAGES)
 
-restow: require-wsl
+restow: require-host require-clone
 	$(STOW) -R -v $(PACKAGES)
 
 lint:
@@ -82,16 +97,15 @@ twins:
 	done; \
 	exit $$fail
 
-verify: twins
+verify: require-host lint check twins
 	@VERIFY_MODE=full VERIFY_REPO='$(CURDIR)' VERIFY_HOME='$(HOME)' \
 	  VERIFY_PACKAGES='$(PACKAGES)' bash scripts/verify.sh
-	@$(MAKE) --no-print-directory test
 	@echo "ok:   verify"
 
 test:
 	@set -e; for test in tests/*.sh; do EYRWSL_PACKAGES='$(PACKAGES)' bash "$$test"; done
 
-clean: require-wsl
+clean: require-host
 	@EYRWSL_PACKAGES='$(PACKAGES)' bash scripts/prepare-stow.sh
 
 # omasync step 1. Clones what references.txt lists and the quarry lacks,
@@ -103,5 +117,5 @@ refs:
 wt-diff:
 	scripts/wt-diff.sh
 
-wt-push: require-wsl
+wt-push: require-host
 	scripts/wt-diff.sh --push

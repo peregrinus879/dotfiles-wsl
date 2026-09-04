@@ -50,7 +50,7 @@ Upstream URLs, official docs, and descriptions live in `DEVIATIONS.md` (Referenc
 - `README.md`, `AGENTS.md`, and `DEVIATIONS.md` reflect any ownership, setup, or workflow changes
 - `make refs` passed in this run; Omarchy release comparisons still use tag `v4.0.0`
 - Every retained difference is still documented in `DEVIATIONS.md`
-- Official-package probes and WSL/Windows gates reflect current sources; `make lint` and `make check` pass, `make verify` passes on the WSL host, plus `make wt-diff` when Terminal settings are involved
+- Official-package probes and WSL/Windows gates reflect current sources, and `make wt-diff` is clean when Terminal settings are involved
 - The final summary distinguishes adopted changes, rejected changes, and intentional retained differences
 
 ## Rules
